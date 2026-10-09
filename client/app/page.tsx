@@ -1,17 +1,25 @@
-import { MotifBg } from '@/components/landing/MotifBg';
-import { BrandMark } from '@/components/landing/BrandMark';
-import { HeroCopy } from '@/components/landing/HeroCopy';
-import { HeroCta } from '@/components/landing/HeroCta';
+import { SiteHeader } from '@/components/landing/SiteHeader';
+import { HeroSection } from '@/components/landing/HeroSection';
+import { HowItWorks } from '@/components/landing/HowItWorks';
+import { DesignsStrip } from '@/components/landing/DesignsStrip';
+import { WhyUs } from '@/components/landing/WhyUs';
+import { Pricing } from '@/components/landing/Pricing';
+import { Faq } from '@/components/landing/Faq';
+import { SiteFooter } from '@/components/landing/SiteFooter';
 
 export default function HomePage() {
   return (
-    <main className="relative flex min-h-screen items-center justify-center px-6 py-16">
-      <MotifBg />
-      <section className="relative z-10 w-full max-w-xl">
-        <BrandMark />
-        <HeroCopy />
-        <HeroCta />
-      </section>
-    </main>
+    <div className="landing">
+      <SiteHeader />
+      <main>
+        <HeroSection />
+        <HowItWorks />
+        <DesignsStrip />
+        <WhyUs />
+        <Pricing />
+        <Faq />
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

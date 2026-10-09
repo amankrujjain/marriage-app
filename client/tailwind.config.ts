@@ -17,7 +17,8 @@ const config: Config = {
       },
       fontFamily: {
         display: ['var(--font-display)', 'Georgia', 'serif'],
-        body: ['var(--font-body)', 'Georgia', 'sans-serif'],
+        body: ['var(--font-body)', 'system-ui', 'sans-serif'],
+        hindi: ['var(--font-hindi)', 'serif'],
       },
     },
   },

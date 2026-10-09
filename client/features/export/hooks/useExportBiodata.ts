@@ -23,7 +23,9 @@ export function useExportBiodata() {
 
   async function exportAs(format: ExportFormat): Promise<void> {
     if (authStatus !== 'authenticated') {
-      router.push('/login?next=/marriage-biodata-maker');
+      const next =
+        typeof window !== 'undefined' ? window.location.pathname : '/download';
+      router.push(`/login?next=${encodeURIComponent(next)}`);
       return;
     }
 
