@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.next/
+out/
+uploads/
+server/uploads/
+coverage/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+Thumbs.db
+*.tsbuildinfo
+.turbo/
+.vscode/
+.idea/

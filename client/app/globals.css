@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-maroon: #6b1e2f;
+  --color-maroon-deep: #4a1220;
+  --color-gold: #c4a35a;
+  --color-gold-soft: #d4bc7d;
+  --color-ivory: #faf6ef;
+  --color-blush: #f3e4df;
+  --color-ink: #2c2421;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  color: var(--color-ink);
+  background:
+    linear-gradient(165deg, var(--color-ivory) 0%, var(--color-blush) 72%, #efe0d6 100%);
+  font-family: var(--font-body), Georgia, sans-serif;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes motif-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.07;
+  }
+}
+
+.animate-rise {
+  animation: rise-in 0.85s ease-out both;
+}
+
+.animate-rise-delay {
+  animation: rise-in 0.85s ease-out 0.15s both;
+}
+
+.animate-rise-delay-2 {
+  animation: rise-in 0.85s ease-out 0.3s both;
+}
+
+.motif-layer {
+  animation: motif-fade 1.4s ease-out both;
+}
