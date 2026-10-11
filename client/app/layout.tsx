@@ -1,19 +1,33 @@
 import type { Metadata } from 'next';
-import { Marcellus, Mukta, Tiro_Devanagari_Hindi } from 'next/font/google';
+import {
+  Cormorant_Garamond,
+  Marcellus,
+  Mulish,
+  Tiro_Devanagari_Hindi,
+} from 'next/font/google';
 import { Providers } from './providers';
 import './globals.css';
+import '@/styles/vp-templates/index.css';
 
-const display = Marcellus({
+const display = Cormorant_Garamond({
   subsets: ['latin'],
-  weight: '400',
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
   variable: '--font-display',
   display: 'swap',
 });
 
-const body = Mukta({
+const body = Mulish({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700', '800'],
   variable: '--font-body',
+  display: 'swap',
+});
+
+const label = Marcellus({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-label',
   display: 'swap',
 });
 
@@ -32,7 +46,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${hindi.variable}`}>
+    <html
+      lang="en"
+      className={`${display.variable} ${body.variable} ${label.variable} ${hindi.variable}`}
+    >
       <body className="font-body antialiased">
         <Providers>{children}</Providers>
       </body>

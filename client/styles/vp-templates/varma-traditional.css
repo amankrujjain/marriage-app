@@ -1,0 +1,13 @@
+.t-varma-traditional{--bg:#5C0F1C;--accent:#F3D58A;--gold:#E3B04B;--ink:#FBEFD9;--muted:#DDBFA4;--line:rgba(227,176,75,.4)}
+.t-varma-traditional .bd-page{--pad:22mm 26mm 17mm}
+.t-varma-traditional .bd-dev{color:#F3D58A}
+.t-varma-traditional .bd-title{color:#F3D58A;font-size:2.5em}
+.t-varma-traditional .bd-tag{color:#E8CDB4}
+.t-varma-traditional .bd-photo{width:34mm;aspect-ratio:4/5;border-radius:50%/46%;border:1mm solid #E3B04B;box-shadow:0 0 0 1.5mm #5C0F1C,0 0 0 2mm #E3B04B}
+.t-varma-traditional .bd-id{margin-top:1em}
+.t-varma-traditional .bd-name{color:#fff;font-size:2.2em}
+.t-varma-traditional .bd-sub{color:#E8CDB4}
+.t-varma-traditional .bd-h{color:#F3D58A}
+.t-varma-traditional .bd-dl dt{color:#DDBFA4}.t-varma-traditional .bd-dl dd{color:#FFF6E6}
+.t-varma-traditional .bd-p{color:#FBEFD9}
+.t-varma-traditional .bd-bless{color:#F3D58A}.t-varma-traditional .bd-credit{color:#DDBFA4}

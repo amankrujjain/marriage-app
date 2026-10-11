@@ -1,224 +1,98 @@
+import { TemplateId } from '@marriage/shared';
+
 export type GalleryStyle = 'Traditional' | 'Royal' | 'Floral' | 'Modern';
-export type GalleryCommunity = 'Hindu' | 'Muslim' | 'Sikh' | 'Jain' | 'Christian' | 'Any';
-export type GalleryPages = '1 page' | '2 pages';
+export type GalleryFaith = 'Hindu' | 'Muslim' | 'Sikh';
 export type GalleryTier = 'Free' | 'Premium';
-export type GalleryPreview =
-  | 'zari'
-  | 'panna'
-  | 'genda'
-  | 'gulab'
-  | 'neelkanth'
-  | 'khalsa'
-  | 'kagaz'
-  | 'slate';
 
 export type GalleryTemplate = {
-  id: string;
+  slug: string;
   name: string;
-  style: GalleryStyle;
-  communities: GalleryCommunity[];
-  pages: GalleryPages;
-  hasPhoto: boolean;
   tier: GalleryTier;
-  blessing: string;
-  accent: string;
-  lineBg: string;
-  photoRadius: string;
-  preview: GalleryPreview;
-  meta: string;
+  cat: GalleryStyle;
+  faith: GalleryFaith[];
+  blurb: string;
+  /** Best-effort map into the current React template engine. */
+  templateId: TemplateId;
 };
 
 export const GALLERY_TEMPLATES: GalleryTemplate[] = [
   {
-    id: 'zari',
-    name: 'Zari',
-    style: 'Traditional',
-    communities: ['Hindu'],
-    pages: '1 page',
-    hasPhoto: true,
+    slug: 'zari-traditional',
+    name: 'Zari Traditional',
     tier: 'Free',
-    blessing: '॥ श्री गणेशाय नमः ॥',
-    accent: '#7A1F2B',
-    lineBg: '#E8D8C2',
-    photoRadius: '2px',
-    preview: 'zari',
-    meta: 'Traditional · 1 page',
+    cat: 'Traditional',
+    faith: ['Hindu', 'Sikh'],
+    blurb: 'Maroon and gold zari border with rosette corners. The classic family biodata.',
+    templateId: TemplateId.TRADITIONAL_MAROON,
   },
   {
-    id: 'zari-do-patra',
-    name: 'Zari Do-Patra',
-    style: 'Traditional',
-    communities: ['Hindu'],
-    pages: '2 pages',
-    hasPhoto: true,
+    slug: 'panna-royal',
+    name: 'Panna Royal',
     tier: 'Premium',
-    blessing: '॥ श्री गणेशाय नमः ॥',
-    accent: '#7A1F2B',
-    lineBg: '#E8D8C2',
-    photoRadius: '2px',
-    preview: 'zari',
-    meta: 'Traditional · 2 pages',
+    cat: 'Royal',
+    faith: ['Hindu', 'Muslim', 'Sikh'],
+    blurb: 'Deep emerald green with a gold arch frame and lattice. Rich and formal.',
+    templateId: TemplateId.ROYAL_GOLD,
   },
   {
-    id: 'panna',
-    name: 'Panna',
-    style: 'Royal',
-    communities: ['Muslim', 'Any'],
-    pages: '1 page',
-    hasPhoto: true,
-    tier: 'Premium',
-    blessing: 'بِسْمِ ٱللَّٰهِ',
-    accent: '#0F4D36',
-    lineBg: '#E2DCC7',
-    photoRadius: '27px 27px 2px 2px',
-    preview: 'panna',
-    meta: 'Royal · 1 page',
-  },
-  {
-    id: 'panna-sada',
-    name: 'Panna Sada',
-    style: 'Royal',
-    communities: ['Muslim', 'Any'],
-    pages: '1 page',
-    hasPhoto: false,
-    tier: 'Premium',
-    blessing: '',
-    accent: '#0F4D36',
-    lineBg: '#E2DCC7',
-    photoRadius: '27px 27px 2px 2px',
-    preview: 'panna',
-    meta: 'Royal · 1 page · no photo',
-  },
-  {
-    id: 'genda',
-    name: 'Genda',
-    style: 'Floral',
-    communities: ['Hindu', 'Jain'],
-    pages: '1 page',
-    hasPhoto: true,
-    tier: 'Premium',
-    blessing: '॥ जय श्री कृष्ण ॥',
-    accent: '#9A3412',
-    lineBg: '#F1DDBE',
-    photoRadius: '50%',
-    preview: 'genda',
-    meta: 'Floral · 1 page',
-  },
-  {
-    id: 'gulab',
-    name: 'Gulab',
-    style: 'Floral',
-    communities: ['Any'],
-    pages: '1 page',
-    hasPhoto: true,
-    tier: 'Premium',
-    blessing: '',
-    accent: '#8E2F48',
-    lineBg: '#F2D9DF',
-    photoRadius: '50%',
-    preview: 'gulab',
-    meta: 'Floral · 1 page',
-  },
-  {
-    id: 'neelkanth',
-    name: 'Neelkanth',
-    style: 'Royal',
-    communities: ['Hindu'],
-    pages: '2 pages',
-    hasPhoto: true,
-    tier: 'Premium',
-    blessing: '॥ ॐ नमः शिवाय ॥',
-    accent: '#1E3A8A',
-    lineBg: '#DCE0EE',
-    photoRadius: '2px',
-    preview: 'neelkanth',
-    meta: 'Royal · 2 pages',
-  },
-  {
-    id: 'khalsa',
-    name: 'Khalsa',
-    style: 'Traditional',
-    communities: ['Sikh'],
-    pages: '1 page',
-    hasPhoto: true,
-    tier: 'Premium',
-    blessing: 'ੴ ਸਤਿ ਨਾਮੁ',
-    accent: '#1E3A8A',
-    lineBg: '#F0E2C6',
-    photoRadius: '2px',
-    preview: 'khalsa',
-    meta: 'Traditional · 1 page',
-  },
-  {
-    id: 'kagaz',
-    name: 'Kagaz',
-    style: 'Modern',
-    communities: ['Any', 'Christian'],
-    pages: '1 page',
-    hasPhoto: true,
+    slug: 'gulab-floral',
+    name: 'Gulab Floral',
     tier: 'Free',
-    blessing: '',
-    accent: '#1F2226',
-    lineBg: '#E8E4E1',
-    photoRadius: '3px',
-    preview: 'kagaz',
-    meta: 'Modern · 1 page',
+    cat: 'Floral',
+    faith: ['Hindu'],
+    blurb: 'Cream page with soft rose clusters in two corners and a round photo.',
+    templateId: TemplateId.FLORAL_SOFT,
   },
   {
-    id: 'kagaz-bina-photo',
-    name: 'Kagaz Bina Photo',
-    style: 'Modern',
-    communities: ['Any', 'Christian'],
-    pages: '1 page',
-    hasPhoto: false,
+    slug: 'kagaz-modern',
+    name: 'Kagaz Modern',
     tier: 'Free',
-    blessing: '',
-    accent: '#1F2226',
-    lineBg: '#E8E4E1',
-    photoRadius: '3px',
-    preview: 'kagaz',
-    meta: 'Modern · 1 page · no photo',
+    cat: 'Modern',
+    faith: ['Hindu', 'Muslim', 'Sikh'],
+    blurb: 'Clean white page with a side rail. Easy to read, easy on the printer.',
+    templateId: TemplateId.MODERN_CLEAN,
   },
   {
-    id: 'slate',
-    name: 'Slate',
-    style: 'Modern',
-    communities: ['Any', 'Christian'],
-    pages: '2 pages',
-    hasPhoto: true,
+    slug: 'suryavanshi-royal',
+    name: 'Suryavanshi Royal',
     tier: 'Premium',
-    blessing: '',
-    accent: '#2C3A45',
-    lineBg: '#DDE1E4',
-    photoRadius: '3px',
-    preview: 'slate',
-    meta: 'Modern · 2 pages',
+    cat: 'Royal',
+    faith: ['Hindu'],
+    blurb: 'Maroon header with a gold temple skyline and a round photo.',
+    templateId: TemplateId.ELEGANT_SERIF,
   },
   {
-    id: 'jinvani',
-    name: 'Jinvani',
-    style: 'Floral',
-    communities: ['Jain'],
-    pages: '1 page',
-    hasPhoto: true,
+    slug: 'rangoli-floral',
+    name: 'Rangoli Floral',
+    tier: 'Free',
+    cat: 'Floral',
+    faith: ['Hindu'],
+    blurb: 'Warm cream with pink blossoms, a rangoli ring and an arched photo.',
+    templateId: TemplateId.FLORAL_SOFT,
+  },
+  {
+    slug: 'varma-traditional',
+    name: 'Varma Traditional',
     tier: 'Premium',
-    blessing: '॥ जय जिनेन्द्र ॥',
-    accent: '#9A3412',
-    lineBg: '#F1DDBE',
-    photoRadius: '2px',
-    preview: 'genda',
-    meta: 'Floral · 1 page',
+    cat: 'Traditional',
+    faith: ['Hindu', 'Sikh'],
+    blurb: 'Full maroon panel inside an ornate triple gold frame.',
+    templateId: TemplateId.TRADITIONAL_MAROON,
+  },
+  {
+    slug: 'aarohi-modern',
+    name: 'Aarohi Modern',
+    tier: 'Free',
+    cat: 'Modern',
+    faith: ['Hindu', 'Muslim', 'Sikh'],
+    blurb: 'Soft beige, a left-aligned name and tidy cards. Calm and contemporary.',
+    templateId: TemplateId.MINIMAL_LINE,
   },
 ];
 
 export const STYLE_FILTERS = ['All', 'Traditional', 'Royal', 'Floral', 'Modern'] as const;
-export const COMMUNITY_FILTERS = [
-  'All',
-  'Hindu',
-  'Muslim',
-  'Sikh',
-  'Jain',
-  'Christian',
-  'Any',
-] as const;
-export const LAYOUT_FILTERS = ['All', '1 page', '2 pages', 'Without photo'] as const;
+export const FAITH_FILTERS = ['Hindu', 'Muslim', 'Sikh'] as const;
+
+export function galleryBySlug(slug: string): GalleryTemplate | undefined {
+  return GALLERY_TEMPLATES.find((t) => t.slug === slug);
+}

@@ -1,0 +1,16 @@
+.t-panna-royal{--bg:#0A3A28;--accent:#E3B04B;--gold:#E3B04B;--ink:#F8EBCB;--muted:#C9BC99;--line:rgba(227,176,75,.35)}
+.t-panna-royal .bd-page{--pad:24mm 23mm 17mm}
+.t-panna-royal .bd-head{margin-top:3mm}
+.t-panna-royal .bd-dev{color:#F3D58A}
+.t-panna-royal .bd-title{font-size:2.2em;color:#F3D58A}
+.t-panna-royal .bd-tag{color:#D8CBA6}
+.t-panna-royal .bd-photo{width:36mm;aspect-ratio:3/4;border-radius:999px 999px 3px 3px;border:.9mm solid #E3B04B;box-shadow:0 0 0 1.6mm #0A3A28,0 0 0 2.1mm #E3B04B}
+.t-panna-royal .bd-name{color:#fff;font-size:2.2em}
+.t-panna-royal .bd-sub{color:#E8DCB8}
+.t-panna-royal .bd-sec{background:rgba(255,255,255,.04);border:1px solid rgba(227,176,75,.38);border-radius:2.2mm;padding:.8em 1em}
+.t-panna-royal .bd-sec .bd-h{font-size:1.2em;color:#F3D58A}
+.t-panna-royal .bd-dl dt{color:#C9BC99}.t-panna-royal .bd-dl dd{color:#FFF6DD}
+.t-panna-royal .bd-p{color:#F4E9CC}
+.t-panna-royal .bd-body{gap:.9em 1.2em}.t-panna-royal .bd-col{gap:.9em}.t-panna-royal .bd-text{gap:.9em 1.2em}
+.t-panna-royal .bd-bless{color:#F3D58A}.t-panna-royal .bd-credit{color:#C9BC99}
+.t-panna-royal .bd-foot{padding-bottom:3mm}

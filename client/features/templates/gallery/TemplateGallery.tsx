@@ -2,132 +2,98 @@
 
 import { useMemo, useState } from 'react';
 import {
-  COMMUNITY_FILTERS,
+  FAITH_FILTERS,
   GALLERY_TEMPLATES,
-  LAYOUT_FILTERS,
   STYLE_FILTERS,
-  type GalleryCommunity,
-  type GalleryPages,
+  type GalleryFaith,
   type GalleryStyle,
+  type GalleryTemplate,
 } from './galleryCatalog';
 import { GalleryCard } from './GalleryCard';
-
-type StyleSel = (typeof STYLE_FILTERS)[number];
-type CommSel = (typeof COMMUNITY_FILTERS)[number];
-type LayoutSel = (typeof LAYOUT_FILTERS)[number];
-
-function FilterChip({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      className={`gallery-chip ${active ? 'is-active' : ''}`}
-      aria-pressed={active}
-      onClick={onClick}
-    >
-      {label}
-    </button>
-  );
-}
-
-function FilterRow({
-  label,
-  children,
-  trailing,
-}: {
-  label: string;
-  children: React.ReactNode;
-  trailing?: React.ReactNode;
-}) {
-  return (
-    <div className="gallery-filter-row">
-      <span className="gallery-filter-label">{label}</span>
-      {children}
-      {trailing}
-    </div>
-  );
-}
+import { TemplatePreviewModal } from './TemplatePreviewModal';
+import { useReveal } from '@/components/landing/useReveal';
 
 export function TemplateGallery() {
-  const [style, setStyle] = useState<StyleSel>('All');
-  const [comm, setComm] = useState<CommSel>('All');
-  const [layout, setLayout] = useState<LayoutSel>('All');
+  const [cat, setCat] = useState<(typeof STYLE_FILTERS)[number]>('All');
+  const [faiths, setFaiths] = useState<Partial<Record<GalleryFaith, boolean>>>({});
+  const [preview, setPreview] = useState<GalleryTemplate | null>(null);
+
+  useReveal();
 
   const filtered = useMemo(() => {
     return GALLERY_TEMPLATES.filter((t) => {
-      const styleOk = style === 'All' || t.style === (style as GalleryStyle);
-      const commOk =
-        comm === 'All' || t.communities.includes(comm as GalleryCommunity);
-      const layoutOk =
-        layout === 'All' ||
-        (layout === 'Without photo'
-          ? !t.hasPhoto
-          : t.pages === (layout as GalleryPages));
-      return styleOk && commOk && layoutOk;
+      const okCat = cat === 'All' || t.cat === (cat as GalleryStyle);
+      const active = (Object.keys(faiths) as GalleryFaith[]).filter((f) => faiths[f]);
+      const okFaith = active.every((f) => t.faith.includes(f));
+      return okCat && okFaith;
     });
-  }, [style, comm, layout]);
+  }, [cat, faiths]);
 
-  const countLabel =
-    filtered.length === 1 ? '1 design' : `${filtered.length} designs`;
+  function reset() {
+    setCat('All');
+    setFaiths({});
+  }
 
   return (
-    <main className="gallery">
-      <div className="gallery-intro">
+    <>
+      <section className="page-head wrap">
         <h1>Marriage biodata designs</h1>
         <p>
-          Every design is A4, works with or without a photo, and shows your own
-          details once you&apos;ve filled the form.
+          Pick a design, then add your details. Every card below shows a sample of the real layout.
         </p>
-      </div>
+        <div className="pills" role="group" aria-label="Filter by style">
+          {STYLE_FILTERS.map((s) => (
+            <button
+              key={s}
+              className="pill"
+              type="button"
+              data-cat={s}
+              aria-pressed={cat === s}
+              onClick={() => {
+                setCat(s);
+                if (s === 'All') setFaiths({});
+              }}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+        <div className="pills" role="group" aria-label="Filter by community" style={{ marginTop: 0 }}>
+          {FAITH_FILTERS.map((f) => (
+            <button
+              key={f}
+              className="pill"
+              type="button"
+              aria-pressed={!!faiths[f]}
+              onClick={() => setFaiths((prev) => ({ ...prev, [f]: !prev[f] }))}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+        <p className="result-count" role="status" aria-live="polite">
+          Showing {filtered.length} of {GALLERY_TEMPLATES.length} designs
+        </p>
+      </section>
 
-      <div className="gallery-filters">
-        <FilterRow label="Style">
-          {STYLE_FILTERS.map((val) => (
-            <FilterChip
-              key={val}
-              label={val}
-              active={style === val}
-              onClick={() => setStyle(val)}
-            />
+      <section className="wrap" style={{ paddingBottom: 20 }}>
+        <div className="tpl-grid">
+          {filtered.map((t) => (
+            <GalleryCard key={t.slug} template={t} onPreview={() => setPreview(t)} />
           ))}
-        </FilterRow>
-        <FilterRow label="Community">
-          {COMMUNITY_FILTERS.map((val) => (
-            <FilterChip
-              key={val}
-              label={val}
-              active={comm === val}
-              onClick={() => setComm(val)}
-            />
-          ))}
-        </FilterRow>
-        <FilterRow
-          label="Layout"
-          trailing={<span className="gallery-count">{countLabel}</span>}
-        >
-          {LAYOUT_FILTERS.map((val) => (
-            <FilterChip
-              key={val}
-              label={val}
-              active={layout === val}
-              onClick={() => setLayout(val)}
-            />
-          ))}
-        </FilterRow>
-      </div>
+        </div>
+        {filtered.length === 0 ? (
+          <div className="empty">
+            <h3>No design matches that mix yet</h3>
+            <p>Try another style or community, or see everything.</p>
+            <button className="btn btn-ghost" type="button" onClick={reset}>
+              Show all designs
+            </button>
+          </div>
+        ) : null}
+      </section>
 
-      <div className="gallery-grid">
-        {filtered.map((template) => (
-          <GalleryCard key={template.id} template={template} />
-        ))}
-      </div>
-    </main>
+      <TemplatePreviewModal template={preview} onClose={() => setPreview(null)} />
+    </>
   );
 }

@@ -9,9 +9,23 @@ export function AuthSubmitButton({
     <button
       type="submit"
       disabled={loading}
-      className="mt-2 inline-flex min-h-12 w-full items-center justify-center bg-maroon px-6 font-body text-base font-medium text-ivory transition-colors hover:bg-[var(--color-maroon-deep)] disabled:opacity-60"
+      className="btn btn-primary btn-block"
+      style={{ minHeight: 52, fontSize: '1.02rem' }}
     >
-      {loading ? 'Please wait…' : label}
+      {loading ? 'Please wait…' : label}{' '}
+      {!loading ? (
+        <svg
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="M4 10h12M11 5l5 5-5 5" />
+        </svg>
+      ) : null}
     </button>
   );
 }

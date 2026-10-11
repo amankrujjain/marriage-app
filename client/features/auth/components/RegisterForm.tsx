@@ -24,12 +24,22 @@ export function RegisterForm() {
 
   async function onSubmit(event: FormEvent): Promise<void> {
     event.preventDefault();
+    const digits = phone.replace(/\D/g, '');
     const { error, value } = registerFormSchema.validate(
-      { name, email, password, phone },
+      {
+        name,
+        email,
+        password,
+        phone: digits ? `+91${digits}` : '',
+      },
       { abortEarly: false },
     );
     if (error) {
       setErrors(mapJoiErrors(error));
+      return;
+    }
+    if (phone && digits.length !== 10) {
+      setErrors({ phone: 'Enter a 10-digit mobile number' });
       return;
     }
     setErrors({});
@@ -47,22 +57,72 @@ export function RegisterForm() {
   }
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={(e) => void onSubmit(e)}>
-      <AuthField label="Full name" name="name" value={name} onChange={setName}
-        autoComplete="name" error={errors.name} />
-      <AuthField label="Email" name="email" type="email" value={email}
-        onChange={setEmail} autoComplete="email" error={errors.email} />
-      <AuthField label="Password" name="password" type="password" value={password}
-        onChange={setPassword} autoComplete="new-password" error={errors.password} />
-      <AuthField label="Phone (optional)" name="phone" value={phone}
-        onChange={setPhone} autoComplete="tel" error={errors.phone} />
-      {authError ? <p className="text-sm text-maroon">{authError}</p> : null}
+    <form onSubmit={(e) => void onSubmit(e)} noValidate>
+      <div className={`form-alert${authError ? ' show' : ''}`} role="alert">
+        {authError}
+      </div>
+      <AuthField
+        label="Name"
+        name="name"
+        value={name}
+        onChange={setName}
+        autoComplete="name"
+        placeholder="Your full name"
+        icon="user"
+        error={errors.name}
+      />
+      <AuthField
+        label="Email"
+        name="email"
+        type="email"
+        value={email}
+        onChange={setEmail}
+        autoComplete="email"
+        placeholder="you@example.com"
+        icon="email"
+        error={errors.email}
+      />
+      <AuthField
+        label="Password"
+        name="password"
+        type="password"
+        value={password}
+        onChange={setPassword}
+        autoComplete="new-password"
+        placeholder="At least 8 characters"
+        icon="password"
+        showStrength
+        hint="Use 8 or more characters with a mix of letters and numbers."
+        error={errors.password}
+      />
+      <AuthField
+        label="Phone"
+        name="phone"
+        value={phone}
+        onChange={setPhone}
+        autoComplete="tel-national"
+        placeholder="98765 43210"
+        icon="phone"
+        optional
+        error={errors.phone}
+      />
       <AuthSubmitButton label="Create account" loading={status === 'loading'} />
+      <p className="terms">
+        By creating an account you agree to the{' '}
+        <a href="#" onClick={(e) => e.preventDefault()}>
+          Terms
+        </a>{' '}
+        and{' '}
+        <a href="#" onClick={(e) => e.preventDefault()}>
+          Privacy Policy
+        </a>
+        .
+      </p>
       <GoogleSignInButton />
-      <p className="text-center font-body text-sm text-ink/70">
+      <p className="auth-alt">
         Already have an account?{' '}
-        <Link href="/login" className="text-maroon underline decoration-gold underline-offset-4">
-          Sign in
+        <Link href="/login">
+          <b>Sign in</b>
         </Link>
       </p>
     </form>

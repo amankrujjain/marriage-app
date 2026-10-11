@@ -4,6 +4,7 @@ import type {
   UpdateBiodataPayload,
 } from '@marriage/shared';
 import {
+  apiDelete,
   apiGet,
   apiGetPaginated,
   apiPatch,
@@ -34,6 +35,10 @@ export async function listBiodata(
   limit = 20,
 ): Promise<PaginatedResult<BiodataRecord>> {
   return apiGetPaginated<BiodataRecord>(`/biodata?page=${page}&limit=${limit}`);
+}
+
+export async function deleteBiodata(id: string): Promise<void> {
+  await apiDelete(`/biodata/${id}`);
 }
 
 export async function uploadBiodataPhoto(

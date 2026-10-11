@@ -19,28 +19,57 @@ export function EditorField({
   hint,
   placeholder,
   type = 'text',
-  wide = false,
 }: EditorFieldProps) {
   const isDate = type === 'date';
+  const isArea = type === 'textarea' || Boolean(hint?.toLowerCase().includes('about'));
+
+  if (isArea || type === 'textarea') {
+    return (
+      <div className="field">
+        <label htmlFor={name} style={{ fontWeight: 700, fontSize: '.88rem', color: 'var(--ink-2)' }}>
+          {label}
+          {hint ? (
+            <span className="note" style={{ display: 'block', fontWeight: 500 }}>
+              {hint}
+            </span>
+          ) : null}
+        </label>
+        <textarea
+          className="input"
+          id={name}
+          name={name}
+          rows={4}
+          style={{ minHeight: 96, resize: 'vertical' }}
+          value={value}
+          placeholder={placeholder}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      </div>
+    );
+  }
 
   return (
-    <label className={`editor-field ${wide ? 'is-wide' : ''}`}>
-      <span className="editor-field-label">
+    <div className="frow">
+      <label htmlFor={name}>
         {label}
-        {hint ? <span className="editor-field-hint">{hint}</span> : null}
-      </span>
+        {hint ? (
+          <span className="note" style={{ display: 'block', fontWeight: 500, fontSize: '.75rem' }}>
+            {hint}
+          </span>
+        ) : null}
+      </label>
       <input
-        className="editor-input"
-        type={type}
+        className="input"
+        id={name}
+        type={isDate ? 'date' : type}
         name={name}
         value={isDate ? toDateInputValue(value) : value}
         placeholder={placeholder}
+        autoComplete="off"
         onChange={(event) =>
-          onChange(
-            isDate ? normalizeDateStorage(event.target.value) : event.target.value,
-          )
+          onChange(isDate ? normalizeDateStorage(event.target.value) : event.target.value)
         }
       />
-    </label>
+    </div>
   );
 }

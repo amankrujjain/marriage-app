@@ -1,35 +1,38 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ExportFormat, PREMIUM_AMOUNT_INR, TemplateId } from '@marriage/shared';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { selectTemplate } from '@/features/templates/store/templateSlice';
+import { ExportFormat, PREMIUM_AMOUNT_INR } from '@marriage/shared';
+import { useAppSelector } from '@/store/hooks';
 import { useExportBiodata } from '@/features/export/hooks/useExportBiodata';
 import { WhatsAppShareButton } from '@/features/export/components/WhatsAppShareButton';
-import { designKeyFromTemplate, EDITOR_DESIGNS } from '@/features/biodata/components/editor/designMap';
+import { designFromSlug, slugFromTemplateId } from '@/features/biodata/components/editor/designMap';
 import { DownloadLanguageSelect } from './DownloadLanguageSelect';
+import type { DownloadPlan } from './DownloadShell';
 
-type Plan = 'premium' | 'free';
+type DownloadCheckoutProps = {
+  plan: DownloadPlan;
+  onPlanChange: (plan: DownloadPlan) => void;
+};
 
-export function DownloadCheckout() {
-  const dispatch = useAppDispatch();
+export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) {
   const router = useRouter();
   const { exportAs } = useExportBiodata();
   const isPremium = useAppSelector((state) => state.auth.user?.isPremium ?? false);
   const authStatus = useAppSelector((state) => state.auth.status);
   const templateId = useAppSelector((state) => state.template.selectedTemplateId);
+  const designSlug = useAppSelector(
+    (state) =>
+      state.template.selectedDesignSlug || slugFromTemplateId(state.template.selectedTemplateId),
+  );
   const exportStatus = useAppSelector((state) => state.export.status);
   const exportError = useAppSelector((state) => state.export.error);
   const result = useAppSelector((state) => state.export.result);
   const translationStatus = useAppSelector((state) => state.language.status);
   const translationError = useAppSelector((state) => state.language.error);
-  const [plan, setPlan] = useState<Plan>(isPremium ? 'premium' : 'premium');
 
   const designName =
-    EDITOR_DESIGNS.find((d) => d.templateId === templateId)?.name ??
-    designKeyFromTemplate(templateId);
+    designFromSlug(designSlug)?.name ?? slugFromTemplateId(templateId);
 
   const busy =
     exportStatus === 'translating' ||
@@ -37,28 +40,30 @@ export function DownloadCheckout() {
     exportStatus === 'exporting' ||
     translationStatus === 'loading';
 
-  async function onPrimary(): Promise<void> {
-    // Guest: full journey is allowed until export — then require login
+  async function onDownloadPdf(): Promise<void> {
     if (authStatus !== 'authenticated') {
       router.push('/login?next=/download');
       return;
     }
 
-    if (plan === 'free') {
-      dispatch(selectTemplate(TemplateId.MODERN_CLEAN));
-      // Let the A4 preview re-render on Kagaz before capture
-      await new Promise((resolve) => setTimeout(resolve, 120));
-      await exportAs(ExportFormat.PDF);
-      return;
-    }
-
-    if (!isPremium) {
-      // Payment integration comes later
+    if (plan === 'premium' && !isPremium) {
       router.push('/wedding-pass');
       return;
     }
 
     await exportAs(ExportFormat.PDF);
+  }
+
+  async function onDownloadWa(): Promise<void> {
+    if (authStatus !== 'authenticated') {
+      router.push('/login?next=/download');
+      return;
+    }
+    if (plan === 'premium' && !isPremium) {
+      router.push('/wedding-pass');
+      return;
+    }
+    await exportAs(ExportFormat.PNG);
   }
 
   const primaryLabel = (() => {
@@ -69,93 +74,143 @@ export function DownloadCheckout() {
     if (exportStatus === 'exporting') return 'Preparing download…';
     if (busy) return 'Preparing download…';
     if (authStatus !== 'authenticated') return 'Sign in to download';
-    if (plan === 'free') return 'Download free PDF';
-    if (isPremium) return 'Download PDF & image';
-    return 'Continue to Wedding Pass';
+    if (plan === 'premium' && !isPremium) return 'Continue to Wedding Pass';
+    return 'Download PDF';
   })();
 
   return (
-    <div className="dl-card">
-      <b>Choose your download</b>
+    <div className="card">
+      <h3>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="M12 4v11M7 11l5 5 5-5M5 20h14" />
+        </svg>
+        Choose your download
+      </h3>
 
       <DownloadLanguageSelect disabled={busy} />
 
-      <label className={`dl-plan ${plan === 'premium' ? 'is-active' : ''}`}>
-        <input
-          type="radio"
-          name="plan"
-          checked={plan === 'premium'}
-          onChange={() => setPlan('premium')}
-        />
-        <span className="dl-plan-body">
-          <span className="dl-plan-top">
-            <b>
-              {designName} · Premium
-            </b>
-            <b>₹{PREMIUM_AMOUNT_INR}</b>
+      <fieldset style={{ border: 0, padding: 0, margin: '14px 0 0' }}>
+        <legend className="fld" style={{ padding: 0, fontWeight: 700 }}>
+          Select format &amp; quality
+        </legend>
+        <label className="opt">
+          <input
+            type="radio"
+            name="q"
+            value="premium"
+            checked={plan === 'premium'}
+            onChange={() => onPlanChange('premium')}
+          />
+          <span>
+            <b>{designName.split(' ')[0]} Premium</b>
+            <small>High quality · A4 size · Print ready · no credit line</small>
           </span>
-          <span className="dl-plan-desc">
-            PDF + WhatsApp image · no credit line · free re-downloads after edits
+          <span className="pr">₹{PREMIUM_AMOUNT_INR}</span>
+        </label>
+        <label className="opt">
+          <input
+            type="radio"
+            name="q"
+            value="basic"
+            checked={plan === 'free'}
+            onChange={() => onPlanChange('free')}
+          />
+          <span>
+            <b>Basic (Free)</b>
+            <small>Standard quality · A4 size · PDF with credit line</small>
           </span>
-        </span>
-      </label>
+          <span className="pr">₹0</span>
+        </label>
+      </fieldset>
 
-      <label className={`dl-plan ${plan === 'free' ? 'is-active' : ''}`}>
-        <input
-          type="radio"
-          name="plan"
-          checked={plan === 'free'}
-          onChange={() => setPlan('free')}
-        />
-        <span className="dl-plan-body">
-          <span className="dl-plan-top">
-            <b>Switch to a free design</b>
-            <b>₹0</b>
-          </span>
-          <span className="dl-plan-desc">Kagaz · PDF with a small footer credit</span>
-        </span>
-      </label>
+      <div className="info" style={{ marginTop: 12 }}>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          aria-hidden
+          style={{ flex: 'none' }}
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 8v5M12 16.5v.01" />
+        </svg>
+        <span>Note: Field labels will stay in English even if you choose another language.</span>
+      </div>
 
       <button
+        className="btn btn-primary btn-block"
         type="button"
-        className="dl-pay-btn"
         disabled={busy}
-        onClick={() => void onPrimary()}
+        onClick={() => void onDownloadPdf()}
+        style={{ marginTop: 16, minHeight: 54, fontSize: '1.05rem' }}
       >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="M12 4v11M7 11l5 5 5-5M5 20h14" />
+        </svg>
         {primaryLabel}
       </button>
 
+      <button
+        className="btn btn-line btn-block"
+        type="button"
+        disabled={busy}
+        onClick={() => void onDownloadWa()}
+        style={{ marginTop: 10 }}
+      >
+        Download WhatsApp image
+      </button>
+
       {authStatus !== 'authenticated' ? (
-        <span className="dl-pay-note">
+        <p className="note" style={{ margin: '10px 0 0' }}>
           You can design freely as a guest. Sign in when you&apos;re ready to download.
-        </span>
+        </p>
       ) : plan === 'premium' && !isPremium ? (
-        <span className="dl-pay-note">
-          Payment comes next. For now continue via{' '}
-          <Link href="/wedding-pass">Wedding Pass</Link> (UPI integration later).
-        </span>
+        <p className="note" style={{ margin: '10px 0 0' }}>
+          Payment is not connected yet. Continue via{' '}
+          <Link href="/wedding-pass">Wedding Pass</Link> (UPI later).
+        </p>
       ) : (
-        <span className="dl-pay-note">
+        <p className="note" style={{ margin: '10px 0 0' }}>
           Downloads start on this device. You can re-open the file anytime.
-        </span>
+        </p>
       )}
 
-      {translationError ? <p className="dl-error">{translationError}</p> : null}
-      {exportError ? <p className="dl-error">{exportError}</p> : null}
+      {translationError ? (
+        <p className="err" style={{ marginTop: 10 }}>
+          {translationError}
+        </p>
+      ) : null}
+      {exportError ? (
+        <p className="err" style={{ marginTop: 10 }}>
+          {exportError}
+        </p>
+      ) : null}
 
       {result ? (
-        <div className="dl-result">
-          <a href={result.url} download={result.fileName} className="dl-result-link">
+        <div style={{ marginTop: 14, display: 'grid', gap: 8 }}>
+          <a href={result.url} download={result.fileName} className="btn btn-line btn-block">
             Open {result.format.toUpperCase()} file
           </a>
-          <button
-            type="button"
-            className="dl-secondary-btn"
-            disabled={busy}
-            onClick={() => void exportAs(ExportFormat.PNG)}
-          >
-            Also download WhatsApp image (PNG)
-          </button>
           <WhatsAppShareButton />
         </div>
       ) : null}

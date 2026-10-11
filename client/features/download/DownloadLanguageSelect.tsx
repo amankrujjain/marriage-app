@@ -14,13 +14,11 @@ export function DownloadLanguageSelect({ disabled }: DownloadLanguageSelectProps
   const translationStatus = useAppSelector((state) => state.language.status);
 
   return (
-    <div className="dl-lang">
-      <label className="dl-lang-label" htmlFor="download-language">
-        Language for download
-      </label>
+    <div className="fld" style={{ margin: '12px 0 4px' }}>
+      <label htmlFor="download-language">Language for download</label>
       <select
         id="download-language"
-        className="dl-lang-select"
+        className="input"
         value={selected}
         disabled={disabled}
         onChange={(event) =>
@@ -29,15 +27,13 @@ export function DownloadLanguageSelect({ disabled }: DownloadLanguageSelectProps
       >
         {LANGUAGE_OPTIONS.map((option) => (
           <option key={option.code} value={option.code}>
-            {option.name} ({option.nativeName})
+            {option.nativeName} ({option.name})
           </option>
         ))}
       </select>
-      <p className="dl-lang-note">
-        Field labels stay in English. Only filled values are translated in the downloaded
-        file. Names stay as you typed them.
-        {translationStatus === 'loading' ? ' Updating preview…' : null}
-      </p>
+      {translationStatus === 'loading' ? (
+        <span className="note">Updating preview…</span>
+      ) : null}
     </div>
   );
 }

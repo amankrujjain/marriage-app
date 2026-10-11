@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { BiodataFormStep } from '@marriage/shared';
-import { MotifBg } from '@/components/landing/MotifBg';
 import { useAppSelector } from '@/store/hooks';
 import { StepProgress } from './StepProgress';
 import { StepRenderer } from './StepRenderer';
@@ -18,7 +17,6 @@ export function BiodataWizard() {
 
   return (
     <main className="relative min-h-screen px-6 py-10 sm:py-14">
-      <MotifBg />
       <div
         className={`relative z-10 mx-auto w-full ${wide ? 'max-w-2xl' : 'max-w-xl'}`}
       >

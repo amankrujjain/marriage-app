@@ -1,0 +1,8 @@
+.t-zari-traditional{--bg:#FFFBF2;--accent:#681421;--gold:#B4852C;--line:#EBD9B8;--muted:#6f5a4f}
+.t-zari-traditional .bd-page{--pad:21mm 24mm 17mm}
+.t-zari-traditional .bd-photo{width:34mm;border:1.2mm solid #fff;outline:.5mm solid #B4852C;box-shadow:0 0 0 2.2mm #FFFBF2,0 0 0 2.6mm #681421;border-radius:2px;margin:1.4mm 0}
+.t-zari-traditional .bd-title{font-size:2.7em}
+.t-zari-traditional .bd-name{text-transform:uppercase;letter-spacing:.1em;font-size:2.1em}
+.t-zari-traditional .bd-name::before,.t-zari-traditional .bd-name::after{content:"❖";color:var(--gold);font-size:.5em;vertical-align:.35em;margin:0 .6em}
+.t-zari-traditional .bd-h{justify-content:flex-start}
+.t-zari-traditional .bd-foot{border-top:1px solid var(--gold);margin-top:auto;padding-top:.9em;margin-inline:12mm}

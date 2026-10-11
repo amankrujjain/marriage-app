@@ -1,21 +1,109 @@
-import Link from 'next/link';
+'use client';
 
-export function SiteFooter() {
+import Link from 'next/link';
+import { BrandLogo } from './BrandLogo';
+import { Toast } from './Toast';
+import { useToast } from './useToast';
+
+type SiteFooterProps = {
+  slim?: boolean;
+};
+
+export function SiteFooter({ slim = false }: SiteFooterProps) {
+  const { message, toast } = useToast();
+  const year = new Date().getFullYear();
+
+  if (slim) {
+    return (
+      <>
+        <footer className="site-foot foot-slim">
+          <div className="wrap">
+            <div className="foot-bottom" style={{ border: 0, margin: 0, padding: 0 }}>
+              <span>© {year} Vivah Patra</span>
+              <span>
+                <button
+                  type="button"
+                  style={{ all: 'unset', cursor: 'pointer', color: '#BFA99C', display: 'inline' }}
+                  onClick={() => toast('Privacy policy is a placeholder. It is not built yet.')}
+                >
+                  Privacy
+                </button>
+                {' · '}
+                <button
+                  type="button"
+                  style={{ all: 'unset', cursor: 'pointer', color: '#BFA99C', display: 'inline' }}
+                  onClick={() => toast('Terms is a placeholder. It is not built yet.')}
+                >
+                  Terms
+                </button>
+              </span>
+            </div>
+          </div>
+        </footer>
+        <Toast message={message} />
+      </>
+    );
+  }
+
   return (
-    <footer className="site-footer">
-      <div className="site-footer-inner">
-        <span className="site-footer-brand">Vivah Patra</span>
-        <div className="site-footer-links">
-          <Link href="/marriage-biodata-maker">Hindu biodata</Link>
-          <Link href="/marriage-biodata-maker">Muslim biodata</Link>
-          <Link href="/marriage-biodata-maker">Hindi biodata</Link>
-          <Link href="#">Privacy</Link>
-          <Link href="#">Contact</Link>
+    <>
+      <footer className="site-foot">
+        <div className="wrap">
+          <div className="foot-grid">
+            <div>
+              <BrandLogo href="/" light />
+              <p style={{ marginTop: 14, maxWidth: 280 }}>
+                Marriage biodata designs, made respectfully for Indian families. Free tools for the
+                wedding ahead.
+              </p>
+            </div>
+            <div>
+              <h4>Make</h4>
+              <Link href="/marriage-biodata-maker">Create my biodata</Link>
+              <Link href="/templates">Browse designs</Link>
+              <Link href="/wedding-pass">Wedding Pass</Link>
+            </div>
+            <div>
+              <h4>Free tools</h4>
+              <Link href="/#tools">Wedding hashtag generator</Link>
+              <Link href="/#tools">Wedding budget calculator</Link>
+              <Link href="/#tools">Marriage profile maker</Link>
+            </div>
+            <div>
+              <h4>Account</h4>
+              <Link href="/login">Sign in</Link>
+              <Link href="/register">Sign up</Link>
+              <Link href="/my-designs">My Designs</Link>
+              <Link href="/account">Profile</Link>
+            </div>
+          </div>
+          <div className="foot-bottom">
+            <span>© {year} Vivah Patra. All rights reserved.</span>
+            <span>
+              <button
+                type="button"
+                style={{ all: 'unset', cursor: 'pointer', color: '#BFA99C', display: 'inline' }}
+                onClick={() => toast('Privacy policy is a placeholder. It is not built yet.')}
+              >
+                Privacy
+              </button>
+              {' · '}
+              <button
+                type="button"
+                style={{ all: 'unset', cursor: 'pointer', color: '#BFA99C', display: 'inline' }}
+                onClick={() => toast('Terms is a placeholder. It is not built yet.')}
+              >
+                Terms
+              </button>
+              {' · '}
+              <a href="mailto:support@example.com" style={{ display: 'inline' }}>
+                Contact
+              </a>
+            </span>
+          </div>
         </div>
-        <span className="site-footer-note">
-          A document tool only. We don&apos;t do matchmaking or store your details.
-        </span>
-      </div>
-    </footer>
+      </footer>
+      <Toast message={message} />
+    </>
   );
 }

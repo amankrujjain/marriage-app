@@ -8,8 +8,8 @@ import { LoginForm } from '@/features/auth/components/LoginForm';
 export default function LoginPage() {
   return (
     <GuestOnlyRoute>
-      <AuthShell title="Sign in">
-        <Suspense fallback={<p className="font-body text-ink/60">Loading…</p>}>
+      <AuthShell title="Sign in" subtitle="Welcome back! Please sign in to continue.">
+        <Suspense fallback={<p className="note">Loading…</p>}>
           <LoginForm />
         </Suspense>
       </AuthShell>

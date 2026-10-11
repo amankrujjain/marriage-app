@@ -1,0 +1,11 @@
+.t-rangoli-floral{--bg:#FFF7EE;--accent:#9A3552;--gold:#B4852C;--line:#F0D2C8;--muted:#7a5a5e}
+.t-rangoli-floral .bd-page{--pad:22mm 28mm 17mm}
+.t-rangoli-floral .bd-head{margin-inline:22mm}
+.t-rangoli-floral .bd-title{font-size:2.3em}
+.t-rangoli-floral .bd-photo{width:34mm;aspect-ratio:3/4;border-radius:999px 999px 3px 3px;border:1mm solid #fff;box-shadow:0 0 0 .6mm #B4852C;margin:3mm}
+.t-rangoli-floral .bd-photo{position:relative;outline:.45mm dashed #D98BA0;outline-offset:2.4mm}
+.t-rangoli-floral .bd-id{margin-top:.8em}
+.t-rangoli-floral .bd-name{font-size:2.3em}
+.t-rangoli-floral .bd-h{border-bottom:1px dashed #E6B3C0}
+.t-rangoli-floral .bd-hm{background:#E8819C;border-radius:50%;transform:none;box-shadow:0 0 0 .18em #fff,0 0 0 .26em #E8819C}
+.t-rangoli-floral .bd-foot{margin-inline:26mm}

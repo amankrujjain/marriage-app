@@ -47,7 +47,10 @@ export function LoginForm() {
   }
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={(e) => void onSubmit(e)}>
+    <form onSubmit={(e) => void onSubmit(e)} noValidate>
+      <div className={`form-alert${authError ? ' show' : ''}`} role="alert">
+        {authError}
+      </div>
       <AuthField
         label="Email"
         name="email"
@@ -55,6 +58,8 @@ export function LoginForm() {
         value={email}
         onChange={setEmail}
         autoComplete="email"
+        placeholder="Enter your email"
+        icon="email"
         error={errors.email}
       />
       <AuthField
@@ -64,18 +69,21 @@ export function LoginForm() {
         value={password}
         onChange={setPassword}
         autoComplete="current-password"
+        placeholder="Enter your password"
+        icon="password"
         error={errors.password}
       />
-      {authError ? <p className="text-sm text-maroon">{authError}</p> : null}
+      <div style={{ textAlign: 'right', marginTop: -6 }}>
+        <Link href="/forgot-password" style={{ fontWeight: 600, fontSize: '.92rem' }}>
+          Forgot password?
+        </Link>
+      </div>
       <AuthSubmitButton label="Sign in" loading={status === 'loading'} />
       <GoogleSignInButton />
-      <p className="text-center font-body text-sm text-ink/70">
-        New here?{' '}
-        <Link
-          href="/register"
-          className="text-maroon underline decoration-gold underline-offset-4"
-        >
-          Create account
+      <p className="auth-alt">
+        New to Vivah Patra?{' '}
+        <Link href="/register">
+          <b>Create account</b>
         </Link>
       </p>
     </form>

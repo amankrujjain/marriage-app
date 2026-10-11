@@ -9,6 +9,7 @@ type EditorAccordionProps = {
   onToggle: () => void;
   onRename?: (title: string) => void;
   canRename?: boolean;
+  icon?: React.ReactNode;
   children?: React.ReactNode;
 };
 
@@ -28,6 +29,7 @@ export function EditorAccordion({
   onToggle,
   onRename,
   canRename = false,
+  icon,
   children,
 }: EditorAccordionProps) {
   const [editing, setEditing] = useState(false);
@@ -50,13 +52,24 @@ export function EditorAccordion({
   }
 
   return (
-    <section className={`editor-acc ${open ? 'is-open' : ''}`}>
-      <div className={`editor-acc-header ${open ? 'is-open' : ''}`}>
+    <details className="panel" open={open}>
+      <summary
+        onClick={(e) => {
+          e.preventDefault();
+          if (!editing) onToggle();
+        }}
+      >
+        {icon ?? (
+          <svg className="i" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21c1-5 4-7 8-7s7 2 8 7z" />
+          </svg>
+        )}
         {editing && canRename ? (
-          <div className="editor-acc-rename">
+          <span className="editor-acc-rename" onClick={(e) => e.stopPropagation()}>
             <input
               ref={inputRef}
-              className="editor-input editor-acc-rename-input"
+              className="input"
               value={draft}
               aria-label="Section title"
               onChange={(e) => setDraft(e.target.value)}
@@ -74,60 +87,56 @@ export function EditorAccordion({
             />
             <button
               type="button"
-              className="editor-acc-rename-done"
+              className="btn btn-line btn-sm"
               onMouseDown={(e) => e.preventDefault()}
               onClick={commitRename}
             >
               Done
             </button>
-          </div>
+          </span>
         ) : (
           <>
-            <div className="editor-acc-left">
-              <div className="editor-acc-title-row">
-                <button type="button" className="editor-acc-title-btn" onClick={onToggle}>
-                  <b>{title}</b>
-                </button>
-                {canRename ? (
-                  <button
-                    type="button"
-                    className="editor-acc-pen"
-                    title="Rename section"
-                    aria-label={`Rename ${title}`}
-                    onClick={() => setEditing(true)}
-                  >
-                    <PenIcon />
-                  </button>
-                ) : null}
-              </div>
-              <button type="button" className="editor-acc-summary-btn" onClick={onToggle}>
-                {summary}
-              </button>
-            </div>
-            <button
-              type="button"
-              className="editor-acc-chevron-btn"
-              onClick={onToggle}
-              aria-expanded={open}
-              aria-label={open ? 'Collapse section' : 'Expand section'}
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#5E4A4D"
-                strokeWidth="2"
-                aria-hidden
-                className="editor-acc-chevron"
+            <span>
+              {title}
+              {summary ? (
+                <small
+                  style={{
+                    display: 'block',
+                    fontWeight: 500,
+                    color: 'var(--ink-3)',
+                    fontSize: '.8rem',
+                  }}
+                >
+                  {summary}
+                </small>
+              ) : null}
+            </span>
+            {canRename ? (
+              <button
+                type="button"
+                title="Rename section"
+                aria-label={`Rename ${title}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setEditing(true);
+                }}
+                style={{
+                  marginLeft: 6,
+                  background: 'none',
+                  border: 0,
+                  cursor: 'pointer',
+                  color: 'var(--ink-3)',
+                  padding: 4,
+                }}
               >
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </button>
+                <PenIcon />
+              </button>
+            ) : null}
           </>
         )}
-      </div>
-      {open ? <div className="editor-acc-body">{children}</div> : null}
-    </section>
+      </summary>
+      {open ? <div className="pb">{children}</div> : null}
+    </details>
   );
 }

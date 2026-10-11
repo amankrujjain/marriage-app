@@ -28,7 +28,14 @@ export type {
   UpdateBiodataPayload,
   ProfilePhotoFit,
 } from './biodata';
-export { emptyBiodataContent, DEFAULT_PROFILE_PHOTO_FIT } from './biodata';
+export {
+  emptyBiodataContent,
+  DEFAULT_PROFILE_PHOTO_FIT,
+  DEFAULT_BIODATA_TAGLINE,
+  DEFAULT_BIODATA_HEADER,
+  DEFAULT_BIODATA_TITLE,
+  DEFAULT_BIODATA_BLESSING,
+} from './biodata';
 export type { TemplateDefinition, TemplateLayout } from './template';
 export type {
   StructuredFields,

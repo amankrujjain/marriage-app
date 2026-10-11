@@ -2,35 +2,37 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SiteHeader } from '@/components/landing/SiteHeader';
+import { SiteFooter } from '@/components/landing/SiteFooter';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { selectTemplate } from '@/features/templates/store/templateSlice';
+import { selectDesign } from '@/features/templates/store/templateSlice';
 import { fetchBiodata } from '../../services/biodataApi';
 import { loadBiodata } from '../../store/biodataSlice';
+import { useSaveBiodata } from '../../hooks/useSaveBiodata';
 import { EditorAppBar } from './EditorAppBar';
 import { EditorForm } from './EditorForm';
 import { EditorA4Preview } from './EditorA4Preview';
 import { EditorDesignSwitcher } from './EditorDesignSwitcher';
-import { templateFromDesignQuery, designKeyFromTemplate } from './designMap';
+import { templateFromDesignQuery } from './designMap';
 import { useEditorSections } from './useEditorSections';
 
 type MobileTab = 'details' | 'preview';
 
 export function BiodataEditor() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const sectionsApi = useEditorSections();
+  const { save } = useSaveBiodata();
   const [mobileTab, setMobileTab] = useState<MobileTab>('details');
-  const templateId = useAppSelector((state) => state.template.selectedTemplateId);
-  const designName = designKeyFromTemplate(templateId);
-  const saveStatus = useAppSelector((state) => state.biodata.saveStatus);
-  const biodataId = useAppSelector((state) => state.biodata.biodataId);
+  const [savingMd, setSavingMd] = useState(false);
   const authStatus = useAppSelector((state) => state.auth.status);
+  const biodataId = useAppSelector((state) => state.biodata.biodataId);
 
   useEffect(() => {
     const mapped = templateFromDesignQuery(searchParams.get('design'));
-    if (mapped) dispatch(selectTemplate(mapped));
+    if (mapped) dispatch(selectDesign(mapped));
   }, [dispatch, searchParams]);
 
   useEffect(() => {
@@ -57,20 +59,24 @@ export function BiodataEditor() {
     };
   }, [searchParams, authStatus, biodataId, dispatch]);
 
-  const draftLabel =
-    saveStatus === 'saving'
-      ? 'Saving…'
-      : saveStatus === 'saved'
-        ? 'Draft saved on this phone'
-        : 'Draft saved on this phone';
+  async function onSaveMyDesigns() {
+    if (authStatus !== 'authenticated') {
+      router.push('/login?next=/my-designs');
+      return;
+    }
+    setSavingMd(true);
+    try {
+      await save();
+      router.push('/my-designs');
+    } finally {
+      setSavingMd(false);
+    }
+  }
 
   return (
-    <div className="editor">
-      <SiteHeader variant="app" />
-
-      <div className="editor-desktop-chrome">
-        <EditorAppBar />
-      </div>
+    <div className="landing editor-page">
+      <SiteHeader variant="editor" />
+      <EditorAppBar />
 
       <header className="editor-mobile-bar">
         <div className="editor-mobile-tabs" role="tablist">
@@ -93,46 +99,51 @@ export function BiodataEditor() {
             Preview
           </button>
         </div>
-        <div className="editor-mobile-progress">
-          <div className="editor-mobile-progress-track">
-            <div
-              className="editor-mobile-progress-fill"
-              style={{ width: `${sectionsApi.progressPct}%` }}
-            />
-          </div>
-          <span>{sectionsApi.progressLabel}</span>
-        </div>
       </header>
 
-      <div className="editor-layout">
+      <main id="main" className="ed">
         <div
-          className={`editor-form-pane ${mobileTab === 'details' ? 'is-mobile-visible' : ''}`}
+          id="form"
+          className={mobileTab === 'details' ? 'is-mobile-visible' : 'hide-on-mobile-tab'}
         >
           <EditorForm sectionsApi={sectionsApi} />
         </div>
+
         <aside
-          className={`editor-aside ${mobileTab === 'preview' ? 'is-mobile-visible' : ''}`}
+          className={`prev${mobileTab === 'preview' ? ' is-mobile-visible' : ' hide-on-mobile-tab'}`}
+          aria-label="Live preview"
         >
           <EditorA4Preview sections={sectionsApi.sections} />
           <EditorDesignSwitcher />
-          <Link href="/download" className="editor-download-cta hide-on-mobile">
-            Preview &amp; download
-          </Link>
+          <div className="ed-foot">
+            <Link className="btn btn-line" href="/templates">
+              Browse all designs
+            </Link>
+            <button
+              className="btn btn-line"
+              type="button"
+              disabled={savingMd}
+              onClick={() => void onSaveMyDesigns()}
+            >
+              {savingMd ? 'Saving…' : 'Save to My Designs'}
+            </button>
+            <Link className="btn btn-primary" href="/download">
+              Continue to download{' '}
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 10h12M11 5l5 5-5 5" />
+              </svg>
+            </Link>
+          </div>
         </aside>
-      </div>
+      </main>
 
       <footer className="editor-mobile-footer">
-        <div className="editor-mobile-thumb" aria-hidden />
-        <div className="editor-mobile-footer-copy">
-          <b>
-            {designName.charAt(0).toUpperCase() + designName.slice(1)} · fits on 1 page
-          </b>
-          <span>{draftLabel}</span>
-        </div>
         <Link href="/download" className="editor-mobile-preview-btn">
-          Preview
+          Continue to download
         </Link>
       </footer>
+
+      <SiteFooter slim />
     </div>
   );
 }

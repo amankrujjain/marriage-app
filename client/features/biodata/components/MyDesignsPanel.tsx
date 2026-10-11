@@ -3,14 +3,31 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { BiodataRecord } from '@marriage/shared';
+import { emptyBiodataContent, type BiodataContent, type BiodataRecord } from '@marriage/shared';
 import { SiteHeader } from '@/components/landing/SiteHeader';
-import { MotifBg } from '@/components/landing/MotifBg';
+import { SiteFooter } from '@/components/landing/SiteFooter';
+import { OrnamentDivLotus } from '@/components/landing/Ornaments';
 import { ApiClientError } from '@/lib/apiClient';
 import { useAppDispatch } from '@/store/hooks';
-import { listBiodata } from '../services/biodataApi';
+import { deleteBiodata, listBiodata } from '../services/biodataApi';
 import { loadBiodata } from '../store/biodataSlice';
-import { photoFitImgStyle } from '../utils/photoFit';
+import { MyDesignThumb } from './MyDesignThumb';
+
+function normalizeContent(content: BiodataContent | null | undefined): BiodataContent {
+  const empty = emptyBiodataContent();
+  if (!content || typeof content !== 'object') return empty;
+  return {
+    ...empty,
+    ...content,
+    personal: { ...empty.personal, ...content.personal },
+    education: { ...empty.education, ...content.education },
+    career: { ...empty.career, ...content.career },
+    family: { ...empty.family, ...content.family },
+    about: { ...empty.about, ...content.about },
+    contact: { ...empty.contact, ...content.contact },
+    hiddenFields: Array.isArray(content.hiddenFields) ? content.hiddenFields : [],
+  };
+}
 
 function formatDate(iso: string): string {
   try {
@@ -24,6 +41,10 @@ function formatDate(iso: string): string {
   }
 }
 
+function designDisplayName(record: BiodataRecord, fallback = 'Untitled biodata'): string {
+  return record.content?.personal?.fullName?.trim() || record.title?.trim() || fallback;
+}
+
 export function MyDesignsPanel() {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -33,6 +54,7 @@ export function MyDesignsPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openingId, setOpeningId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const limit = 12;
 
   const load = useCallback(async (nextPage: number) => {
@@ -65,7 +87,7 @@ export function MyDesignsPanel() {
         loadBiodata({
           id: record.id,
           title: record.title,
-          content: record.content,
+          content: normalizeContent(record.content),
         }),
       );
       router.push(`/marriage-biodata-maker?id=${record.id}`);
@@ -74,100 +96,165 @@ export function MyDesignsPanel() {
     }
   }
 
+  async function onDelete(record: BiodataRecord): Promise<void> {
+    const name = designDisplayName(record, 'this biodata');
+    if (!window.confirm(`Delete “${name}” from your account?`)) return;
+    setDeletingId(record.id);
+    try {
+      await deleteBiodata(record.id);
+      await load(page);
+    } catch (err) {
+      setError(
+        err instanceof ApiClientError || err instanceof Error
+          ? err.message
+          : 'Could not delete biodata',
+      );
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
-    <div className="landing app-shell">
+    <div className="landing">
       <SiteHeader variant="app" />
-      <main className="app-page">
-        <MotifBg />
-        <div className="app-page-inner">
-          <header className="app-page-head">
-            <div>
-              <h1>My Designs</h1>
-              <p>Biodatas you have saved — open one to keep editing.</p>
-            </div>
-            <Link href="/marriage-biodata-maker" className="btn-primary">
-              New biodata
-            </Link>
-          </header>
-
-          {loading ? (
-            <p className="app-page-status">Loading your designs…</p>
-          ) : null}
-          {error ? <p className="app-page-error">{error}</p> : null}
-
-          {!loading && !error && items.length === 0 ? (
-            <div className="my-designs-empty">
-              <p>No saved biodatas yet.</p>
-              <Link href="/templates" className="btn-primary">
-                Browse templates
-              </Link>
-            </div>
-          ) : null}
-
-          {items.length > 0 ? (
-            <ul className="my-designs-grid">
-              {items.map((record) => {
-                const name =
-                  record.content.personal.fullName?.trim() ||
-                  record.title ||
-                  'Untitled biodata';
-                const photo = record.content.profilePhotoUrl;
-                const fit = record.content.profilePhotoFit;
-                return (
-                  <li key={record.id} className="my-designs-card">
-                    <div className="my-designs-thumb">
-                      {photo ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={photo} alt="" style={photoFitImgStyle(fit)} />
-                      ) : (
-                        <span className="my-designs-thumb-empty" />
-                      )}
-                    </div>
-                    <div className="my-designs-card-body">
-                      <h2>{name}</h2>
-                      <p>Updated {formatDate(record.updatedAt)}</p>
-                      <button
-                        type="button"
-                        className="editor-btn-outline"
-                        disabled={openingId === record.id}
-                        onClick={() => void openDesign(record)}
-                      >
-                        {openingId === record.id ? 'Opening…' : 'Open'}
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : null}
-
-          {totalPages > 1 ? (
-            <div className="my-designs-pager">
-              <button
-                type="button"
-                className="editor-btn-ghost"
-                disabled={page <= 1 || loading}
-                onClick={() => void load(page - 1)}
-              >
-                Previous
-              </button>
-              <span>
-                Page {page} of {totalPages}
-              </span>
-              <button
-                type="button"
-                className="editor-btn-ghost"
-                disabled={page >= totalPages || loading}
-                onClick={() => void load(page + 1)}
-              >
-                Next
-              </button>
-            </div>
-          ) : null}
+      <section className="md-head">
+        <div className="wrap">
+          <div>
+            <h1>My Designs</h1>
+            <p>Biodatas you have saved</p>
+          </div>
+          <Link className="btn btn-primary" href="/marriage-biodata-maker?new=1">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+              <path d="M10 4v12M4 10h12" />
+            </svg>
+            New biodata
+          </Link>
         </div>
+      </section>
+
+      <main id="main" className="wrap">
+        {loading ? <p className="note" style={{ padding: '24px 0' }}>Loading your designs…</p> : null}
+        {error ? (
+          <p className="err" style={{ padding: '16px 0' }} role="alert">
+            {error}
+          </p>
+        ) : null}
+
+        {!loading && !error && items.length === 0 ? (
+          <div className="md-empty" id="empty">
+            <OrnamentDivLotus />
+            <h2 style={{ fontSize: '1.8rem' }}>No biodatas yet</h2>
+            <p style={{ color: 'var(--ink-2)' }}>
+              Create your first biodata. It takes a few minutes, and it is saved to your account.
+            </p>
+            <Link className="btn btn-primary" href="/marriage-biodata-maker?new=1">
+              Create my biodata
+            </Link>
+          </div>
+        ) : null}
+
+        {items.length > 0 ? (
+          <div className="md-grid">
+            {items.map((record) => {
+              const name = designDisplayName(record);
+              return (
+                <article key={record.id} className="md-card">
+                  <Link
+                    href={`/marriage-biodata-maker?id=${record.id}`}
+                    aria-label={`Open ${name}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      void openDesign(record);
+                    }}
+                  >
+                    <MyDesignThumb content={normalizeContent(record.content)} />
+                  </Link>
+                  <h3>{name}</h3>
+                  <div className="meta">
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      aria-hidden
+                    >
+                      <rect x="3" y="4" width="14" height="13" rx="2" />
+                      <path d="M3 8h14M7 2v4M13 2v4" />
+                    </svg>
+                    Updated {formatDate(record.updatedAt)}
+                  </div>
+                  <div className="acts">
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      type="button"
+                      disabled={openingId === record.id}
+                      onClick={() => void openDesign(record)}
+                    >
+                      <svg
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinejoin="round"
+                        aria-hidden
+                      >
+                        <path d="M2 5h6l2 2h8v9H2z" />
+                      </svg>
+                      {openingId === record.id ? 'Opening…' : 'Open'}
+                    </button>
+                    <button
+                      className="btn btn-line btn-sm del"
+                      type="button"
+                      aria-label={`Delete ${name}`}
+                      disabled={deletingId === record.id}
+                      onClick={() => void onDelete(record)}
+                    >
+                      <svg
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                        aria-hidden
+                      >
+                        <path d="M4 6h12M8 6V4h4v2M6 6l1 11h6l1-11" />
+                      </svg>
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : null}
+
+        {totalPages > 1 ? (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, paddingBottom: 32 }}>
+            <button
+              type="button"
+              className="btn btn-line btn-sm"
+              disabled={page <= 1 || loading}
+              onClick={() => void load(page - 1)}
+            >
+              Previous
+            </button>
+            <span className="note">
+              Page {page} of {totalPages}
+            </span>
+            <button
+              type="button"
+              className="btn btn-line btn-sm"
+              disabled={page >= totalPages || loading}
+              onClick={() => void load(page + 1)}
+            >
+              Next
+            </button>
+          </div>
+        ) : null}
       </main>
+      <SiteFooter slim />
     </div>
   );
 }

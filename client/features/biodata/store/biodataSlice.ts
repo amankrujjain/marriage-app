@@ -61,6 +61,20 @@ const biodataSlice = createSlice({
     patchContact(state, action: PayloadAction<Partial<ContactDetails>>) {
       state.content.contact = { ...state.content.contact, ...action.payload };
     },
+    patchPresentation(
+      state,
+      action: PayloadAction<
+        Partial<
+          Pick<BiodataContent, 'headerLine' | 'documentTitle' | 'tagline' | 'blessing'>
+        >
+      >,
+    ) {
+      const next = action.payload;
+      if (next.headerLine !== undefined) state.content.headerLine = next.headerLine;
+      if (next.documentTitle !== undefined) state.content.documentTitle = next.documentTitle;
+      if (next.tagline !== undefined) state.content.tagline = next.tagline;
+      if (next.blessing !== undefined) state.content.blessing = next.blessing;
+    },
     setProfilePhotoUrl(state, action: PayloadAction<string | undefined>) {
       state.content.profilePhotoUrl = action.payload;
       if (action.payload) {
@@ -116,6 +130,7 @@ export const {
   patchFamily,
   patchAbout,
   patchContact,
+  patchPresentation,
   setProfilePhotoUrl,
   setProfilePhotoFit,
   toggleHiddenField,

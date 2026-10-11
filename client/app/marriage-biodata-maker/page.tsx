@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function MarriageBiodataMakerPage() {
   return (
-    <Suspense fallback={<div className="editor editor-loading">Loading editor…</div>}>
+    <Suspense fallback={<div className="landing editor-page" style={{ padding: 48 }}>Loading editor…</div>}>
       <BiodataEditor />
     </Suspense>
   );

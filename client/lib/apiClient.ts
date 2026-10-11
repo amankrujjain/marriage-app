@@ -138,6 +138,13 @@ export async function apiPatch<T>(path: string, body: unknown): Promise<T> {
   });
 }
 
+export async function apiDelete<T = null>(path: string): Promise<T> {
+  return request<T>(path, {
+    method: 'DELETE',
+    headers: baseHeaders(false),
+  });
+}
+
 export async function apiUpload<T>(path: string, form: FormData): Promise<T> {
   return request<T>(path, {
     method: 'POST',

@@ -1,0 +1,16 @@
+.t-suryavanshi-royal{--bg:#FFF8EC;--accent:#681421;--gold:#B4852C;--line:#EBD6A8;--muted:#6f5a4f}
+.t-suryavanshi-royal .bd-page{--pad:9mm 24mm 0}
+.t-suryavanshi-royal .bd-head{height:56mm;padding-top:1mm}
+.t-suryavanshi-royal .bd-dev{color:#F3D58A;font-size:1.3em}
+.t-suryavanshi-royal .bd-title{color:#F8E7BC;font-size:2.1em;margin-top:2mm}
+.t-suryavanshi-royal .bd-orn,.t-suryavanshi-royal .bd-tag{display:none}
+.t-suryavanshi-royal .bd-id{margin-top:-8mm;flex-direction:row;gap:7mm;text-align:left;align-items:flex-end;justify-content:center}
+.t-suryavanshi-royal .bd-photo{width:36mm;aspect-ratio:1;border-radius:50%;border:1.2mm solid #fff;box-shadow:0 0 0 .9mm #D9A93F,0 3mm 6mm rgba(74,12,22,.25);margin-top:-2mm}
+.t-suryavanshi-royal .bd-who{padding-bottom:3mm}
+.t-suryavanshi-royal .bd-name{font-size:2.5em}
+.t-suryavanshi-royal .bd-body,.t-suryavanshi-royal .bd-text,.t-suryavanshi-royal .bd-contact{margin-inline:2mm}
+.t-suryavanshi-royal .bd-body{margin-top:1.6em}
+.t-suryavanshi-royal .bd-h{border-bottom-color:#D9A93F}
+.t-suryavanshi-royal .bd-foot{color:#F8E7BC;padding:0;height:9.5mm;display:flex;align-items:center;justify-content:center;margin-inline:-24mm;margin-top:auto}
+.t-suryavanshi-royal .bd-bless{color:#F8E7BC;font-size:1em;}
+.t-suryavanshi-royal .bd-credit{display:none}

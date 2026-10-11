@@ -73,6 +73,7 @@ export function PhotoAdjuster({
     const dx = event.clientX - drag.startX;
     const dy = event.clientY - drag.startY;
     const zoom = drag.origin.zoom;
+    // Dragging the photo down/right should reveal more of the top/left (lower focal %).
     setFit(
       clampPhotoFit({
         x: drag.origin.x - (dx / rect.width) * (100 / zoom),
@@ -95,7 +96,7 @@ export function PhotoAdjuster({
         <header className="photo-adjuster-head">
           <div>
             <h2 id="photo-adjuster-title">Adjust photo</h2>
-            <p>Drag to position. Use zoom so the face sits fully in the frame.</p>
+            <p>Drag to move. Zoom out if the top of the head is clipped — the frame matches the A4 photo slot.</p>
           </div>
           <button type="button" className="photo-adjuster-x" onClick={onClose} aria-label="Close">
             ×

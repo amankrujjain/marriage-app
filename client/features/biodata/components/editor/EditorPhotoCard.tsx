@@ -6,7 +6,7 @@ import { setProfilePhotoFit, setProfilePhotoUrl } from '../../store/biodataSlice
 import { uploadBiodataPhoto } from '../../services/biodataApi';
 import { photoFitImgStyle } from '../../utils/photoFit';
 import { PhotoAdjuster } from './PhotoAdjuster';
-import type { ProfilePhotoFit } from '@marriage/shared';
+import { DEFAULT_PROFILE_PHOTO_FIT, type ProfilePhotoFit } from '@marriage/shared';
 
 function readLocalDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -53,62 +53,97 @@ export function EditorPhotoCard() {
     setAdjustOpen(false);
   }
 
+  function resetFit(): void {
+    dispatch(setProfilePhotoFit({ ...DEFAULT_PROFILE_PHOTO_FIT }));
+  }
+
   return (
-    <section className="editor-photo">
-      <div className="editor-photo-thumb">
-        {photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={photoUrl} alt="" style={photoFitImgStyle(photoFit)} />
-        ) : null}
-      </div>
-      <div className="editor-photo-copy">
-        <b>Photo</b>
-        <span>Clear, recent, face visible. Drag to frame the face in the 3:4 crop.</span>
-        <div className="editor-photo-actions">
-          <button
-            type="button"
-            className="editor-btn-outline"
-            disabled={uploading}
-            onClick={() => inputRef.current?.click()}
-          >
-            {photoUrl ? 'Change photo' : 'Upload photo'}
-          </button>
+    <details className="panel" open>
+      <summary>
+        <svg
+          className="i"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
+          <circle cx="12" cy="13" r="3.5" />
+        </svg>
+        Photo upload
+      </summary>
+      <div className="photo-row">
+        <div className="photo-box">
           {photoUrl ? (
-            <button
-              type="button"
-              className="editor-btn-outline"
-              onClick={() => setAdjustOpen(true)}
-            >
-              Adjust crop
-            </button>
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={photoUrl} alt="Photo preview" style={photoFitImgStyle(photoFit)} />
           ) : null}
+        </div>
+        <div className="photo-act">
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            hidden
+            onChange={(event) => void onFile(event.target.files?.[0] ?? null)}
+          />
+          <div className="photo-act-btns">
+            <button
+              className="btn btn-line btn-sm"
+              type="button"
+              disabled={uploading}
+              onClick={() => inputRef.current?.click()}
+            >
+              {photoUrl ? 'Change photo' : 'Upload photo'}
+            </button>
+            {photoUrl ? (
+              <button
+                className="btn btn-line btn-sm"
+                type="button"
+                onClick={() => setAdjustOpen(true)}
+              >
+                Adjust crop
+              </button>
+            ) : null}
+            {photoUrl ? (
+              <button className="btn btn-line btn-sm" type="button" onClick={resetFit}>
+                Reset crop
+              </button>
+            ) : null}
+          </div>
           {photoUrl ? (
             <button
+              className="btn btn-sm"
               type="button"
-              className="editor-btn-ghost"
+              style={{
+                background: 'none',
+                color: 'var(--ink-3)',
+                textDecoration: 'underline',
+                minHeight: 30,
+                padding: 0,
+                border: 0,
+              }}
               onClick={() => dispatch(setProfilePhotoUrl(undefined))}
             >
-              Biodata without photo
+              Remove photo
             </button>
-          ) : (
-            <button type="button" className="editor-btn-ghost" disabled>
-              Biodata without photo
-            </button>
-          )}
+          ) : null}
+          <span className="note">
+            {authStatus !== 'authenticated' && photoUrl
+              ? 'Saved on this device until you sign in.'
+              : 'Your photo stays on this device. It is only shown in your own browser.'}
+          </span>
+          {uploading ? <span className="note">Uploading…</span> : null}
         </div>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          className="sr-only"
-          onChange={(event) => void onFile(event.target.files?.[0] ?? null)}
-        />
-        {uploading ? <span className="editor-photo-status">Uploading…</span> : null}
-        {authStatus !== 'authenticated' && photoUrl ? (
-          <span className="editor-photo-status">Saved on this device until you sign in</span>
-        ) : null}
-        {error ? <span className="editor-photo-error">{error}</span> : null}
       </div>
+      {error ? (
+        <p className="err" role="alert" style={{ padding: '0 18px 12px' }}>
+          {error}
+        </p>
+      ) : null}
 
       {adjustOpen && photoUrl ? (
         <PhotoAdjuster
@@ -118,6 +153,6 @@ export function EditorPhotoCard() {
           onClose={() => setAdjustOpen(false)}
         />
       ) : null}
-    </section>
+    </details>
   );
 }
