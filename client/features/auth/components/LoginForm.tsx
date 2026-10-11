@@ -7,14 +7,10 @@ import { loginFormSchema } from '../validators/loginFormSchema';
 import { useAuthActions } from '../hooks/useAuthActions';
 import { useAppSelector } from '@/store/hooks';
 import { mapJoiErrors } from '../utils/mapJoiErrors';
+import { safeNextPath } from '../utils/safeNextPath';
 import { AuthField } from './AuthField';
 import { AuthSubmitButton } from './AuthSubmitButton';
 import { GoogleSignInButton } from './GoogleSignInButton';
-
-function safeNextPath(raw: string | null): string {
-  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/account';
-  return raw;
-}
 
 export function LoginForm() {
   const router = useRouter();

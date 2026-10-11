@@ -6,13 +6,9 @@ import { useAppDispatch } from '@/store/hooks';
 import { googleAuthRequest } from '../services/authApi';
 import { authFailed, authLoading, authSuccess } from '../store/authSlice';
 import { ApiClientError } from '@/lib/apiClient';
+import { safeNextPath } from '../utils/safeNextPath';
 
 const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
-
-function safeNextPath(raw: string | null): string {
-  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/account';
-  return raw;
-}
 
 function GoogleMark() {
   return (

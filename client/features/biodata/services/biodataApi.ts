@@ -43,8 +43,11 @@ export async function deleteBiodata(id: string): Promise<void> {
 
 export async function uploadBiodataPhoto(
   file: File,
-): Promise<{ url: string; key: string }> {
+): Promise<{ url: string; key: string; canonicalUrl?: string }> {
   const form = new FormData();
   form.append('photo', file);
-  return apiUpload<{ url: string; key: string }>('/biodata/upload-photo', form);
+  return apiUpload<{ url: string; key: string; canonicalUrl?: string }>(
+    '/biodata/upload-photo',
+    form,
+  );
 }
