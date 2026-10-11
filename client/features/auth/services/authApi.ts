@@ -1,33 +1,34 @@
 import type {
-  AuthTokensResponse,
+  AuthSessionResponse,
   GoogleAuthPayload,
   LoginPayload,
   PublicUser,
   RegisterPayload,
 } from '@marriage/shared';
 import { apiGet, apiPost } from '@/lib/apiClient';
-import { clearAccessToken, setAccessToken } from '@/lib/tokenStorage';
+import { clearLegacyAccessToken } from '@/lib/tokenStorage';
 
 export async function registerRequest(
   payload: RegisterPayload,
-): Promise<AuthTokensResponse> {
-  const data = await apiPost<AuthTokensResponse>('/auth/register', payload);
-  setAccessToken(data.accessToken);
-  return data;
+): Promise<AuthSessionResponse> {
+  clearLegacyAccessToken();
+  return apiPost<AuthSessionResponse>('/auth/register', payload);
 }
 
-export async function loginRequest(payload: LoginPayload): Promise<AuthTokensResponse> {
-  const data = await apiPost<AuthTokensResponse>('/auth/login', payload);
-  setAccessToken(data.accessToken);
-  return data;
+export async function loginRequest(payload: LoginPayload): Promise<AuthSessionResponse> {
+  clearLegacyAccessToken();
+  return apiPost<AuthSessionResponse>('/auth/login', payload);
 }
 
 export async function googleAuthRequest(
   payload: GoogleAuthPayload,
-): Promise<AuthTokensResponse> {
-  const data = await apiPost<AuthTokensResponse>('/auth/google', payload);
-  setAccessToken(data.accessToken);
-  return data;
+): Promise<AuthSessionResponse> {
+  clearLegacyAccessToken();
+  return apiPost<AuthSessionResponse>('/auth/google', payload);
+}
+
+export async function refreshSessionRequest(): Promise<AuthSessionResponse> {
+  return apiPost<AuthSessionResponse>('/auth/refresh');
 }
 
 export async function fetchMe(): Promise<PublicUser> {
@@ -38,6 +39,6 @@ export async function logoutRequest(): Promise<void> {
   try {
     await apiPost<null>('/auth/logout');
   } finally {
-    clearAccessToken();
+    clearLegacyAccessToken();
   }
 }

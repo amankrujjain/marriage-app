@@ -7,6 +7,7 @@ export type {
 } from './api';
 export type { PublicUser } from './user';
 export type {
+  AuthSessionResponse,
   AuthTokensResponse,
   RegisterPayload,
   LoginPayload,
@@ -25,8 +26,9 @@ export type {
   BiodataRecord,
   CreateBiodataPayload,
   UpdateBiodataPayload,
+  ProfilePhotoFit,
 } from './biodata';
-export { emptyBiodataContent } from './biodata';
+export { emptyBiodataContent, DEFAULT_PROFILE_PHOTO_FIT } from './biodata';
 export type { TemplateDefinition, TemplateLayout } from './template';
 export type {
   StructuredFields,

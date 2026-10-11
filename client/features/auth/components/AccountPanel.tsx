@@ -1,42 +1,74 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { SiteHeader } from '@/components/landing/SiteHeader';
+import { MotifBg } from '@/components/landing/MotifBg';
 import { useAppSelector } from '@/store/hooks';
 import { useAuthActions } from '../hooks/useAuthActions';
-import { MotifBg } from '@/components/landing/MotifBg';
 
 export function AccountPanel() {
+  const router = useRouter();
   const user = useAppSelector((state) => state.auth.user);
   const { logout } = useAuthActions();
 
   if (!user) return null;
 
+  async function onLogout(): Promise<void> {
+    await logout();
+    router.replace('/');
+  }
+
   return (
-    <main className="relative flex min-h-screen items-center justify-center px-6 py-16">
-      <MotifBg />
-      <section className="relative z-10 w-full max-w-md text-center">
-        <p className="font-display text-3xl text-maroon">Namaste, {user.name}</p>
-        <div className="mx-auto mt-3 h-px w-16 bg-gold" />
-        <p className="mt-4 font-body text-ink/75">{user.email}</p>
-        <p className="mt-2 font-body text-sm text-ink/60">
-          {user.isPremium ? 'Wedding Pass active' : 'Free plan — upgrade at export'}
-        </p>
-        <div className="mt-8 flex flex-col gap-3">
-          <Link
-            href="/marriage-biodata-maker"
-            className="inline-flex min-h-12 items-center justify-center bg-maroon px-6 font-body text-ivory"
-          >
-            Create Marriage Biodata
-          </Link>
-          <button
-            type="button"
-            onClick={() => void logout()}
-            className="min-h-12 font-body text-maroon underline decoration-gold underline-offset-4"
-          >
-            Sign out
-          </button>
+    <div className="landing app-shell">
+      <SiteHeader variant="app" />
+      <main className="app-page">
+        <MotifBg />
+        <div className="app-page-inner app-page-inner--narrow">
+          <header className="app-page-head">
+            <div>
+              <h1>Profile</h1>
+              <p>Your Vivah Patra account</p>
+            </div>
+          </header>
+
+          <section className="profile-card">
+            <p className="profile-name">Namaste, {user.name}</p>
+            <dl className="profile-meta">
+              <div>
+                <dt>Email</dt>
+                <dd>{user.email}</dd>
+              </div>
+              {user.phone ? (
+                <div>
+                  <dt>Phone</dt>
+                  <dd>{user.phone}</dd>
+                </div>
+              ) : null}
+              <div>
+                <dt>Plan</dt>
+                <dd>{user.isPremium ? 'Wedding Pass active' : 'Free — upgrade at export'}</dd>
+              </div>
+            </dl>
+
+            <div className="profile-actions">
+              <Link href="/my-designs" className="btn-primary">
+                My Designs
+              </Link>
+              <Link href="/marriage-biodata-maker" className="editor-btn-outline">
+                Create Marriage Biodata
+              </Link>
+              <button
+                type="button"
+                className="editor-btn-ghost"
+                onClick={() => void onLogout()}
+              >
+                Sign out
+              </button>
+            </div>
+          </section>
         </div>
-      </section>
-    </main>
+      </main>
+    </div>
   );
 }

@@ -1,14 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setProfilePhotoUrl } from '../../store/biodataSlice';
 import { uploadBiodataPhoto } from '../../services/biodataApi';
 
+function readLocalDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ''));
+    reader.onerror = () => reject(new Error('Could not read photo'));
+    reader.readAsDataURL(file);
+  });
+}
+
 export function PhotoStep() {
   const dispatch = useAppDispatch();
-  const router = useRouter();
   const authStatus = useAppSelector((state) => state.auth.status);
   const photoUrl = useAppSelector((state) => state.biodata.content.profilePhotoUrl);
   const [error, setError] = useState<string | null>(null);
@@ -16,15 +23,16 @@ export function PhotoStep() {
 
   async function onFileChange(file: File | null): Promise<void> {
     if (!file) return;
-    if (authStatus !== 'authenticated') {
-      router.push('/login?next=/marriage-biodata-maker');
-      return;
-    }
     setUploading(true);
     setError(null);
     try {
-      const result = await uploadBiodataPhoto(file);
-      dispatch(setProfilePhotoUrl(result.url));
+      if (authStatus === 'authenticated') {
+        const result = await uploadBiodataPhoto(file);
+        dispatch(setProfilePhotoUrl(result.url));
+      } else {
+        const dataUrl = await readLocalDataUrl(file);
+        dispatch(setProfilePhotoUrl(dataUrl));
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed');
     } finally {

@@ -1,8 +1,8 @@
-import { LanguageCode } from '../../enums/LanguageCode';
 import { TemplateCategory } from '../../enums/TemplateCategory';
 import { TemplateId } from '../../enums/TemplateId';
 import { TemplateSection } from '../../enums/TemplateSection';
 import type { TemplateDefinition } from '../../types/template';
+import { ALL_LANGUAGE_CODES } from '../languages';
 
 const ALL_SECTIONS: TemplateSection[] = [
   TemplateSection.PHOTO,
@@ -14,17 +14,7 @@ const ALL_SECTIONS: TemplateSection[] = [
   TemplateSection.CONTACT,
 ];
 
-const INDIAN_LANGS = [
-  LanguageCode.EN,
-  LanguageCode.HI,
-  LanguageCode.BN,
-  LanguageCode.MR,
-  LanguageCode.GU,
-  LanguageCode.PA,
-  LanguageCode.TA,
-  LanguageCode.TE,
-  LanguageCode.KN,
-];
+const INDIAN_LANGS = ALL_LANGUAGE_CODES;
 
 export const TEMPLATE_DEFINITIONS: TemplateDefinition[] = [
   {

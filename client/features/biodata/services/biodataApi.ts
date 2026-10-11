@@ -3,10 +3,14 @@ import type {
   CreateBiodataPayload,
   UpdateBiodataPayload,
 } from '@marriage/shared';
-import { apiGet, apiPatch, apiPost } from '@/lib/apiClient';
-import { getAccessToken } from '@/lib/tokenStorage';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
+import {
+  apiGet,
+  apiGetPaginated,
+  apiPatch,
+  apiPost,
+  apiUpload,
+  type PaginatedResult,
+} from '@/lib/apiClient';
 
 export async function createBiodata(
   payload: CreateBiodataPayload,
@@ -25,20 +29,17 @@ export async function fetchBiodata(id: string): Promise<BiodataRecord> {
   return apiGet<BiodataRecord>(`/biodata/${id}`);
 }
 
+export async function listBiodata(
+  page = 1,
+  limit = 20,
+): Promise<PaginatedResult<BiodataRecord>> {
+  return apiGetPaginated<BiodataRecord>(`/biodata?page=${page}&limit=${limit}`);
+}
+
 export async function uploadBiodataPhoto(
   file: File,
 ): Promise<{ url: string; key: string }> {
   const form = new FormData();
   form.append('photo', file);
-  const token = getAccessToken();
-  const response = await fetch(`${API_BASE}/biodata/upload-photo`, {
-    method: 'POST',
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: form,
-  });
-  const json = await response.json();
-  if (!response.ok || !json.success) {
-    throw new Error(json.message ?? 'Upload failed');
-  }
-  return json.data as { url: string; key: string };
+  return apiUpload<{ url: string; key: string }>('/biodata/upload-photo', form);
 }

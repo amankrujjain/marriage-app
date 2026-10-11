@@ -14,9 +14,7 @@ export function BiodataWizard() {
   const biodataId = useAppSelector((state) => state.biodata.biodataId);
   const step = useAppSelector((state) => state.biodata.step);
   const wide =
-    step === BiodataFormStep.TEMPLATE ||
-    step === BiodataFormStep.LANGUAGE ||
-    step === BiodataFormStep.PREVIEW;
+    step === BiodataFormStep.TEMPLATE || step === BiodataFormStep.PREVIEW;
 
   return (
     <main className="relative min-h-screen px-6 py-10 sm:py-14">

@@ -49,5 +49,10 @@ export const biodataContentSchema = Joi.object({
     address: optionalString(300),
   }).default({}),
   profilePhotoUrl: Joi.string().uri({ allowRelative: true }).allow(''),
+  profilePhotoFit: Joi.object({
+    x: Joi.number().min(0).max(100).required(),
+    y: Joi.number().min(0).max(100).required(),
+    zoom: Joi.number().min(1).max(2.5).required(),
+  }).optional(),
   hiddenFields: Joi.array().items(Joi.string().max(80)).default([]),
 }).required();

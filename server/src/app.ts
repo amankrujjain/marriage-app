@@ -1,6 +1,7 @@
 import path from 'path';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { env } from './config/env';
 import apiRouter from './routes';
@@ -22,6 +23,7 @@ export function createApp() {
       credentials: true,
     }),
   );
+  app.use(cookieParser());
   app.use(express.json({ limit: '8mb' }));
   app.use(requestLogger);
   app.use(

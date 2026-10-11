@@ -1,5 +1,6 @@
 import { BiodataFormStep } from '../enums/BiodataFormStep';
 
+/** Language is chosen on the download page, not in the wizard. */
 export const BIODATA_STEP_ORDER: BiodataFormStep[] = [
   BiodataFormStep.PERSONAL,
   BiodataFormStep.EDUCATION_CAREER,
@@ -8,7 +9,6 @@ export const BIODATA_STEP_ORDER: BiodataFormStep[] = [
   BiodataFormStep.CONTACT,
   BiodataFormStep.PHOTO,
   BiodataFormStep.TEMPLATE,
-  BiodataFormStep.LANGUAGE,
   BiodataFormStep.PREVIEW,
 ];
 

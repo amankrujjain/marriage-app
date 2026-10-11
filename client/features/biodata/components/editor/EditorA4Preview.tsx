@@ -5,16 +5,27 @@ import { useAppSelector } from '@/store/hooks';
 import { DemoA4Page } from '@/features/demo/DemoA4Page';
 import { mapBiodataToDemo } from '@/features/demo/mapBiodataToDemo';
 import { useFitScale } from '@/features/demo/useFitScale';
+import type { EditorSectionDef } from './editorSectionModel';
 
-export function EditorA4Preview() {
+type EditorA4PreviewProps = {
+  sections?: EditorSectionDef[];
+};
+
+export function EditorA4Preview({ sections }: EditorA4PreviewProps) {
   const content = useAppSelector((state) => state.biodata.content);
   const templateId = useAppSelector((state) => state.template.selectedTemplateId);
   const pageRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
 
   const demoState = useMemo(
-    () => mapBiodataToDemo(content, templateId),
-    [content, templateId],
+    () =>
+      mapBiodataToDemo(content, templateId, {
+        sections: sections?.map((s) => ({
+          title: s.title,
+          fields: s.fields.map((f) => ({ label: f.label, value: f.value })),
+        })),
+      }),
+    [content, templateId, sections],
   );
 
   const { fit, scale } = useFitScale(pageRef, stageRef, [demoState]);

@@ -1,4 +1,4 @@
-import { AuthProvider } from '@marriage/shared';
+import { AuthProvider, UserRole } from '@marriage/shared';
 import { UserModel, type UserDocument } from '../models/User';
 
 export interface CreateEmailUserInput {
@@ -35,6 +35,7 @@ export async function createEmailUser(
     ...input,
     email: input.email.toLowerCase(),
     authProvider: AuthProvider.EMAIL,
+    role: UserRole.USER,
   });
 }
 
@@ -46,5 +47,6 @@ export async function createGoogleUser(
     email: input.email.toLowerCase(),
     googleId: input.googleId,
     authProvider: AuthProvider.GOOGLE,
+    role: UserRole.USER,
   });
 }

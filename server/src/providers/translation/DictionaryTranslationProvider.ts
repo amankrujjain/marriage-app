@@ -1,4 +1,7 @@
-import type { StructuredFields } from '@marriage/shared';
+import {
+  PRESERVED_TRANSLATION_KEY_SET,
+  type StructuredFields,
+} from '@marriage/shared';
 import type {
   TranslateStructuredInput,
   TranslationProvider,
@@ -19,6 +22,10 @@ export class DictionaryTranslationProvider implements TranslationProvider {
     const result: StructuredFields = {};
 
     for (const [key, value] of Object.entries(input.fields)) {
+      if (PRESERVED_TRANSLATION_KEY_SET.has(key)) {
+        result[key] = value;
+        continue;
+      }
       result[key] = glossary[value] ?? value;
     }
 

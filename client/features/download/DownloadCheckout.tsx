@@ -9,6 +9,7 @@ import { selectTemplate } from '@/features/templates/store/templateSlice';
 import { useExportBiodata } from '@/features/export/hooks/useExportBiodata';
 import { WhatsAppShareButton } from '@/features/export/components/WhatsAppShareButton';
 import { designKeyFromTemplate, EDITOR_DESIGNS } from '@/features/biodata/components/editor/designMap';
+import { DownloadLanguageSelect } from './DownloadLanguageSelect';
 
 type Plan = 'premium' | 'free';
 
@@ -22,21 +23,29 @@ export function DownloadCheckout() {
   const exportStatus = useAppSelector((state) => state.export.status);
   const exportError = useAppSelector((state) => state.export.error);
   const result = useAppSelector((state) => state.export.result);
+  const translationStatus = useAppSelector((state) => state.language.status);
+  const translationError = useAppSelector((state) => state.language.error);
   const [plan, setPlan] = useState<Plan>(isPremium ? 'premium' : 'premium');
 
   const designName =
     EDITOR_DESIGNS.find((d) => d.templateId === templateId)?.name ??
     designKeyFromTemplate(templateId);
 
-  const busy = exportStatus === 'capturing' || exportStatus === 'exporting';
+  const busy =
+    exportStatus === 'translating' ||
+    exportStatus === 'capturing' ||
+    exportStatus === 'exporting' ||
+    translationStatus === 'loading';
 
   async function onPrimary(): Promise<void> {
+    // Guest: full journey is allowed until export — then require login
+    if (authStatus !== 'authenticated') {
+      router.push('/login?next=/download');
+      return;
+    }
+
     if (plan === 'free') {
       dispatch(selectTemplate(TemplateId.MODERN_CLEAN));
-      if (authStatus !== 'authenticated') {
-        router.push('/login?next=/download');
-        return;
-      }
       // Let the A4 preview re-render on Kagaz before capture
       await new Promise((resolve) => setTimeout(resolve, 120));
       await exportAs(ExportFormat.PDF);
@@ -44,12 +53,8 @@ export function DownloadCheckout() {
     }
 
     if (!isPremium) {
+      // Payment integration comes later
       router.push('/wedding-pass');
-      return;
-    }
-
-    if (authStatus !== 'authenticated') {
-      router.push('/login?next=/download');
       return;
     }
 
@@ -57,15 +62,23 @@ export function DownloadCheckout() {
   }
 
   const primaryLabel = (() => {
+    if (exportStatus === 'translating' || translationStatus === 'loading') {
+      return 'Translating…';
+    }
+    if (exportStatus === 'capturing') return 'Capturing preview…';
+    if (exportStatus === 'exporting') return 'Preparing download…';
     if (busy) return 'Preparing download…';
+    if (authStatus !== 'authenticated') return 'Sign in to download';
     if (plan === 'free') return 'Download free PDF';
     if (isPremium) return 'Download PDF & image';
-    return 'Pay with UPI and download';
+    return 'Continue to Wedding Pass';
   })();
 
   return (
     <div className="dl-card">
       <b>Choose your download</b>
+
+      <DownloadLanguageSelect disabled={busy} />
 
       <label className={`dl-plan ${plan === 'premium' ? 'is-active' : ''}`}>
         <input
@@ -112,10 +125,14 @@ export function DownloadCheckout() {
         {primaryLabel}
       </button>
 
-      {plan === 'premium' && !isPremium ? (
+      {authStatus !== 'authenticated' ? (
         <span className="dl-pay-note">
-          GPay, PhonePe, Paytm or any UPI app. Downloads start right after payment via{' '}
-          <Link href="/wedding-pass">Wedding Pass</Link>.
+          You can design freely as a guest. Sign in when you&apos;re ready to download.
+        </span>
+      ) : plan === 'premium' && !isPremium ? (
+        <span className="dl-pay-note">
+          Payment comes next. For now continue via{' '}
+          <Link href="/wedding-pass">Wedding Pass</Link> (UPI integration later).
         </span>
       ) : (
         <span className="dl-pay-note">
@@ -123,6 +140,7 @@ export function DownloadCheckout() {
         </span>
       )}
 
+      {translationError ? <p className="dl-error">{translationError}</p> : null}
       {exportError ? <p className="dl-error">{exportError}</p> : null}
 
       {result ? (

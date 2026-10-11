@@ -1,9 +1,34 @@
-import type { StructuredFields } from '@marriage/shared';
+import {
+  getLanguageOption,
+  LanguageCode,
+  PRESERVED_TRANSLATION_KEY_SET,
+  type StructuredFields,
+} from '@marriage/shared';
 import { BadRequestError } from '../../errors/BadRequestError';
 import type {
   TranslateStructuredInput,
   TranslationProvider,
 } from './TranslationProvider';
+
+const SYSTEM_PROMPT = `You translate marriage biodata field VALUES for a PDF export.
+
+Rules:
+- Translate ONLY the string values inside "fields".
+- Return JSON with exactly this shape: {"fields":{...}} using the EXACT same keys as the input.
+- Do not add, remove, or rename keys. Keys are paths like personal.religion and must stay unchanged.
+- Do NOT translate keys or invent new fields.
+- Keep emails, phone numbers, URLs, and pure numeric IDs unchanged.
+- Keep dates readable; you may localize month names when natural, but preserve the intended date.
+- Use the correct script for the target language.
+- Prefer natural, formal phrasing suitable for a marriage biodata.
+- If a value is already in the target language, return it unchanged.
+- Never include markdown or commentary outside the JSON object.
+- Personal names are omitted from the payload on purpose — do not invent name fields.`;
+
+function languageLabel(code: LanguageCode | undefined): string {
+  if (!code) return 'auto';
+  return getLanguageOption(code)?.name ?? code;
+}
 
 export class OpenAiTranslationProvider implements TranslationProvider {
   readonly name = 'openai';
@@ -19,6 +44,23 @@ export class OpenAiTranslationProvider implements TranslationProvider {
     const keys = Object.keys(input.fields);
     if (keys.length === 0) return {};
 
+    const preserved: StructuredFields = {};
+    const toTranslate: StructuredFields = {};
+    for (const [key, value] of Object.entries(input.fields)) {
+      if (PRESERVED_TRANSLATION_KEY_SET.has(key)) {
+        preserved[key] = value;
+      } else {
+        toTranslate[key] = value;
+      }
+    }
+
+    if (Object.keys(toTranslate).length === 0) {
+      return { ...preserved };
+    }
+
+    const targetName = languageLabel(input.targetLanguage);
+    const sourceName = languageLabel(input.sourceLanguage ?? LanguageCode.EN);
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -32,15 +74,17 @@ export class OpenAiTranslationProvider implements TranslationProvider {
         messages: [
           {
             role: 'system',
-            content:
-              'Translate biodata field values. Return JSON with the exact same keys. Do not add keys.',
+            content: SYSTEM_PROMPT,
           },
           {
             role: 'user',
             content: JSON.stringify({
-              targetLanguage: input.targetLanguage,
-              sourceLanguage: input.sourceLanguage ?? 'auto',
-              fields: input.fields,
+              task: 'Translate biodata field values only',
+              targetLanguage: targetName,
+              targetLanguageCode: input.targetLanguage,
+              sourceLanguage: sourceName,
+              sourceLanguageCode: input.sourceLanguage ?? LanguageCode.EN,
+              fields: toTranslate,
             }),
           },
         ],
@@ -48,7 +92,19 @@ export class OpenAiTranslationProvider implements TranslationProvider {
     });
 
     if (!response.ok) {
-      throw new BadRequestError('Translation provider failed', 'TRANSLATION_PROVIDER_ERROR');
+      let detail = '';
+      try {
+        const errBody = (await response.json()) as {
+          error?: { message?: string };
+        };
+        detail = errBody.error?.message ? `: ${errBody.error.message}` : '';
+      } catch {
+        /* ignore */
+      }
+      throw new BadRequestError(
+        `Translation provider failed${detail}`,
+        'TRANSLATION_PROVIDER_ERROR',
+      );
     }
 
     const json = (await response.json()) as {
@@ -59,12 +115,25 @@ export class OpenAiTranslationProvider implements TranslationProvider {
       throw new BadRequestError('Empty translation response', 'TRANSLATION_EMPTY');
     }
 
-    const parsed = JSON.parse(content) as Record<string, unknown>;
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(content) as Record<string, unknown>;
+    } catch {
+      throw new BadRequestError(
+        'Translation response was not valid JSON',
+        'TRANSLATION_PARSE_ERROR',
+      );
+    }
+
     const rawFields =
       typeof parsed.fields === 'object' && parsed.fields !== null
         ? (parsed.fields as StructuredFields)
         : (parsed as StructuredFields);
-    return this.keepKeys(input.fields, rawFields);
+
+    return {
+      ...this.keepKeys(toTranslate, rawFields),
+      ...preserved,
+    };
   }
 
   private keepKeys(

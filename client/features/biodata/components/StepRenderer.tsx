@@ -9,7 +9,6 @@ import { AboutStep } from './steps/AboutStep';
 import { ContactStep } from './steps/ContactStep';
 import { PhotoStep } from './steps/PhotoStep';
 import { TemplateStep } from './steps/TemplateStep';
-import { LanguageStep } from './steps/LanguageStep';
 import { PreviewStep } from './steps/PreviewStep';
 
 export function StepRenderer() {
@@ -31,7 +30,6 @@ export function StepRenderer() {
     case BiodataFormStep.TEMPLATE:
       return <TemplateStep />;
     case BiodataFormStep.LANGUAGE:
-      return <LanguageStep />;
     case BiodataFormStep.PREVIEW:
       return <PreviewStep />;
     default:

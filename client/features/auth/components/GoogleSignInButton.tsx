@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppDispatch } from '@/store/hooks';
 import { googleAuthRequest } from '../services/authApi';
 import { authFailed, authLoading, authSuccess } from '../store/authSlice';
@@ -9,11 +9,18 @@ import { ApiClientError } from '@/lib/apiClient';
 
 const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
 
+function safeNextPath(raw: string | null): string {
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/account';
+  return raw;
+}
+
 export function GoogleSignInButton() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const buttonRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
+  const nextPath = safeNextPath(searchParams.get('next'));
 
   useEffect(() => {
     if (!clientId || !buttonRef.current) return;
@@ -29,7 +36,7 @@ export function GoogleSignInButton() {
           try {
             const data = await googleAuthRequest({ idToken: response.credential });
             dispatch(authSuccess(data.user));
-            router.push('/account');
+            router.push(nextPath);
           } catch (error) {
             const message =
               error instanceof ApiClientError ? error.message : 'Google sign-in failed';
@@ -48,7 +55,7 @@ export function GoogleSignInButton() {
       }
     };
     document.body.appendChild(script);
-  }, [dispatch, router]);
+  }, [dispatch, router, nextPath]);
 
   if (!clientId) {
     return (

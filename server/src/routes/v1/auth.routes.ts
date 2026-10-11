@@ -4,6 +4,7 @@ import { loginController } from '../../controllers/auth/loginController';
 import { googleController } from '../../controllers/auth/googleController';
 import { meController } from '../../controllers/auth/meController';
 import { logoutController } from '../../controllers/auth/logoutController';
+import { refreshController } from '../../controllers/auth/refreshController';
 import { validateRequest } from '../../middleware/validateRequest';
 import { authenticate } from '../../middleware/authenticate';
 import { authRateLimit } from '../../middleware/authRateLimit';
@@ -17,6 +18,7 @@ router.use(authRateLimit);
 router.post('/register', validateRequest({ body: registerSchema }), registerController);
 router.post('/login', validateRequest({ body: loginSchema }), loginController);
 router.post('/google', validateRequest({ body: googleAuthSchema }), googleController);
+router.post('/refresh', refreshController);
 router.post('/logout', logoutController);
 router.get('/me', authenticate, meController);
 

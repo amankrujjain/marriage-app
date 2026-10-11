@@ -1,9 +1,12 @@
 import type { PublicUser } from './user';
 
-export interface AuthTokensResponse {
+/** Session payload after login/register/refresh — tokens live in httpOnly cookies. */
+export interface AuthSessionResponse {
   user: PublicUser;
-  accessToken: string;
 }
+
+/** @deprecated Prefer AuthSessionResponse — accessToken is no longer returned in JSON. */
+export type AuthTokensResponse = AuthSessionResponse;
 
 export interface RegisterPayload {
   name: string;

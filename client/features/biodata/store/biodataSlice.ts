@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import {
   BiodataFormStep,
+  DEFAULT_PROFILE_PHOTO_FIT,
   emptyBiodataContent,
   type BiodataContent,
   type PersonalDetails,
@@ -9,6 +10,7 @@ import {
   type FamilyDetails,
   type AboutDetails,
   type ContactDetails,
+  type ProfilePhotoFit,
 } from '@marriage/shared';
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
@@ -61,6 +63,14 @@ const biodataSlice = createSlice({
     },
     setProfilePhotoUrl(state, action: PayloadAction<string | undefined>) {
       state.content.profilePhotoUrl = action.payload;
+      if (action.payload) {
+        state.content.profilePhotoFit = { ...DEFAULT_PROFILE_PHOTO_FIT };
+      } else {
+        delete state.content.profilePhotoFit;
+      }
+    },
+    setProfilePhotoFit(state, action: PayloadAction<ProfilePhotoFit>) {
+      state.content.profilePhotoFit = action.payload;
     },
     toggleHiddenField(state, action: PayloadAction<string>) {
       const key = action.payload;
@@ -98,8 +108,21 @@ const biodataSlice = createSlice({
 });
 
 export const {
-  setStep, setTitle, patchPersonal, patchEducation, patchCareer, patchFamily,
-  patchAbout, patchContact, setProfilePhotoUrl, toggleHiddenField, saveStarted,
-  saveSucceeded, saveFailed, loadBiodata, resetBiodataDraft,
+  setStep,
+  setTitle,
+  patchPersonal,
+  patchEducation,
+  patchCareer,
+  patchFamily,
+  patchAbout,
+  patchContact,
+  setProfilePhotoUrl,
+  setProfilePhotoFit,
+  toggleHiddenField,
+  saveStarted,
+  saveSucceeded,
+  saveFailed,
+  loadBiodata,
+  resetBiodataDraft,
 } = biodataSlice.actions;
 export const biodataReducer = biodataSlice.reducer;

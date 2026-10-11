@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { loginFormSchema } from '../validators/loginFormSchema';
 import { useAuthActions } from '../hooks/useAuthActions';
@@ -11,14 +11,21 @@ import { AuthField } from './AuthField';
 import { AuthSubmitButton } from './AuthSubmitButton';
 import { GoogleSignInButton } from './GoogleSignInButton';
 
+function safeNextPath(raw: string | null): string {
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/account';
+  return raw;
+}
+
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuthActions();
   const status = useAppSelector((state) => state.auth.status);
   const authError = useAppSelector((state) => state.auth.error);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const nextPath = safeNextPath(searchParams.get('next'));
 
   async function onSubmit(event: FormEvent): Promise<void> {
     event.preventDefault();
@@ -33,7 +40,7 @@ export function LoginForm() {
     setErrors({});
     try {
       await login(value);
-      router.push('/account');
+      router.push(nextPath);
     } catch {
       /* error shown via Redux */
     }

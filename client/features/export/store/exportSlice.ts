@@ -1,7 +1,13 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { ExportResult } from '@marriage/shared';
 
-export type ExportStatus = 'idle' | 'capturing' | 'exporting' | 'ready' | 'error';
+export type ExportStatus =
+  | 'idle'
+  | 'translating'
+  | 'capturing'
+  | 'exporting'
+  | 'ready'
+  | 'error';
 
 interface ExportState {
   status: ExportStatus;
@@ -19,6 +25,10 @@ const exportSlice = createSlice({
   name: 'export',
   initialState,
   reducers: {
+    exportTranslating(state) {
+      state.status = 'translating';
+      state.error = null;
+    },
     exportCapturing(state) {
       state.status = 'capturing';
       state.error = null;
@@ -43,6 +53,7 @@ const exportSlice = createSlice({
 });
 
 export const {
+  exportTranslating,
   exportCapturing,
   exportUploading,
   exportSucceeded,

@@ -1,3 +1,5 @@
+import { normalizeDateStorage, toDateInputValue } from '@/lib/formatDate';
+
 type EditorFieldProps = {
   label: string;
   name: string;
@@ -19,6 +21,8 @@ export function EditorField({
   type = 'text',
   wide = false,
 }: EditorFieldProps) {
+  const isDate = type === 'date';
+
   return (
     <label className={`editor-field ${wide ? 'is-wide' : ''}`}>
       <span className="editor-field-label">
@@ -29,9 +33,13 @@ export function EditorField({
         className="editor-input"
         type={type}
         name={name}
-        value={value}
+        value={isDate ? toDateInputValue(value) : value}
         placeholder={placeholder}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(event) =>
+          onChange(
+            isDate ? normalizeDateStorage(event.target.value) : event.target.value,
+          )
+        }
       />
     </label>
   );

@@ -1,3 +1,5 @@
+import { normalizeDateStorage, toDateInputValue } from '@/lib/formatDate';
+
 interface BiodataFieldProps {
   label: string;
   name: string;
@@ -19,6 +21,8 @@ export function BiodataField({
   hidden,
   onToggleHidden,
 }: BiodataFieldProps) {
+  const isDate = type === 'date';
+
   return (
     <label className="block">
       <span className="flex items-center justify-between gap-2 font-body text-sm text-ink/80">
@@ -40,8 +44,12 @@ export function BiodataField({
         className="mt-1.5 min-h-12 w-full border border-maroon/20 bg-ivory/80 px-3 font-body text-base text-ink outline-none focus:border-maroon"
         type={type}
         name={name}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
+        value={isDate ? toDateInputValue(value) : value}
+        onChange={(event) =>
+          onChange(
+            isDate ? normalizeDateStorage(event.target.value) : event.target.value,
+          )
+        }
       />
     </label>
   );

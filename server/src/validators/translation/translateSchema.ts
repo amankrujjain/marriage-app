@@ -18,6 +18,11 @@ export const translateBiodataSchema = Joi.object({
     about: Joi.object().unknown(true).default({}),
     contact: Joi.object().unknown(true).default({}),
     profilePhotoUrl: Joi.string().allow('').optional(),
+    profilePhotoFit: Joi.object({
+      x: Joi.number().min(0).max(100).required(),
+      y: Joi.number().min(0).max(100).required(),
+      zoom: Joi.number().min(1).max(2.5).required(),
+    }).optional(),
     hiddenFields: Joi.array().items(Joi.string()).default([]),
   }).required(),
   targetLanguage: language.required(),

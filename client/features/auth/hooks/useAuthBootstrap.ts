@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react';
 import { useAppDispatch } from '@/store/hooks';
-import { clearAccessToken, getAccessToken } from '@/lib/tokenStorage';
-import { fetchMe } from '../services/authApi';
+import { clearLegacyAccessToken } from '@/lib/tokenStorage';
+import { fetchMe, refreshSessionRequest } from '../services/authApi';
 import { authAnonymous, authLoading, authSuccess } from '../store/authSlice';
 
 export function useAuthBootstrap(): void {
@@ -11,19 +11,22 @@ export function useAuthBootstrap(): void {
 
   useEffect(() => {
     let active = true;
+    clearLegacyAccessToken();
 
     async function bootstrap(): Promise<void> {
-      const token = getAccessToken();
-      if (!token) {
-        dispatch(authAnonymous());
-        return;
-      }
       dispatch(authLoading());
       try {
         const user = await fetchMe();
         if (active) dispatch(authSuccess(user));
+        return;
       } catch {
-        clearAccessToken();
+        /* try refresh cookie */
+      }
+
+      try {
+        const session = await refreshSessionRequest();
+        if (active) dispatch(authSuccess(session.user));
+      } catch {
         if (active) dispatch(authAnonymous());
       }
     }

@@ -1,11 +1,17 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { LanguageCode, type BiodataContent } from '@marriage/shared';
+import {
+  LanguageCode,
+  type BiodataContent,
+  type StructuredFields,
+} from '@marriage/shared';
 
 export type TranslationStatus = 'idle' | 'loading' | 'ready' | 'error';
 
 interface LanguageState {
   exportLanguage: LanguageCode;
   translatedContent: BiodataContent | null;
+  /** Translated unsynced editor fields keyed as editor.{sectionId}.{fieldId} */
+  translatedExtras: StructuredFields | null;
   status: TranslationStatus;
   error: string | null;
   cached: boolean;
@@ -15,6 +21,7 @@ interface LanguageState {
 const initialState: LanguageState = {
   exportLanguage: LanguageCode.EN,
   translatedContent: null,
+  translatedExtras: null,
   status: 'idle',
   error: null,
   cached: false,
@@ -28,6 +35,7 @@ const languageSlice = createSlice({
     setExportLanguage(state, action: PayloadAction<LanguageCode>) {
       state.exportLanguage = action.payload;
       state.translatedContent = null;
+      state.translatedExtras = null;
       state.status = 'idle';
       state.error = null;
       state.cached = false;
@@ -41,11 +49,13 @@ const languageSlice = createSlice({
       state,
       action: PayloadAction<{
         content: BiodataContent;
+        extras?: StructuredFields;
         cached: boolean;
         provider: string;
       }>,
     ) {
       state.translatedContent = action.payload.content;
+      state.translatedExtras = action.payload.extras ?? {};
       state.cached = action.payload.cached;
       state.provider = action.payload.provider;
       state.status = 'ready';
@@ -56,6 +66,7 @@ const languageSlice = createSlice({
     },
     clearTranslation(state) {
       state.translatedContent = null;
+      state.translatedExtras = null;
       state.status = 'idle';
       state.error = null;
       state.cached = false;

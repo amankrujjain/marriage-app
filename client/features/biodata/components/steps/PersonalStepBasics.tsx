@@ -1,6 +1,7 @@
 'use client';
 
 import { Gender } from '@marriage/shared';
+import { normalizeDateStorage } from '@/lib/formatDate';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { patchPersonal } from '../../store/biodataSlice';
 import { BiodataField } from '../BiodataField';
@@ -37,7 +38,9 @@ export function PersonalStepBasics() {
         name="dateOfBirth"
         type="date"
         value={personal.dateOfBirth ?? ''}
-        onChange={(value) => dispatch(patchPersonal({ dateOfBirth: value }))}
+        onChange={(value) =>
+          dispatch(patchPersonal({ dateOfBirth: normalizeDateStorage(value) || value }))
+        }
       />
       <BiodataField
         label="Height"

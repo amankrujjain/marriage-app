@@ -13,6 +13,9 @@ export function applyTranslatedFields(
     about: { ...original.about },
     contact: { ...original.contact },
     profilePhotoUrl: original.profilePhotoUrl,
+    profilePhotoFit: original.profilePhotoFit
+      ? { ...original.profilePhotoFit }
+      : undefined,
     hiddenFields: [...original.hiddenFields],
   };
 

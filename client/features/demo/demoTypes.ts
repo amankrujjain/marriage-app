@@ -1,3 +1,5 @@
+import type { ProfilePhotoFit } from '@marriage/shared';
+
 export type DemoTpl = 'zari' | 'panna' | 'kagaz';
 
 export type DemoField = {
@@ -16,17 +18,6 @@ export type DemoState = {
   docTitle: string;
   name: string;
   photo: string;
+  photoFit?: ProfilePhotoFit;
   sections: DemoSection[];
 };
-
-export const MANTRA_OPTIONS = [
-  '॥ श्री गणेशाय नमः ॥',
-  '॥ ॐ नमः शिवाय ॥',
-  '॥ जय श्री कृष्ण ॥',
-  '॥ जय श्री राम ॥',
-  'بِسْمِ ٱللَّٰهِ',
-  'ੴ ਸਤਿ ਨਾਮੁ',
-  '',
-] as const;
-
-export const DEMO_DRAFT_KEY = 'biodata-demo-draft';

@@ -1,16 +1,13 @@
 'use client';
 
-import { BiodataFormStep } from '@marriage/shared';
 import { useBiodataSteps } from '../hooks/useBiodataSteps';
 import { useSaveBiodata } from '../hooks/useSaveBiodata';
 import { useAppSelector } from '@/store/hooks';
 
 export function StepNav() {
-  const { isFirst, isLast, goBack, goNext, step } = useBiodataSteps();
+  const { isFirst, isLast, goBack, goNext } = useBiodataSteps();
   const { save } = useSaveBiodata();
   const saveStatus = useAppSelector((state) => state.biodata.saveStatus);
-  const hideContinue = step === BiodataFormStep.LANGUAGE;
-
   return (
     <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between">
       <button
@@ -29,7 +26,7 @@ export function StepNav() {
         >
           {saveStatus === 'saving' ? 'Saving…' : 'Save draft'}
         </button>
-        {!hideContinue && !isLast ? (
+        {!isLast ? (
           <button
             type="button"
             onClick={goNext}

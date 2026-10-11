@@ -1,8 +1,8 @@
 import {
   applyTranslatedFields,
   flattenBiodataFields,
+  LanguageCode,
   type BiodataContent,
-  type LanguageCode,
   type StructuredFields,
   type TranslateBiodataResponse,
   type TranslateResponse,
@@ -15,13 +15,19 @@ export async function translateStructuredFields(input: {
   targetLanguage: LanguageCode;
   sourceLanguage?: LanguageCode;
 }): Promise<TranslateResponse> {
+  const sourceLanguage = input.sourceLanguage ?? LanguageCode.EN;
+
   if (
     Object.keys(input.fields).length === 0 ||
-    (input.sourceLanguage && input.targetLanguage === input.sourceLanguage)
+    input.targetLanguage === LanguageCode.EN ||
+    input.targetLanguage === sourceLanguage
   ) {
     const passthrough = new PassthroughTranslationProvider();
     return {
-      fields: await passthrough.translateStructured(input),
+      fields: await passthrough.translateStructured({
+        ...input,
+        sourceLanguage,
+      }),
       targetLanguage: input.targetLanguage,
       cached: false,
       provider: passthrough.name,
@@ -29,8 +35,9 @@ export async function translateStructuredFields(input: {
   }
 
   const provider = createTranslationProvider();
-  const alreadyCached = provider.wasCached(input);
-  const fields = await provider.translateStructured(input);
+  const request = { ...input, sourceLanguage };
+  const alreadyCached = provider.wasCached(request);
+  const fields = await provider.translateStructured(request);
 
   return {
     fields,
@@ -49,7 +56,7 @@ export async function translateBiodataContent(input: {
   const translated = await translateStructuredFields({
     fields: flat,
     targetLanguage: input.targetLanguage,
-    sourceLanguage: input.sourceLanguage,
+    sourceLanguage: input.sourceLanguage ?? LanguageCode.EN,
   });
 
   return {

@@ -1,16 +1,11 @@
 import type { NextFunction, Request, Response } from 'express';
 import { UnauthorizedError } from '../errors/UnauthorizedError';
 import { verifyAccessToken } from '../services/tokenService';
-
-function extractBearer(header?: string): string | null {
-  if (!header?.startsWith('Bearer ')) return null;
-  const token = header.slice(7).trim();
-  return token.length > 0 ? token : null;
-}
+import { readAccessTokenFromRequest } from '../utils/authCookies';
 
 export function authenticate(req: Request, _res: Response, next: NextFunction): void {
   try {
-    const token = extractBearer(req.headers.authorization);
+    const token = readAccessTokenFromRequest(req);
     if (!token) {
       throw new UnauthorizedError('Authentication required', 'AUTH_REQUIRED');
     }

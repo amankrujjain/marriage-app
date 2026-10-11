@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef } from 'react';
+import { photoFitImgStyle } from '@/features/biodata/utils/photoFit';
 import type { DemoState } from './demoTypes';
 import { CornerOrnament, LotusMotif } from './DemoMotifs';
 
@@ -72,7 +73,12 @@ export const DemoA4Page = forwardRef<HTMLDivElement, DemoA4PageProps>(
                     </div>
                     <div className="demo-page-photo-wrap">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="demo-page-photo" src={state.photo} alt="" />
+                      <img
+                        className="demo-page-photo"
+                        src={state.photo}
+                        alt=""
+                        style={photoFitImgStyle(state.photoFit)}
+                      />
                     </div>
                   </div>
                 ) : (
