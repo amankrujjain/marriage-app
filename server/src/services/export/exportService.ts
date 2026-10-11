@@ -7,10 +7,12 @@ import {
   type ExportFormat,
   type ExportResult,
 } from '@marriage/shared';
-import { env } from '../../config/env';
 import { createExportProvider } from '../../providers/export/createExportProvider';
 import { parseImageBase64 } from '../../utils/parseImageBase64';
+import { buildSignedMediaUrl } from '../../utils/signedMediaUrl';
 import { requirePremiumUser } from './requirePremiumUser';
+
+const EXPORT_URL_TTL_SEC = 7 * 24 * 60 * 60;
 
 function sanitizeFileName(name: string): string {
   return name.replace(/[^a-zA-Z0-9-_ ]/g, '').trim().slice(0, 60) || 'biodata';
@@ -35,8 +37,11 @@ export async function exportBiodata(input: {
   await fs.mkdir(dir, { recursive: true });
   await fs.writeFile(path.join(dir, fileName), artifact.buffer);
 
-  const base = process.env.SERVER_PUBLIC_URL ?? `http://localhost:${env.PORT}`;
-  const url = `${base}/uploads/exports/${fileName}`;
+  const url = buildSignedMediaUrl({
+    kind: 'exports',
+    fileName,
+    ttlSec: EXPORT_URL_TTL_SEC,
+  });
   const shareText = buildBiodataShareText({
     name: input.personName ?? baseName,
     downloadUrl: url,

@@ -5,6 +5,7 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 2 * 1024 * 1024, files: 1 },
   fileFilter: (_req, file, cb) => {
+    // First pass on declared MIME; magic bytes are verified in uploadPhotoService.
     const ok = ['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype);
     if (!ok) {
       cb(new BadRequestError('Only JPEG, PNG, or WebP allowed', 'PHOTO_TYPE_INVALID'));

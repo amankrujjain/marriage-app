@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { authenticate } from '../../middleware/authenticate';
 import { validateRequest } from '../../middleware/validateRequest';
 import { translationRateLimit } from '../../middleware/translationRateLimit';
 import {
@@ -10,6 +11,7 @@ import { translateBiodataController } from '../../controllers/translation/transl
 
 const router = Router();
 
+router.use(authenticate);
 router.use(translationRateLimit);
 router.post(
   '/translate',

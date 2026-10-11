@@ -50,3 +50,18 @@ export async function createGoogleUser(
     role: UserRole.USER,
   });
 }
+
+export async function bindGoogleId(
+  userId: string,
+  googleId: string,
+): Promise<UserDocument> {
+  const updated = await UserModel.findByIdAndUpdate(
+    userId,
+    { $set: { googleId } },
+    { new: true },
+  );
+  if (!updated) {
+    throw new Error('User not found while binding Google id');
+  }
+  return updated;
+}

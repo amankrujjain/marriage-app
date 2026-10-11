@@ -2,7 +2,9 @@ import type { AuthSessionResponse } from '@marriage/shared';
 import type { Response } from 'express';
 import { UnauthorizedError } from '../../errors/UnauthorizedError';
 import {
+  findRefreshTokenByHash,
   findValidRefreshToken,
+  revokeAllRefreshTokensForUser,
   revokeRefreshToken,
 } from '../../repositories/refreshTokenRepository';
 import { findUserById } from '../../repositories/userRepository';
@@ -30,6 +32,11 @@ export async function refreshAuthSession(
   const tokenHash = hashToken(rawRefreshToken);
   const stored = await findValidRefreshToken(tokenHash);
   if (!stored) {
+    // Reuse of a rotated/revoked refresh → revoke the whole session family.
+    const prior = await findRefreshTokenByHash(tokenHash);
+    if (prior) {
+      await revokeAllRefreshTokensForUser(prior.userId);
+    }
     clearAuthCookies(res);
     throw new UnauthorizedError('Refresh token revoked or unknown', 'INVALID_REFRESH');
   }

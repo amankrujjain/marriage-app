@@ -23,6 +23,12 @@ export async function findValidRefreshToken(
   });
 }
 
+export async function findRefreshTokenByHash(
+  tokenHash: string,
+): Promise<RefreshTokenDocument | null> {
+  return RefreshTokenModel.findOne({ tokenHash });
+}
+
 export async function revokeRefreshToken(tokenHash: string): Promise<void> {
   await RefreshTokenModel.updateOne(
     { tokenHash, revokedAt: null },

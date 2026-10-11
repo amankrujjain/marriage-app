@@ -1,10 +1,10 @@
 import type { BiodataRecord, UpdateBiodataPayload } from '@marriage/shared';
-import { ForbiddenError } from '../../errors/ForbiddenError';
 import { NotFoundError } from '../../errors/NotFoundError';
 import {
   findBiodataById,
   updateBiodata,
 } from '../../repositories/biodataRepository';
+import { canonicalizeProfilePhotoUrl } from '../../utils/profilePhotoUrlRule';
 import { toBiodataRecord } from '../../utils/toBiodataRecord';
 import { resolveTitle } from './resolveTitle';
 
@@ -14,12 +14,16 @@ export async function updateBiodataService(
   payload: UpdateBiodataPayload,
 ): Promise<BiodataRecord> {
   const existing = await findBiodataById(id);
-  if (!existing) throw new NotFoundError('Biodata not found', 'BIODATA_NOT_FOUND');
-  if (existing.userId.toString() !== userId) {
-    throw new ForbiddenError('You do not own this biodata');
+  if (!existing || existing.userId.toString() !== userId) {
+    throw new NotFoundError('Biodata not found', 'BIODATA_NOT_FOUND');
   }
 
-  const content = payload.content ?? existing.content;
+  const content = payload.content
+    ? {
+        ...payload.content,
+        profilePhotoUrl: canonicalizeProfilePhotoUrl(payload.content.profilePhotoUrl),
+      }
+    : existing.content;
   const title = payload.title
     ? resolveTitle(payload.title, content)
     : payload.content

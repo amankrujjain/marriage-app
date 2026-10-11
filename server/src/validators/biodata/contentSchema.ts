@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import { Gender, MaritalStatus } from '@marriage/shared';
+import { isAllowedProfilePhotoUrl } from '../../utils/profilePhotoUrlRule';
 
 const optionalString = (max: number) => Joi.string().trim().max(max).allow('');
 
@@ -48,11 +49,22 @@ export const biodataContentSchema = Joi.object({
     email: Joi.string().trim().email({ tlds: false }).allow(''),
     address: optionalString(300),
   }).default({}),
-  profilePhotoUrl: Joi.string().uri({ allowRelative: true }).allow(''),
+  profilePhotoUrl: Joi.string()
+    .allow('')
+    .max(2_500_000)
+    .custom((value, helpers) => {
+      if (value === '' || isAllowedProfilePhotoUrl(value)) return value;
+      return helpers.error('any.invalid');
+    })
+    .messages({ 'any.invalid': 'profilePhotoUrl must be a site media URL or image data URL' }),
   profilePhotoFit: Joi.object({
     x: Joi.number().min(0).max(100).required(),
     y: Joi.number().min(0).max(100).required(),
     zoom: Joi.number().min(1).max(2.5).required(),
   }).optional(),
+  headerLine: optionalString(120),
+  documentTitle: optionalString(120),
+  tagline: optionalString(200),
+  blessing: optionalString(200),
   hiddenFields: Joi.array().items(Joi.string().max(80)).default([]),
 }).required();

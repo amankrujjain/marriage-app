@@ -1,4 +1,3 @@
-import { ForbiddenError } from '../../errors/ForbiddenError';
 import { NotFoundError } from '../../errors/NotFoundError';
 import {
   deleteBiodata,
@@ -10,9 +9,8 @@ export async function deleteBiodataService(
   id: string,
 ): Promise<void> {
   const existing = await findBiodataById(id);
-  if (!existing) throw new NotFoundError('Biodata not found', 'BIODATA_NOT_FOUND');
-  if (existing.userId.toString() !== userId) {
-    throw new ForbiddenError('You do not own this biodata');
+  if (!existing || existing.userId.toString() !== userId) {
+    throw new NotFoundError('Biodata not found', 'BIODATA_NOT_FOUND');
   }
   await deleteBiodata(id);
 }

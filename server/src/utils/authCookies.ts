@@ -50,14 +50,9 @@ export function readAccessTokenFromRequest(req: {
   cookies?: Record<string, string>;
   headers: { authorization?: string };
 }): string | null {
+  // Cookie-only for the SPA — avoids Bearer tokens leaking via logs/referrers.
   const fromCookie = req.cookies?.[authConfig.cookies.accessName];
   if (fromCookie && fromCookie.length > 0) return fromCookie;
-
-  const header = req.headers.authorization;
-  if (header?.startsWith('Bearer ')) {
-    const token = header.slice(7).trim();
-    return token.length > 0 ? token : null;
-  }
   return null;
 }
 

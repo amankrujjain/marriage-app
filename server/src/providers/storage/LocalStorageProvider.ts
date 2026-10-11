@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import type { StorageProvider, StoredFile } from './StorageProvider';
+import { extensionForImageMime } from '../../utils/imageMagic';
 
 export class LocalStorageProvider implements StorageProvider {
   constructor(
@@ -15,7 +16,8 @@ export class LocalStorageProvider implements StorageProvider {
     mimeType: string;
   }): Promise<StoredFile> {
     await fs.mkdir(this.uploadDir, { recursive: true });
-    const ext = path.extname(params.originalName).toLowerCase() || '.jpg';
+    const mime = params.mimeType as 'image/jpeg' | 'image/png' | 'image/webp';
+    const ext = extensionForImageMime(mime);
     const key = `${randomUUID()}${ext}`;
     await fs.writeFile(path.join(this.uploadDir, key), params.buffer);
     return {
