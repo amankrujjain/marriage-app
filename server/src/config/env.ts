@@ -13,6 +13,10 @@ interface EnvConfig {
   CLIENT_URL: string;
   CRON_SECRET: string;
   LOG_RETENTION_DAYS: number;
+  REDIS_URL?: string;
+  RAZORPAY_KEY_ID?: string;
+  RAZORPAY_KEY_SECRET?: string;
+  RAZORPAY_WEBHOOK_SECRET?: string;
 }
 
 const schema = Joi.object<EnvConfig>({
@@ -25,6 +29,10 @@ const schema = Joi.object<EnvConfig>({
   CLIENT_URL: Joi.string().uri().required(),
   CRON_SECRET: Joi.string().min(16).required(),
   LOG_RETENTION_DAYS: Joi.number().integer().min(1).max(30).default(3),
+  REDIS_URL: Joi.string().min(1).allow('').optional(),
+  RAZORPAY_KEY_ID: Joi.string().allow('').optional(),
+  RAZORPAY_KEY_SECRET: Joi.string().allow('').optional(),
+  RAZORPAY_WEBHOOK_SECRET: Joi.string().allow('').optional(),
 }).unknown(true);
 
 const { value, error } = schema.validate(process.env, { abortEarly: false });

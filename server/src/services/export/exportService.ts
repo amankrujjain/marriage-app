@@ -14,8 +14,15 @@ import { requirePremiumUser } from './requirePremiumUser';
 
 const EXPORT_URL_TTL_SEC = 7 * 24 * 60 * 60;
 
+/** Must match signed-media SAFE_FILE: [a-zA-Z0-9._-]+ (no spaces). */
 function sanitizeFileName(name: string): string {
-  return name.replace(/[^a-zA-Z0-9-_ ]/g, '').trim().slice(0, 60) || 'biodata';
+  const cleaned = name
+    .normalize('NFKD')
+    .replace(/[^\w.-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 60);
+  return cleaned || 'biodata';
 }
 
 export async function exportBiodata(input: {

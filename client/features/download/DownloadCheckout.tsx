@@ -19,6 +19,7 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
   const router = useRouter();
   const { exportAs } = useExportBiodata();
   const isPremium = useAppSelector((state) => state.auth.user?.isPremium ?? false);
+  const premiumUntil = useAppSelector((state) => state.auth.user?.premiumUntil);
   const authStatus = useAppSelector((state) => state.auth.status);
   const templateId = useAppSelector((state) => state.template.selectedTemplateId);
   const designSlug = useAppSelector(
@@ -78,6 +79,8 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
     return 'Download PDF';
   })();
 
+  const premiumPriceLabel = isPremium ? 'Included' : `₹${PREMIUM_AMOUNT_INR}`;
+
   return (
     <div className="card">
       <h3>
@@ -95,13 +98,26 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
         Choose your download
       </h3>
 
+      {isPremium ? (
+        <div className="info" style={{ marginTop: 12, marginBottom: 4 }}>
+          <span className="badge prem">Wedding Pass active</span>
+          <span style={{ marginLeft: 8 }}>
+            Premium downloads unlocked
+            {premiumUntil
+              ? ` until ${new Date(premiumUntil).toLocaleDateString()}`
+              : ''}
+            . No extra payment.
+          </span>
+        </div>
+      ) : null}
+
       <DownloadLanguageSelect disabled={busy} />
 
       <fieldset style={{ border: 0, padding: 0, margin: '14px 0 0' }}>
         <legend className="fld" style={{ padding: 0, fontWeight: 700 }}>
           Select format &amp; quality
         </legend>
-        <label className="opt">
+        <label className={`opt${isPremium ? ' pass-owned' : ''}`}>
           <input
             type="radio"
             name="q"
@@ -110,10 +126,17 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
             onChange={() => onPlanChange('premium')}
           />
           <span>
-            <b>{designName.split(' ')[0]} Premium</b>
-            <small>High quality · A4 size · Print ready · no credit line</small>
+            <b>
+              {designName.split(' ')[0]} Premium
+              {isPremium ? ' · Your Pass' : ''}
+            </b>
+            <small>
+              {isPremium
+                ? 'High quality · A4 · Print ready · no credit line · already unlocked'
+                : 'High quality · A4 size · Print ready · no credit line'}
+            </small>
           </span>
-          <span className="pr">₹{PREMIUM_AMOUNT_INR}</span>
+          <span className={`pr${isPremium ? ' included' : ''}`}>{premiumPriceLabel}</span>
         </label>
         <label className="opt">
           <input
@@ -186,8 +209,8 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
         </p>
       ) : plan === 'premium' && !isPremium ? (
         <p className="note" style={{ margin: '10px 0 0' }}>
-          Payment is not connected yet. Continue via{' '}
-          <Link href="/wedding-pass">Wedding Pass</Link> (UPI later).
+          Unlock premium downloads with the{' '}
+          <Link href="/wedding-pass">Wedding Pass</Link> (₹{PREMIUM_AMOUNT_INR} for 30 days).
         </p>
       ) : (
         <p className="note" style={{ margin: '10px 0 0' }}>

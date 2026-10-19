@@ -14,6 +14,7 @@ import {
   exportTranslating,
   exportUploading,
 } from '../store/exportSlice';
+import { globalLoadingHide, globalLoadingShow } from '@/store/slices/uiSlice';
 
 function waitForPreviewPaint(): Promise<void> {
   return new Promise((resolve) => {
@@ -50,6 +51,7 @@ export function useExportBiodata() {
     }
 
     try {
+      dispatch(globalLoadingShow('Preparing your download…'));
       if (exportLanguage !== LanguageCode.EN) {
         dispatch(exportTranslating());
       }
@@ -96,6 +98,8 @@ export function useExportBiodata() {
           typeof window !== 'undefined' ? window.location.pathname : '/download';
         router.push(`/login?next=${encodeURIComponent(next)}`);
       }
+    } finally {
+      dispatch(globalLoadingHide());
     }
   }
 

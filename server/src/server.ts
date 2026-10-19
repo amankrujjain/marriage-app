@@ -1,6 +1,7 @@
 import { createApp } from './app';
 import { env } from './config/env';
 import { connectDatabase, disconnectDatabase } from './config/database';
+import { disconnectRedis } from './config/redis';
 import { seedCronConfigs } from './services/cron/seedCronConfigs';
 import {
   startCronScheduler,
@@ -23,6 +24,7 @@ async function bootstrap(): Promise<void> {
     logger.info(`Shutting down (${signal})`);
     stopCronScheduler();
     server.close(async () => {
+      await disconnectRedis();
       await disconnectDatabase();
       process.exit(0);
     });

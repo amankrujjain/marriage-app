@@ -15,6 +15,7 @@ import { OrnamentDivLotus } from '@/components/landing/Ornaments';
 import { ApiClientError } from '@/lib/apiClient';
 import { useAppDispatch } from '@/store/hooks';
 import { selectDesign } from '@/features/templates/store/templateSlice';
+import { globalLoadingHide, globalLoadingShow } from '@/store/slices/uiSlice';
 import { deleteBiodata, listBiodata } from '../services/biodataApi';
 import { loadBiodata, setDesignSlug } from '../store/biodataSlice';
 import { designFromSlug } from './editor/designMap';
@@ -89,6 +90,7 @@ export function MyDesignsPanel() {
   const load = useCallback(async (nextPage: number) => {
     setLoading(true);
     setError(null);
+    if (nextPage === 1) dispatch(globalLoadingShow('Loading your designs…'));
     try {
       const result = await listBiodata(nextPage, limit);
       setItems(result.items);
@@ -102,8 +104,9 @@ export function MyDesignsPanel() {
       );
     } finally {
       setLoading(false);
+      dispatch(globalLoadingHide());
     }
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     void load(1);

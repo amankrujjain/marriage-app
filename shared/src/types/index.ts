@@ -46,3 +46,10 @@ export type {
   TranslateBiodataResponse,
 } from './translation';
 export type { ExportRequest, ExportResult } from './export';
+export type {
+  PaymentOrderStatus,
+  BillingPlanPublic,
+  CheckoutResponse,
+  VerifyPaymentPayload,
+  BillingMeResponse,
+} from './billing';

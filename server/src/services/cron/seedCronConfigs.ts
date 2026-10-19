@@ -17,6 +17,19 @@ function defaultConfigs() {
       description:
         'Deletes Winston daily/weekly log files older than retention. Hit by the in-process cron scheduler.',
     },
+    {
+      key: 'reconcile-payments',
+      name: 'Reconcile pending Wedding Pass payments',
+      endpoint: '/api/v1/cron/reconcile-payments',
+      method: 'POST' as const,
+      /** Every 15 minutes */
+      schedule: '*/15 * * * *',
+      enabled: true,
+      payload: {},
+      timeoutMs: 120_000,
+      description:
+        'Heals stale pending Razorpay orders (fulfil if captured, abandon after grace).',
+    },
   ];
 }
 

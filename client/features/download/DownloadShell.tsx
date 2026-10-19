@@ -17,7 +17,7 @@ export function DownloadShell() {
   return (
     <ProtectedRoute>
       <div className="landing dl-page">
-        <SiteHeader variant="minimal" />
+        <SiteHeader variant="app" />
         <main id="main" className="dl">
           <DownloadPreviews credit={plan === 'free'} />
           <section aria-label="Download options">

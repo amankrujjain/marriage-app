@@ -2,11 +2,25 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { UserRole } from '@marriage/shared';
 import { SiteHeader } from '@/components/landing/SiteHeader';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { OrnamentDiv } from '@/components/landing/Ornaments';
 import { useAppSelector } from '@/store/hooks';
 import { useAuthActions } from '../hooks/useAuthActions';
+
+function formatPremiumUntil(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(new Date(iso));
+  } catch {
+    return iso.slice(0, 10);
+  }
+}
 
 export function AccountPanel() {
   const router = useRouter();
@@ -16,6 +30,7 @@ export function AccountPanel() {
   if (!user) return null;
 
   const firstName = user.name.trim().split(/\s+/)[0] || 'there';
+  const until = formatPremiumUntil(user.premiumUntil);
 
   async function onLogout(): Promise<void> {
     await logout();
@@ -82,14 +97,42 @@ export function AccountPanel() {
                 </svg>
                 <div>
                   <small>Plan</small>
-                  <span>
-                    {user.isPremium ? 'Wedding Pass' : 'Free'}{' '}
-                    {!user.isPremium ? <em>— upgrade at export</em> : null}
-                  </span>
+                  <div className="plan-badge-row">
+                    {user.isPremium ? (
+                      <>
+                        <span className="badge prem">Wedding Pass</span>
+                        {until ? <span className="exp">until {until}</span> : null}
+                      </>
+                    ) : (
+                      <span className="badge free">Free</span>
+                    )}
+                  </div>
                 </div>
               </li>
             </ul>
-            <Link className="btn btn-primary btn-block" href="/my-designs" style={{ minHeight: 50 }}>
+            {!user.isPremium ? (
+              <Link
+                className="btn btn-primary btn-block"
+                href="/wedding-pass"
+                style={{ minHeight: 50 }}
+              >
+                Get Wedding Pass
+              </Link>
+            ) : null}
+            {user.role === UserRole.ADMIN ? (
+              <Link
+                className="btn btn-primary btn-block"
+                href="/admin"
+                style={{ minHeight: 50 }}
+              >
+                Admin panel
+              </Link>
+            ) : null}
+            <Link
+              className={`btn ${user.isPremium && user.role !== UserRole.ADMIN ? 'btn-primary' : 'btn-ghost'} btn-block`}
+              href="/my-designs"
+              style={{ minHeight: 50 }}
+            >
               My Designs
             </Link>
             <Link

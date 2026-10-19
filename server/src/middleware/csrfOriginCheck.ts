@@ -14,6 +14,12 @@ export function csrfOriginCheck(req: Request, _res: Response, next: NextFunction
     return;
   }
 
+  // Provider webhooks have no browser Origin; signature is verified separately.
+  if (req.path.includes('/billing/webhooks/')) {
+    next();
+    return;
+  }
+
   const origin = req.get('origin');
   const referer = req.get('referer');
   const allowed = env.CLIENT_URL.replace(/\/$/, '');
