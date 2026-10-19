@@ -8,13 +8,17 @@ import { SiteFooter } from '@/components/landing/SiteFooter';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectDesign } from '@/features/templates/store/templateSlice';
 import { fetchBiodata } from '../../services/biodataApi';
-import { loadBiodata } from '../../store/biodataSlice';
+import {
+  loadBiodata,
+  resetBiodataDraft,
+  setDesignSlug,
+} from '../../store/biodataSlice';
 import { useSaveBiodata } from '../../hooks/useSaveBiodata';
 import { EditorAppBar } from './EditorAppBar';
 import { EditorForm } from './EditorForm';
 import { EditorA4Preview } from './EditorA4Preview';
 import { EditorDesignSwitcher } from './EditorDesignSwitcher';
-import { templateFromDesignQuery } from './designMap';
+import { designFromSlug, templateFromDesignQuery } from './designMap';
 import { useEditorSections } from './useEditorSections';
 
 type MobileTab = 'details' | 'preview';
@@ -31,8 +35,22 @@ export function BiodataEditor() {
   const biodataId = useAppSelector((state) => state.biodata.biodataId);
 
   useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      dispatch(resetBiodataDraft());
+      const mapped = templateFromDesignQuery(searchParams.get('design'));
+      if (mapped) {
+        dispatch(selectDesign(mapped));
+        dispatch(setDesignSlug(mapped.slug));
+      }
+    }
+  }, [dispatch, searchParams]);
+
+  useEffect(() => {
     const mapped = templateFromDesignQuery(searchParams.get('design'));
-    if (mapped) dispatch(selectDesign(mapped));
+    if (mapped) {
+      dispatch(selectDesign(mapped));
+      dispatch(setDesignSlug(mapped.slug));
+    }
   }, [dispatch, searchParams]);
 
   useEffect(() => {
@@ -43,13 +61,36 @@ export function BiodataEditor() {
     void fetchBiodata(id)
       .then((record) => {
         if (cancelled) return;
+        const slug =
+          record.designSlug ||
+          record.content?.designSlug ||
+          searchParams.get('design') ||
+          undefined;
         dispatch(
           loadBiodata({
             id: record.id,
             title: record.title,
-            content: record.content,
+            content: {
+              ...record.content,
+              ...(slug ? { designSlug: slug } : {}),
+            },
+            designSlug: slug,
+            editorSections: record.editorSections,
           }),
         );
+        const fromRecord = designFromSlug(slug);
+        if (fromRecord) {
+          dispatch(
+            selectDesign({ templateId: fromRecord.templateId, slug: fromRecord.slug }),
+          );
+          dispatch(setDesignSlug(fromRecord.slug));
+          return;
+        }
+        const fromQuery = templateFromDesignQuery(searchParams.get('design'));
+        if (fromQuery) {
+          dispatch(selectDesign(fromQuery));
+          dispatch(setDesignSlug(fromQuery.slug));
+        }
       })
       .catch(() => {
         /* keep current draft if fetch fails */

@@ -1,10 +1,12 @@
-import type { BiodataContent } from '@marriage/shared';
+import type { BiodataContent, BiodataEditorSection } from '@marriage/shared';
 import { BiodataModel, type BiodataDocument } from '../models/Biodata';
 
 export async function createBiodata(input: {
   userId: string;
   title: string;
   content: BiodataContent;
+  designSlug?: string;
+  editorSections?: BiodataEditorSection[];
 }): Promise<BiodataDocument> {
   return BiodataModel.create(input);
 }
@@ -31,7 +33,12 @@ export async function listBiodataByUser(
 
 export async function updateBiodata(
   id: string,
-  updates: { title?: string; content?: BiodataContent },
+  updates: {
+    title?: string;
+    content?: BiodataContent;
+    designSlug?: string;
+    editorSections?: BiodataEditorSection[];
+  },
 ): Promise<BiodataDocument | null> {
   return BiodataModel.findByIdAndUpdate(id, { $set: updates }, { new: true });
 }

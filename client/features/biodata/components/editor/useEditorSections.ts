@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { BiodataContent } from '@marriage/shared';
 import { normalizeDateStorage } from '@/lib/formatDate';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -11,6 +11,7 @@ import {
   patchEducation,
   patchFamily,
   patchPersonal,
+  setEditorSections,
 } from '../../store/biodataSlice';
 import {
   countFilled,
@@ -56,9 +57,13 @@ function hydrateFromContent(
   }));
 }
 
-function loadStored(): EditorSectionDef[] | null {
+function storageKey(biodataId: string | null): string {
+  return `${EDITOR_SECTIONS_KEY}:${biodataId || 'draft'}`;
+}
+
+function loadStored(biodataId: string | null): EditorSectionDef[] | null {
   try {
-    const raw = localStorage.getItem(EDITOR_SECTIONS_KEY);
+    const raw = localStorage.getItem(storageKey(biodataId));
     if (!raw) return null;
     const parsed = JSON.parse(raw) as EditorSectionDef[];
     if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -72,35 +77,41 @@ export function useEditorSections() {
   const dispatch = useAppDispatch();
   const content = useAppSelector((state) => state.biodata.content);
   const biodataId = useAppSelector((state) => state.biodata.biodataId);
+  const savedSections = useAppSelector((state) => state.biodata.editorSections);
   const [sections, setSections] = useState<EditorSectionDef[]>(DEFAULT_EDITOR_SECTIONS);
   const [openId, setOpenId] = useState('personal');
   const [reorderMode, setReorderMode] = useState(false);
   const [ready, setReady] = useState(false);
+  const lastSourceKey = useRef<string>('');
 
+  // Load sections whenever the active biodata / server snapshot changes.
   useEffect(() => {
-    const stored = loadStored();
-    const base = stored ?? DEFAULT_EDITOR_SECTIONS;
-    setSections(hydrateFromContent(base, content));
+    const hasServer = Boolean(savedSections && savedSections.length > 0);
+    const sourceKey = `${biodataId || 'draft'}:${hasServer ? 'server' : 'local'}`;
+    if (lastSourceKey.current === sourceKey) return;
+    lastSourceKey.current = sourceKey;
+
+    const base =
+      (hasServer ? savedSections : null) ??
+      loadStored(biodataId) ??
+      DEFAULT_EDITOR_SECTIONS;
+    const hydrated = hydrateFromContent(base!, content);
+    setSections(hydrated);
+    dispatch(setEditorSections(hydrated));
     setReady(true);
-    // hydrate once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [biodataId, savedSections]);
 
-  useEffect(() => {
-    if (!ready || !biodataId) return;
-    setSections((prev) => hydrateFromContent(prev, content));
-    // Re-sync field values when a saved design is loaded
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [biodataId, ready]);
-
+  // Persist to per-biodata local cache + Redux (for save payload).
   useEffect(() => {
     if (!ready) return;
+    dispatch(setEditorSections(sections));
     try {
-      localStorage.setItem(EDITOR_SECTIONS_KEY, JSON.stringify(sections));
+      localStorage.setItem(storageKey(biodataId), JSON.stringify(sections));
     } catch {
       /* ignore */
     }
-  }, [sections, ready]);
+  }, [sections, ready, biodataId, dispatch]);
 
   const syncToRedux = useCallback(
     (sync: string, value: string) => {

@@ -4,6 +4,7 @@ import {
   DEFAULT_PROFILE_PHOTO_FIT,
   emptyBiodataContent,
   type BiodataContent,
+  type BiodataEditorSection,
   type PersonalDetails,
   type EducationDetails,
   type CareerDetails,
@@ -19,6 +20,8 @@ interface BiodataState {
   biodataId: string | null;
   title: string;
   content: BiodataContent;
+  designSlug: string | null;
+  editorSections: BiodataEditorSection[] | null;
   step: BiodataFormStep;
   saveStatus: SaveStatus;
   saveError: string | null;
@@ -28,6 +31,8 @@ const initialState: BiodataState = {
   biodataId: null,
   title: '',
   content: emptyBiodataContent(),
+  designSlug: null,
+  editorSections: null,
   step: BiodataFormStep.PERSONAL,
   saveStatus: 'idle',
   saveError: null,
@@ -42,6 +47,17 @@ const biodataSlice = createSlice({
     },
     setTitle(state, action: PayloadAction<string>) {
       state.title = action.payload;
+    },
+    setDesignSlug(state, action: PayloadAction<string | null>) {
+      state.designSlug = action.payload;
+      if (action.payload) {
+        state.content.designSlug = action.payload;
+      } else {
+        delete state.content.designSlug;
+      }
+    },
+    setEditorSections(state, action: PayloadAction<BiodataEditorSection[]>) {
+      state.editorSections = action.payload;
     },
     patchPersonal(state, action: PayloadAction<Partial<PersonalDetails>>) {
       state.content.personal = { ...state.content.personal, ...action.payload };
@@ -108,11 +124,20 @@ const biodataSlice = createSlice({
     },
     loadBiodata(
       state,
-      action: PayloadAction<{ id: string; title: string; content: BiodataContent }>,
+      action: PayloadAction<{
+        id: string;
+        title: string;
+        content: BiodataContent;
+        designSlug?: string;
+        editorSections?: BiodataEditorSection[];
+      }>,
     ) {
       state.biodataId = action.payload.id;
       state.title = action.payload.title;
       state.content = action.payload.content;
+      state.designSlug =
+        action.payload.designSlug || action.payload.content.designSlug || null;
+      state.editorSections = action.payload.editorSections ?? null;
       state.saveStatus = 'saved';
     },
     resetBiodataDraft() {
@@ -124,6 +149,8 @@ const biodataSlice = createSlice({
 export const {
   setStep,
   setTitle,
+  setDesignSlug,
+  setEditorSections,
   patchPersonal,
   patchEducation,
   patchCareer,

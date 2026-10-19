@@ -1,22 +1,7 @@
-export type EditorFieldDef = {
-  id: string;
-  label: string;
-  value: string;
-  hint?: string;
-  placeholder?: string;
-  type?: string;
-  wide?: boolean;
-  /** Dot path into biodata content, e.g. personal.fullName */
-  sync?: string;
-};
+import type { BiodataEditorField, BiodataEditorSection } from '@marriage/shared';
 
-export type EditorSectionDef = {
-  id: string;
-  title: string;
-  blurb: string;
-  fields: EditorFieldDef[];
-  custom?: boolean;
-};
+export type EditorFieldDef = BiodataEditorField;
+export type EditorSectionDef = BiodataEditorSection;
 
 function fid(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;

@@ -3,19 +3,31 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { emptyBiodataContent, type BiodataContent, type BiodataRecord } from '@marriage/shared';
+import {
+  emptyBiodataContent,
+  mergeSectionsIntoContent,
+  type BiodataContent,
+  type BiodataRecord,
+} from '@marriage/shared';
 import { SiteHeader } from '@/components/landing/SiteHeader';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { OrnamentDivLotus } from '@/components/landing/Ornaments';
 import { ApiClientError } from '@/lib/apiClient';
 import { useAppDispatch } from '@/store/hooks';
+import { selectDesign } from '@/features/templates/store/templateSlice';
 import { deleteBiodata, listBiodata } from '../services/biodataApi';
-import { loadBiodata } from '../store/biodataSlice';
+import { loadBiodata, setDesignSlug } from '../store/biodataSlice';
+import { designFromSlug } from './editor/designMap';
 import { MyDesignThumb } from './MyDesignThumb';
 
-function normalizeContent(content: BiodataContent | null | undefined): BiodataContent {
+function normalizeContent(
+  content: BiodataContent | null | undefined,
+  designSlug?: string,
+): BiodataContent {
   const empty = emptyBiodataContent();
-  if (!content || typeof content !== 'object') return empty;
+  if (!content || typeof content !== 'object') {
+    return { ...empty, ...(designSlug ? { designSlug } : {}) };
+  }
   return {
     ...empty,
     ...content,
@@ -25,8 +37,17 @@ function normalizeContent(content: BiodataContent | null | undefined): BiodataCo
     family: { ...empty.family, ...content.family },
     about: { ...empty.about, ...content.about },
     contact: { ...empty.contact, ...content.contact },
+    designSlug: designSlug?.trim() || content.designSlug?.trim() || undefined,
     hiddenFields: Array.isArray(content.hiddenFields) ? content.hiddenFields : [],
   };
+}
+
+function recordSlug(record: BiodataRecord): string {
+  return (
+    record.designSlug?.trim() ||
+    record.content?.designSlug?.trim() ||
+    'zari-traditional'
+  );
 }
 
 function formatDate(iso: string): string {
@@ -42,7 +63,15 @@ function formatDate(iso: string): string {
 }
 
 function designDisplayName(record: BiodataRecord, fallback = 'Untitled biodata'): string {
-  return record.content?.personal?.fullName?.trim() || record.title?.trim() || fallback;
+  const merged = mergeSectionsIntoContent(
+    normalizeContent(record.content, record.designSlug),
+    record.editorSections,
+  );
+  return (
+    merged.personal?.fullName?.trim() ||
+    record.title?.trim() ||
+    fallback
+  );
 }
 
 export function MyDesignsPanel() {
@@ -83,14 +112,28 @@ export function MyDesignsPanel() {
   async function openDesign(record: BiodataRecord): Promise<void> {
     setOpeningId(record.id);
     try {
+      const slug = recordSlug(record);
+      const content = mergeSectionsIntoContent(
+        normalizeContent(record.content, slug),
+        record.editorSections,
+      );
       dispatch(
         loadBiodata({
           id: record.id,
           title: record.title,
-          content: normalizeContent(record.content),
+          content,
+          designSlug: slug,
+          editorSections: record.editorSections,
         }),
       );
-      router.push(`/marriage-biodata-maker?id=${record.id}`);
+      const design = designFromSlug(slug);
+      if (design) {
+        dispatch(selectDesign({ templateId: design.templateId, slug: design.slug }));
+        dispatch(setDesignSlug(design.slug));
+      }
+      router.push(
+        `/marriage-biodata-maker?id=${record.id}&design=${encodeURIComponent(slug)}`,
+      );
     } finally {
       setOpeningId(null);
     }
@@ -159,17 +202,26 @@ export function MyDesignsPanel() {
           <div className="md-grid">
             {items.map((record) => {
               const name = designDisplayName(record);
+              const slug = recordSlug(record);
+              const content = mergeSectionsIntoContent(
+                normalizeContent(record.content, slug),
+                record.editorSections,
+              );
               return (
                 <article key={record.id} className="md-card">
                   <Link
-                    href={`/marriage-biodata-maker?id=${record.id}`}
+                    href={`/marriage-biodata-maker?id=${record.id}&design=${encodeURIComponent(slug)}`}
                     aria-label={`Open ${name}`}
                     onClick={(e) => {
                       e.preventDefault();
                       void openDesign(record);
                     }}
                   >
-                    <MyDesignThumb content={normalizeContent(record.content)} />
+                    <MyDesignThumb
+                      content={content}
+                      sections={record.editorSections}
+                      slug={slug}
+                    />
                   </Link>
                   <h3>{name}</h3>
                   <div className="meta">

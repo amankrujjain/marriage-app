@@ -6,6 +6,7 @@ import type {
   FamilyDetails,
   PersonalDetails,
 } from './biodataSections';
+import type { BiodataEditorSection } from './biodataEditor';
 
 /** How the profile photo is framed in the biodata photo slot (4:5). */
 export interface ProfilePhotoFit {
@@ -46,6 +47,8 @@ export interface BiodataContent {
   tagline?: string;
   /** Footer blessing line. */
   blessing?: string;
+  /** VP / gallery design slug last used (e.g. zari-traditional, panna-royal). */
+  designSlug?: string;
   /** Dot-path field keys excluded from final biodata, e.g. "personal.caste" */
   hiddenFields: string[];
 }
@@ -55,6 +58,10 @@ export interface BiodataRecord {
   userId: string;
   title: string;
   content: BiodataContent;
+  /** Gallery / VP design slug for this saved biodata. */
+  designSlug?: string;
+  /** Full editor accordion layout + values for this biodata. */
+  editorSections?: BiodataEditorSection[];
   createdAt: string;
   updatedAt: string;
 }
@@ -62,11 +69,15 @@ export interface BiodataRecord {
 export interface CreateBiodataPayload {
   title?: string;
   content: BiodataContent;
+  designSlug?: string;
+  editorSections?: BiodataEditorSection[];
 }
 
 export interface UpdateBiodataPayload {
   title?: string;
   content?: BiodataContent;
+  designSlug?: string;
+  editorSections?: BiodataEditorSection[];
 }
 
 export function emptyBiodataContent(): BiodataContent {

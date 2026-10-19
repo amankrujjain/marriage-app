@@ -1,10 +1,18 @@
 import { createApp } from './app';
 import { env } from './config/env';
 import { connectDatabase, disconnectDatabase } from './config/database';
+import { seedCronConfigs } from './services/cron/seedCronConfigs';
+import {
+  startCronScheduler,
+  stopCronScheduler,
+} from './services/cron/startCronScheduler';
 import { logger } from './utils/logger';
 
 async function bootstrap(): Promise<void> {
   await connectDatabase();
+  await seedCronConfigs();
+  await startCronScheduler();
+
   const app = createApp();
 
   const server = app.listen(env.PORT, () => {
@@ -13,6 +21,7 @@ async function bootstrap(): Promise<void> {
 
   const shutdown = async (signal: string): Promise<void> => {
     logger.info(`Shutting down (${signal})`);
+    stopCronScheduler();
     server.close(async () => {
       await disconnectDatabase();
       process.exit(0);

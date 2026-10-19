@@ -66,5 +66,6 @@ export const biodataContentSchema = Joi.object({
   documentTitle: optionalString(120),
   tagline: optionalString(200),
   blessing: optionalString(200),
+  designSlug: Joi.string().trim().max(80).allow(''),
   hiddenFields: Joi.array().items(Joi.string().max(80)).default([]),
 }).required();

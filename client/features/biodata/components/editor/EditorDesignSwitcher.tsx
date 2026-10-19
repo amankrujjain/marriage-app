@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectDesign } from '@/features/templates/store/templateSlice';
+import { setDesignSlug } from '../../store/biodataSlice';
 import { loadVp } from '@/lib/vp/loadVp';
 import { EDITOR_DESIGNS, slugFromTemplateId } from './designMap';
 
@@ -51,9 +52,10 @@ export function EditorDesignSwitcher() {
           data-slug={design.slug}
           aria-pressed={selectedSlug === design.slug}
           aria-label={`${design.name} (${design.tier})`}
-          onClick={() =>
-            dispatch(selectDesign({ templateId: design.templateId, slug: design.slug }))
-          }
+          onClick={() => {
+            dispatch(selectDesign({ templateId: design.templateId, slug: design.slug }));
+            dispatch(setDesignSlug(design.slug));
+          }}
         >
           <div className="thumb" />
           {design.shortName}

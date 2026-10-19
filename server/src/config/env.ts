@@ -11,6 +11,8 @@ interface EnvConfig {
   MONGODB_URI: string;
   JWT_SECRET: string;
   CLIENT_URL: string;
+  CRON_SECRET: string;
+  LOG_RETENTION_DAYS: number;
 }
 
 const schema = Joi.object<EnvConfig>({
@@ -21,6 +23,8 @@ const schema = Joi.object<EnvConfig>({
   MONGODB_URI: Joi.string().min(1).required(),
   JWT_SECRET: Joi.string().min(16).required(),
   CLIENT_URL: Joi.string().uri().required(),
+  CRON_SECRET: Joi.string().min(16).required(),
+  LOG_RETENTION_DAYS: Joi.number().integer().min(1).max(30).default(3),
 }).unknown(true);
 
 const { value, error } = schema.validate(process.env, { abortEarly: false });

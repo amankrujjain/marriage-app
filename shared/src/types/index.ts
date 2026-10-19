@@ -28,6 +28,7 @@ export type {
   UpdateBiodataPayload,
   ProfilePhotoFit,
 } from './biodata';
+export type { BiodataEditorField, BiodataEditorSection } from './biodataEditor';
 export {
   emptyBiodataContent,
   DEFAULT_PROFILE_PHOTO_FIT,

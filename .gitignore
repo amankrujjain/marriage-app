@@ -4,6 +4,8 @@ dist/
 out/
 uploads/
 server/uploads/
+server/logs/
+logs/
 coverage/
 .env
 .env.local

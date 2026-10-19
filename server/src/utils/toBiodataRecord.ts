@@ -11,11 +11,17 @@ export function toBiodataRecord(doc: BiodataDocument): BiodataRecord {
       resignMediaUrlIfNeeded(content.profilePhotoUrl, PHOTO_URL_TTL_SEC) ??
       content.profilePhotoUrl;
   }
+  const designSlug = doc.designSlug || content.designSlug;
+  if (designSlug && !content.designSlug) {
+    content.designSlug = designSlug;
+  }
   return {
     id: doc._id.toString(),
     userId: doc.userId.toString(),
     title: doc.title,
     content,
+    designSlug,
+    editorSections: Array.isArray(doc.editorSections) ? doc.editorSections : undefined,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };
