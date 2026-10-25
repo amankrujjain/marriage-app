@@ -5,6 +5,7 @@ import { biodataReducer } from '@/features/biodata/store/biodataSlice';
 import { templateReducer } from '@/features/templates/store/templateSlice';
 import { languageReducer } from '@/features/translation/store/languageSlice';
 import { exportReducer } from '@/features/export/store/exportSlice';
+import { designsReducer } from '@/features/designs/store/designsSlice';
 
 export const rootReducer = combineReducers({
   ui: uiReducer,
@@ -13,6 +14,7 @@ export const rootReducer = combineReducers({
   template: templateReducer,
   language: languageReducer,
   export: exportReducer,
+  designs: designsReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

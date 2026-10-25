@@ -5,12 +5,14 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectDesign } from '@/features/templates/store/templateSlice';
 import { setDesignSlug } from '../../store/biodataSlice';
 import { loadVp } from '@/lib/vp/loadVp';
-import { EDITOR_DESIGNS, slugFromTemplateId } from './designMap';
+import { slugFromTemplateId } from './designMap';
+import { useDesignCatalog } from '@/features/designs/hooks/useDesignCatalog';
 
 const A4_PX_W = (210 * 96) / 25.4;
 
 export function EditorDesignSwitcher() {
   const dispatch = useAppDispatch();
+  const { editorDesigns } = useDesignCatalog();
   const selectedSlug = useAppSelector(
     (state) =>
       state.template.selectedDesignSlug ||
@@ -27,8 +29,10 @@ export function EditorDesignSwitcher() {
       if (!alive || !stripRef.current) return;
       stripRef.current.querySelectorAll<HTMLElement>('button .thumb').forEach((th) => {
         const slug = th.closest('button')?.dataset.slug;
-        if (!slug || th.firstChild) return;
-        VP.thumb(th, VP.sampleShort, slug, { credit: false });
+        if (!slug) return;
+        th.innerHTML = '';
+        const sample = VP.sampleFor ? VP.sampleFor(slug, 'short') : VP.sampleShort;
+        VP.thumb(th, sample, slug, { credit: false });
         requestAnimationFrame(() => {
           const bd = th.firstElementChild as HTMLElement | null;
           if (!bd?.classList.contains('bd')) return;
@@ -41,11 +45,11 @@ export function EditorDesignSwitcher() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [editorDesigns]);
 
   return (
     <div className="sw" ref={stripRef} role="group" aria-label="Choose a design" id="design">
-      {EDITOR_DESIGNS.map((design) => (
+      {editorDesigns.map((design) => (
         <button
           key={design.slug}
           type="button"

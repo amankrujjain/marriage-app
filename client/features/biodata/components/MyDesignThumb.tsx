@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import type { BiodataContent, BiodataEditorSection } from '@marriage/shared';
 import { loadVp } from '@/lib/vp/loadVp';
 import { mapBiodataToVp } from './editor/mapBiodataToVp';
-import { isFreeDesign } from './editor/designMap';
+import { useDesignCatalog } from '@/features/designs/hooks/useDesignCatalog';
 
 const A4_PX_W = (210 * 96) / 25.4;
 
@@ -20,6 +20,7 @@ export function MyDesignThumb({
   slug = 'zari-traditional',
 }: MyDesignThumbProps) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const { isFreeDesign } = useDesignCatalog();
 
   useEffect(() => {
     const host = hostRef.current;
@@ -43,7 +44,7 @@ export function MyDesignThumb({
       alive = false;
       if (host) host.innerHTML = '';
     };
-  }, [content, sections, slug]);
+  }, [content, sections, slug, isFreeDesign]);
 
   return <div ref={hostRef} className="thumb" />;
 }

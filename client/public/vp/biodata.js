@@ -60,7 +60,7 @@ var SPRITE='<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="
 '<use href="#vp-rose" x="-6" y="-6" width="124" height="124"/><use href="#vp-rose" x="100" y="-4" width="84" height="84"/><use href="#vp-rose" x="-4" y="104" width="84" height="84"/><use href="#vp-bud" x="108" y="100" width="40" height="40"/><use href="#vp-bud" x="176" y="30" width="26" height="26"/><use href="#vp-bud" x="30" y="186" width="26" height="26"/><use href="#vp-bud" x="150" y="150" width="22" height="22"/><use href="#vp-bud" x="212" y="6" width="16" height="16"/><use href="#vp-bud" x="6" y="224" width="16" height="16"/></g></symbol>'+
 '<symbol id="vp-paisley" viewBox="0 0 40 64"><g fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M20 4c14 6 18 22 12 36S12 62 8 50c-3-9 4-16 11-14 7 2 6 11 0 12"/><circle cx="19" cy="42" r="2" fill="currentColor"/><path d="M20 14c8 4 10 13 7 21"/></g></symbol>'+
 '</defs></svg>';
-VP.ensureSprite=function(){if(!document.getElementById('vp-sprite-host')){var d=document.createElement('div');d.id='vp-sprite-host';d.setAttribute('aria-hidden','true');d.innerHTML=SPRITE;(document.body.firstChild?document.body.insertBefore(d,document.body.firstChild):document.body.appendChild(d));}};
+VP.ensureSprite=function(){if(!document.getElementById('vp-sprite-host')){var d=document.createElement('div');d.id='vp-sprite-host';d.setAttribute('aria-hidden','true');d.innerHTML=SPRITE.replace('</defs></svg>',(VP.extraSprite||'')+'</defs></svg>');(document.body.firstChild?document.body.insertBefore(d,document.body.firstChild):document.body.appendChild(d));}};
 
 /* ---------- photo silhouette ---------- */
 VP.avatar=function(g){
@@ -98,6 +98,7 @@ var DECOR={
 'aarohi-modern':function(){return deco('<rect width="794" height="1123" fill="#F6EFE6"/><circle cx="740" cy="-30" r="200" fill="#EBDDCB" fill-opacity=".7"/><circle cx="740" cy="-30" r="140" fill="#E4D2BC" fill-opacity=".6"/><circle cx="-30" cy="1140" r="170" fill="#EBDDCB" fill-opacity=".7"/><rect x="0" y="0" width="12" height="1123" fill="#681421"/><rect x="12" y="0" width="2" height="1123" fill="url(#vp-goldv)"/>');}
 };
 
+VP.DECOR=DECOR;
 /* ---------- renderer ---------- */
 function fmtDate(v){if(!v)return '';var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v);if(!m)return v;var M=['January','February','March','April','May','June','July','August','September','October','November','December'];return parseInt(m[3],10)+' '+M[parseInt(m[2],10)-1]+' '+m[1];}
 VP.fmtDate=fmtDate;
@@ -105,35 +106,46 @@ function rows(list){var h='';list.forEach(function(r){if(r[1]&&String(r[1]).trim
 function sec(cls,title,body){if(!body)return '';return '<section class="bd-sec '+cls+'"><h3 class="bd-h"><span class="bd-hm" aria-hidden="true"></span>'+esc(title)+'</h3>'+body+'</section>';}
 function dl(list){var r=rows(list);return r?'<dl class="bd-dl">'+r+'</dl>':'';}
 function txt(v){return v&&String(v).trim()?'<p class="bd-p">'+esc(v)+'</p>':'';}
+VP.TAGLINE={Hindu:'A bond of love, respect and tradition.',Muslim:'A bond of love, respect and trust.',Christian:'A bond of love, faith and joy.'};
+VP.BISMILLAH='بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
+VP.commOf=function(d,slug){return (d&&d.community)||VP.tpl(slug).community||'Hindu';};
 VP.html=function(d,slug,o){
- o=o||{};d=d||{};var g=d.gender==='M'?'M':'F';
- var hi=o.lang==='hi';
+ o=o||{};d=d||{};var t=VP.tpl(slug),comm=VP.commOf(d,slug),g=d.gender==='M'?'M':'F';
+ var hi=o.lang==='hi'&&comm==='Hindu';
  var parents=[d.father,d.mother].filter(Boolean).join(' & ');
  var sub=parents?((g==='M'?'S/o ':'D/o ')+parents):'';
  var photo=d.photo||VP.avatar(g);
- var imgStyle='';if(d.photo){var z=d.photoZoom||1,x=d.photoX==null?50:d.photoX,y=d.photoY==null?42:d.photoY;if(z<=1.001){imgStyle=' style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:'+x+'% '+y+'%;display:block"';}else{var left=50-x*z,top=50-y*z;imgStyle=' style="position:absolute;width:'+(z*100)+'%;height:'+(z*100)+'%;max-width:none;left:'+left+'%;top:'+top+'%;object-fit:cover;object-position:center;display:block"';}}
- var personal=dl([['Date of Birth',fmtDate(d.dob)],['Time of Birth',d.tob],['Place of Birth',d.pob],['Height',d.height],['Complexion',d.complexion],['Religion',d.religion],['Caste / Community',d.caste],['Mother Tongue',d.motherTongue],['Marital Status',d.marital],['Diet',d.diet]]);
+ var imgStyle='';if(d.photo){var z=d.photoZoom||1,x=d.photoX==null?50:d.photoX,y=d.photoY==null?50:d.photoY;imgStyle=' style="object-position:'+x+'% '+y+'%;transform:scale('+z+')"';}
+ var cl=comm==='Hindu'?'Caste / Community':'Community';
+ var personal=dl([['Date of Birth',fmtDate(d.dob)],['Time of Birth',d.tob],['Place of Birth',d.pob],['Height',d.height],['Complexion',d.complexion],['Religion',d.religion],[cl,d.caste],['Mother Tongue',d.motherTongue],['Marital Status',d.marital],['Diet',d.diet]]);
  var career=dl([['Education',d.education],['Occupation',d.occupation],['Company',d.company],['Location',d.location],['Annual Income',d.income]]);
- var fam=dl([["Father's Name",[d.father,d.fatherOcc].filter(Boolean).join(', ')],["Mother's Name",[d.mother,d.motherOcc].filter(Boolean).join(', ')],['Siblings',d.siblings],['Family Type',d.familyType],['Family Values',d.familyValues],['Native Place',d.native]]);
- var horo=dl([['Gotra',d.gotra],['Rashi',d.rashi],['Nakshatra',d.nakshatra],['Manglik',d.manglik]]);
+ var fam=dl([["Father's Name",[d.father,d.fatherOcc].filter(Boolean).join(', ')],["Mother's Name",[d.mother,d.motherOcc].filter(Boolean).join(', ')],['Siblings',d.siblings],['Family Type',d.familyType],['Family Values',d.familyValues],['Family Background',d.familyBackground],['Native Place',d.native]]);
+ var faith,faithTitle;
+ if(comm==='Muslim'){faithTitle='Faith & Practice';faith=dl([['Sect / Maslak',d.sect],['Religiosity',d.religiosity],['Prayer',d.prayer],[g==='M'?'Beard':'Hijab',d.hijabBeard]]);}
+ else if(comm==='Christian'){faithTitle='Faith & Church';faith=dl([['Denomination',d.denomination],['Church / Parish',d.parish],['Baptism',d.baptism]]);}
+ else{faithTitle='Horoscope';faith=dl([['Gotra',d.gotra],['Rashi',d.rashi],['Nakshatra',d.nakshatra],['Manglik',d.manglik]]);}
  var contact=dl([['Phone',d.phone],['Email',d.email],['Address',d.address]]);
- var c1=sec('s-personal','Personal Details',personal)+sec('s-horo','Horoscope',horo);
- var c2=sec('s-career','Education & Career',career)+sec('s-family','Family Details',fam);
- var tx=sec('s-about','About Me',txt(d.about))+sec('s-expect','Partner Expectations',txt(d.expectations));
+ var sFaith=sec('s-horo s-faith',faithTitle,faith),sPers=sec('s-personal','Personal Details',personal),sCar=sec('s-career','Education & Career',career),sFam=sec('s-family','Family Details',fam);
+ var sAbout=sec('s-about','About Me',txt(d.about)),sExp=sec('s-expect','Partner Expectations',txt(d.expectations)),sCon=contact?sec('s-contact','Contact',contact):'';
  var credit=o.credit!==false?'<div class="bd-credit">Made with Vivah Patra · vivahpatra.in</div>':'';
- var headerLine=d.headerLine||'॥ शुभ विवाह ॥';
- var docTitle=d.documentTitle||(hi?'विवाह बायोडाटा':'Marriage Biodata');
- var tagline=d.tagline||'A bond of love, respect and tradition.';
- var blessing=d.blessing||'॥ Wishing you a blessed and joyful journey together ॥';
- return '<div class="bd-page">'+
-  '<header class="bd-head"><div class="bd-dev" lang="hi">'+esc(headerLine)+'</div><div class="bd-title" '+(hi?'lang="hi"':'')+'>'+esc(docTitle)+'</div><svg class="bd-orn" viewBox="0 0 240 16" aria-hidden="true"><use href="#vp-div"/></svg><div class="bd-tag">'+esc(tagline)+'</div></header>'+
-  '<div class="bd-id"><div class="bd-photo"><img src="'+esc(photo)+'" alt="'+(d.photo?'Photo of '+esc(d.name||'candidate'):'Photo placeholder')+'"'+imgStyle+'></div><div class="bd-who"><div class="bd-name">'+esc(d.name||'Your Name')+'</div>'+(sub?'<div class="bd-sub">'+esc(sub)+'</div>':'')+'</div></div>'+
-  '<div class="bd-body"><div class="bd-col c1">'+c1+'</div><div class="bd-col c2">'+c2+'</div></div>'+
-  (tx?'<div class="bd-text">'+tx+'</div>':'')+
-  (contact?'<div class="bd-contact">'+sec('s-contact','Contact',contact)+'</div>':'')+
-  '<footer class="bd-foot"><div class="bd-bless" lang="hi">'+esc(blessing)+'</div>'+credit+'</footer></div>';
+ var top='';
+ if(comm==='Muslim'){if(d.showBismillah!==false)top+='<div class="bd-dev bd-bism" lang="ar" dir="rtl">'+VP.BISMILLAH+'</div>';if(d.showGreeting!==false)top+='<div class="bd-greet">Assalamu Alaikum</div>';}
+ else if(comm==='Christian'){if(d.blessing&&String(d.blessing).trim())top+='<div class="bd-dev bd-bless-top">'+esc(d.blessing)+'</div>';}
+ else top+='<div class="bd-dev" lang="hi">॥ शुभ विवाह ॥</div>';
+ var title=hi?'विवाह बायोडाटा':(t.title||'Marriage Biodata');
+ var head='<header class="bd-head">'+top+'<div class="bd-title" '+(hi?'lang="hi"':'')+'>'+esc(title)+'</div><svg class="bd-orn" viewBox="0 0 240 16" aria-hidden="true"><use href="#'+(t.orn||'vp-div')+'"/></svg><div class="bd-tag">'+(VP.TAGLINE[comm]||VP.TAGLINE.Hindu)+'</div></header>';
+ var idb='<div class="bd-id"><div class="bd-photo"><img src="'+esc(photo)+'" alt="'+(d.photo?'Photo of '+esc(d.name||'candidate'):'Photo placeholder')+'"'+imgStyle+'></div><div class="bd-who"><div class="bd-name">'+esc(d.name||'Your Name')+'</div>'+(sub?'<div class="bd-sub">'+esc(sub)+'</div>':'')+'</div></div>';
+ var foot='<footer class="bd-foot"><div class="bd-bless" '+(comm==='Hindu'?'lang="hi"':'')+'>'+(comm==='Hindu'?'॥ Wishing you a blessed and joyful journey together ॥':'Wishing you a blessed and joyful journey together')+'</div>'+credit+'</footer>';
+ var tx=sAbout+sExp;
+ var lay=t.layout;
+ if(lay==='railL'||lay==='railR'||lay==='panel'){
+  return '<div class="bd-page"><div class="bd-main bd-main-h">'+head+'</div><aside class="bd-rail">'+idb+(sFaith?'<div class="bd-rail-sec">'+sFaith+'</div>':'')+(sCon?'<div class="bd-contact bd-rail-sec">'+sCon+'</div>':'')+'</aside><div class="bd-main bd-main-b"><div class="bd-body"><div class="bd-col c1">'+sPers+'</div><div class="bd-col c2">'+sCar+sFam+'</div></div>'+(tx?'<div class="bd-text">'+tx+'</div>':'')+'</div>'+foot+'</div>';
+ }
+ var c1=sPers+sFaith,c2=sCar+sFam;
+ return '<div class="bd-page">'+head+idb+'<div class="bd-body"><div class="bd-col c1">'+c1+'</div><div class="bd-col c2">'+c2+'</div></div>'+(tx?'<div class="bd-text">'+tx+'</div>':'')+(sCon?'<div class="bd-contact">'+sCon+'</div>':'')+foot+'</div>';
 };
-VP.make=function(d,slug,o){VP.ensureSprite();var el=document.createElement('div');el.className='bd t-'+slug;el.style.setProperty('--d','1');el.innerHTML=(DECOR[slug]?DECOR[slug]():'')+VP.html(d,slug,o);el.dataset.slug=slug;return el;};
+VP.make=function(d,slug,o){VP.ensureSprite();var t=VP.tpl(slug);var el=document.createElement('div');el.className='bd t-'+slug;if(t.layout){el.dataset.layout=t.layout;['photo','h','dl','sec','head'].forEach(function(k){if(t[k])el.dataset[k]=t[k];});}
+ el.style.setProperty('--d','1');var u='u'+(VP._u=(VP._u||0)+1);el.innerHTML=(DECOR[slug]?DECOR[slug](u):'')+VP.html(d,slug,o);el.dataset.slug=slug;return el;};
 VP.MIN_D=0.72;VP.MAX_D=1.1;
 VP.fit=function(bd){
  var page=bd.querySelector('.bd-page');if(!page||!page.clientHeight)return {d:1,over:false,state:'unmeasured'};
@@ -151,13 +163,13 @@ VP.update=function(host,d,slug,o){var old=host.firstElementChild;var bd=VP.make(
 
 /* ---------- WhatsApp 4:5 card ---------- */
 VP.waCard=function(d,slug,o){
- var t=VP.tpl(slug).theme,g=d.gender==='M'?'M':'F';var dark=(slug==='panna-royal'||slug==='varma-traditional');
+ var t=VP.tpl(slug).theme,g=d.gender==='M'?'M':'F';var dark=(VP.tpl(slug).dark||slug==='panna-royal'||slug==='varma-traditional');
  var el=document.createElement('div');el.className='wa-pic t-'+slug;
  el.style.cssText='--bg:'+t.bg+';--ac:'+t.accent+';--go:'+t.gold+';--ik:'+t.ink+';';
  var photo=d.photo||VP.avatar(g);
  var line=[d.dob?fmtDate(d.dob):'',d.height].filter(Boolean).join('  ·  ');
  var line2=[d.occupation,(d.location||'').split(',')[0]].filter(Boolean).join('  ·  ');
- el.innerHTML='<div class="wp-in"><div class="wp-dev" lang="hi">॥ शुभ विवाह ॥</div><div class="wp-t">Marriage Biodata</div><svg class="wp-o" viewBox="0 0 240 16"><use href="#vp-div"/></svg><div class="wp-ph"><img src="'+esc(photo)+'" alt=""></div><div class="wp-n">'+esc(d.name||'Your Name')+'</div><div class="wp-l">'+esc(line)+'</div><div class="wp-l">'+esc(line2)+'</div></div><div class="wp-btn">View Full Biodata PDF</div>';
+ var comm=VP.commOf(d,slug);var tl=comm==='Muslim'?(d.showBismillah!==false?'<span lang="ar" dir="rtl" style="font-family:\'Noto Naskh Arabic\',serif;font-size:1.25em">'+VP.BISMILLAH+'</span>':'Assalamu Alaikum'):(comm==='Christian'?esc(d.blessing||''):'॥ शुभ विवाह ॥');el.style.setProperty('--fh',VP.tpl(slug).fh||"'Cormorant Garamond',serif");el.innerHTML='<div class="wp-in"><div class="wp-dev" lang="hi">'+tl+'</div><div class="wp-t">Marriage Biodata</div><svg class="wp-o" viewBox="0 0 240 16"><use href="#vp-div"/></svg><div class="wp-ph"><img src="'+esc(photo)+'" alt=""></div><div class="wp-n">'+esc(d.name||'Your Name')+'</div><div class="wp-l">'+esc(line)+'</div><div class="wp-l">'+esc(line2)+'</div></div><div class="wp-btn">View Full Biodata PDF</div>';
  el.dataset.dark=dark?'1':'';return el;
 };
 

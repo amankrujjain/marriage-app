@@ -1,4 +1,5 @@
 @import './base.css';
+@import './layouts.css';
 @import './zari-traditional.css';
 @import './panna-royal.css';
 @import './gulab-floral.css';
@@ -7,3 +8,4 @@
 @import './rangoli-floral.css';
 @import './varma-traditional.css';
 @import './aarohi-modern.css';
+@import './all-30.css';

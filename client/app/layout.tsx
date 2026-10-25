@@ -50,6 +50,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${display.variable} ${body.variable} ${label.variable} ${hindi.variable}`}
     >
+      <head>
+        {/* ui-v2 template fonts — urls resolve under /vp/fonts/ */}
+        <link rel="stylesheet" href="/vp/fonts.css" />
+      </head>
       <body className="font-body antialiased">
         <Providers>{children}</Providers>
       </body>

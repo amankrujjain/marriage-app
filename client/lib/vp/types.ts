@@ -5,9 +5,13 @@ export type VpTemplate = {
   name: string;
   tier: string;
   cat: string;
-  faith: string[];
+  faith?: string[];
+  community?: string;
   blurb: string;
   theme: { bg: string; accent: string; gold: string; ink: string };
+  layout?: string;
+  photo?: string;
+  tags?: string[];
 };
 
 export type VpApi = {
@@ -15,6 +19,7 @@ export type VpApi = {
   sampleShort: VpSample;
   sampleLong: VpSample;
   sampleMale: VpSample;
+  sampleFor?: (slug: string, kind?: string) => VpSample;
   ensureSprite: () => void;
   thumb: (
     host: HTMLElement,

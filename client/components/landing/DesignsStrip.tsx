@@ -1,8 +1,12 @@
+'use client';
+
 import Link from 'next/link';
 import { VpThumb } from './VpThumb';
-import { GALLERY_TEMPLATES } from '@/features/templates/gallery/galleryCatalog';
+import { useDesignCatalog } from '@/features/designs/hooks/useDesignCatalog';
 
 export function DesignsStrip() {
+  const { activeGallery } = useDesignCatalog();
+
   return (
     <section className="sec" id="designs" aria-labelledby="des-h">
       <div className="wrap">
@@ -16,7 +20,7 @@ export function DesignsStrip() {
         </div>
       </div>
       <div className="strip" tabIndex={0} aria-label="Biodata designs, scroll sideways">
-        {GALLERY_TEMPLATES.map((t) => (
+        {activeGallery.map((t) => (
           <Link
             key={t.slug}
             className="strip-item"

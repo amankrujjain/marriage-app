@@ -4,40 +4,69 @@ import type { VpApi } from './types';
 
 let loading: Promise<VpApi> | null = null;
 
-/** Load the ui-v1 biodata renderer from /vp/biodata.js (client-only). */
+function loadScript(src: string, dataAttr: 'vpBiodata' | 'vpBiodata30'): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const selector =
+      dataAttr === 'vpBiodata' ? 'script[data-vp-biodata]' : 'script[data-vp-biodata30]';
+    const existing = document.querySelector<HTMLScriptElement>(selector);
+    if (existing) {
+      if (existing.dataset.loaded === '1' || (dataAttr === 'vpBiodata' && window.VP)) {
+        existing.dataset.loaded = '1';
+        resolve();
+        return;
+      }
+      existing.addEventListener('load', () => {
+        existing.dataset.loaded = '1';
+        resolve();
+      }, { once: true });
+      existing.addEventListener(
+        'error',
+        () => reject(new Error(`Failed to load ${src}`)),
+        { once: true },
+      );
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = false;
+    if (dataAttr === 'vpBiodata') script.dataset.vpBiodata = '1';
+    else script.dataset.vpBiodata30 = '1';
+    script.onload = () => {
+      script.dataset.loaded = '1';
+      resolve();
+    };
+    script.onerror = () => reject(new Error(`Failed to load ${src}`));
+    document.head.appendChild(script);
+  });
+}
+
+/** Load ui-v2 biodata renderer: biodata.js then biodata30.js (38 templates). */
 export function loadVp(): Promise<VpApi> {
   if (typeof window === 'undefined') {
     return Promise.reject(new Error('VP requires window'));
   }
-  if (window.VP && typeof window.VP.thumb === 'function') {
+  if (
+    window.VP &&
+    typeof window.VP.thumb === 'function' &&
+    Array.isArray(window.VP.TEMPLATES) &&
+    window.VP.TEMPLATES.length >= 30
+  ) {
     window.VP.ensureSprite();
     return Promise.resolve(window.VP);
   }
   if (!loading) {
-    loading = new Promise<VpApi>((resolve, reject) => {
-      const ready = () => {
-        if (!window.VP || typeof window.VP.thumb !== 'function') {
-          reject(new Error('VP failed to initialize'));
-          return;
-        }
-        window.VP.ensureSprite();
-        resolve(window.VP);
-      };
-
-      const existing = document.querySelector<HTMLScriptElement>('script[data-vp-biodata]');
-      if (existing) {
-        if (window.VP && typeof window.VP.thumb === 'function') ready();
-        else existing.addEventListener('load', ready, { once: true });
-        return;
+    loading = (async () => {
+      await loadScript('/vp/biodata.js', 'vpBiodata');
+      await loadScript('/vp/biodata30.js', 'vpBiodata30');
+      if (!window.VP || typeof window.VP.thumb !== 'function') {
+        throw new Error('VP failed to initialize');
       }
-
-      const script = document.createElement('script');
-      script.src = '/vp/biodata.js';
-      script.async = true;
-      script.dataset.vpBiodata = '1';
-      script.onload = () => ready();
-      script.onerror = () => reject(new Error('Failed to load biodata.js'));
-      document.head.appendChild(script);
+      window.VP.ensureSprite();
+      return window.VP;
+    })().catch((err) => {
+      loading = null;
+      throw err;
     });
   }
   return loading;

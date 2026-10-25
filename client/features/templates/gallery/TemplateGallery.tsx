@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react';
 import {
   FAITH_FILTERS,
-  GALLERY_TEMPLATES,
   STYLE_FILTERS,
   type GalleryFaith,
   type GalleryStyle,
@@ -12,8 +11,10 @@ import {
 import { GalleryCard } from './GalleryCard';
 import { TemplatePreviewModal } from './TemplatePreviewModal';
 import { useReveal } from '@/components/landing/useReveal';
+import { useDesignCatalog } from '@/features/designs/hooks/useDesignCatalog';
 
 export function TemplateGallery() {
+  const { activeGallery } = useDesignCatalog();
   const [cat, setCat] = useState<(typeof STYLE_FILTERS)[number]>('All');
   const [faiths, setFaiths] = useState<Partial<Record<GalleryFaith, boolean>>>({});
   const [preview, setPreview] = useState<GalleryTemplate | null>(null);
@@ -21,13 +22,13 @@ export function TemplateGallery() {
   useReveal();
 
   const filtered = useMemo(() => {
-    return GALLERY_TEMPLATES.filter((t) => {
+    return activeGallery.filter((t) => {
       const okCat = cat === 'All' || t.cat === (cat as GalleryStyle);
       const active = (Object.keys(faiths) as GalleryFaith[]).filter((f) => faiths[f]);
       const okFaith = active.every((f) => t.faith.includes(f));
       return okCat && okFaith;
     });
-  }, [cat, faiths]);
+  }, [cat, faiths, activeGallery]);
 
   function reset() {
     setCat('All');
@@ -72,7 +73,7 @@ export function TemplateGallery() {
           ))}
         </div>
         <p className="result-count" role="status" aria-live="polite">
-          Showing {filtered.length} of {GALLERY_TEMPLATES.length} designs
+          Showing {filtered.length} of {activeGallery.length} designs
         </p>
       </section>
 

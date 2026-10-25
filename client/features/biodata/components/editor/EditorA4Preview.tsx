@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import { loadVp } from '@/lib/vp/loadVp';
-import { isFreeDesign, slugFromTemplateId } from './designMap';
+import { slugFromTemplateId } from './designMap';
 import { mapBiodataToVp } from './mapBiodataToVp';
 import type { EditorSectionDef } from './editorSectionModel';
+import { useDesignCatalog } from '@/features/designs/hooks/useDesignCatalog';
 
 type EditorA4PreviewProps = {
   sections?: EditorSectionDef[];
@@ -45,6 +46,7 @@ function fitFromVp(f: { d: number; over: boolean }): FitState {
 }
 
 export function EditorA4Preview({ sections }: EditorA4PreviewProps) {
+  const { isFreeDesign } = useDesignCatalog();
   const content = useAppSelector((state) => state.biodata.content);
   const templateId = useAppSelector((state) => state.template.selectedTemplateId);
   const designSlug = useAppSelector(
@@ -100,7 +102,7 @@ export function EditorA4Preview({ sections }: EditorA4PreviewProps) {
     return () => {
       alive = false;
     };
-  }, [content, sections, designSlug]);
+  }, [content, sections, designSlug, isFreeDesign]);
 
   const fitClass = fit.over ? 'fit over' : fit.tight ? 'fit tight' : 'fit';
 

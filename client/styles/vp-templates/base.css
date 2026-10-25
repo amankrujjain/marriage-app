@@ -1,5 +1,5 @@
 /* Shared biodata structure. Every template overrides variables + layout. A4 = 210x297mm. */
-.bd{--d:1;--bg:#fff;--ink:#2A1517;--muted:#6b5659;--accent:#681421;--gold:#B4852C;--line:#E6D8C6;--f-h:var(--font-display),Georgia,serif;--f-b:var(--font-body),system-ui,sans-serif;--f-dev:var(--font-hindi),serif;
+.bd{--d:1;--bg:#fff;--ink:#2A1517;--muted:#6b5659;--accent:#681421;--gold:#B4852C;--line:#E6D8C6;--f-h:'Cormorant Garamond','Marcellus',Georgia,serif;--f-b:'Mulish',system-ui,sans-serif;--f-dev:'Noto Serif Devanagari','Cormorant Garamond',serif;
 font-variant-numeric:lining-nums;position:relative;width:210mm;height:297mm;overflow:hidden;background:var(--bg);color:var(--ink);font:400 calc(11.4px*var(--d))/1.45 var(--f-b);text-align:left;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;text-rendering:geometricPrecision}
 .bd *{box-sizing:border-box;margin:0;padding:0}
 .bd-deco{position:absolute;left:0;top:0;width:100%;height:100%;z-index:0}
@@ -11,8 +11,8 @@ font-variant-numeric:lining-nums;position:relative;width:210mm;height:297mm;over
 .bd-orn{display:block;width:62mm;height:4.6mm;margin:.45em auto .35em;color:var(--gold)}
 .bd-tag{font:italic 500 1.15em/1.3 var(--f-h);color:var(--muted)}
 .bd-id{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.6em;margin-top:1.1em}
-.bd-photo{width:36mm;aspect-ratio:4/5;overflow:hidden;background:#e7d9c8;flex:none;position:relative}
-.bd-photo img{display:block;object-fit:cover}
+.bd-photo{width:36mm;aspect-ratio:4/5;overflow:hidden;background:#e7d9c8;flex:none}
+.bd-photo img{display:block;width:100%;height:100%;object-fit:cover}
 .bd-name{font:700 2.3em/1.1 var(--f-h);color:var(--accent);letter-spacing:.02em}
 .bd-sub{font-size:1em;color:var(--muted);margin-top:.15em}
 .bd-body{display:grid;grid-template-columns:1fr 1fr;gap:1.1em 2.2em;margin-top:1.2em;align-items:start}
@@ -33,16 +33,19 @@ font-variant-numeric:lining-nums;position:relative;width:210mm;height:297mm;over
 .bd-bless{font:italic 600 1.1em/1.3 var(--f-h);color:var(--accent);letter-spacing:.02em}
 .bd-credit{font-size:.74em;letter-spacing:.06em;color:var(--muted);margin-top:.5em;opacity:.85}
 /* ---- WhatsApp 4:5 card ---- */
-.wa-pic{aspect-ratio:4/5;width:100%;background:var(--bg);color:var(--ik);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;position:relative;container-type:inline-size;font-family:var(--font-body),sans-serif}
+.wa-pic{aspect-ratio:4/5;width:100%;background:var(--bg);color:var(--ik);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;position:relative;container-type:inline-size;font-family:'Mulish',sans-serif}
 .wa-pic .wp-in{flex:1;display:flex;flex-direction:column;align-items:center;padding:7cqw 6cqw 3cqw;text-align:center;border:.6cqw solid var(--go);margin:2.2cqw 2.2cqw 0;border-radius:2cqw}
-.wp-dev{font:500 5cqw/1.4 var(--font-hindi),serif;color:var(--go)}
-.wp-t{font:700 9.5cqw/1.1 var(--font-display),serif;color:var(--ac);letter-spacing:.06em;text-transform:uppercase}
+.wp-dev{font:500 5cqw/1.4 'Noto Serif Devanagari',serif;color:var(--go)}
+.wp-t{font:700 9.5cqw/1.1 var(--fh,'Cormorant Garamond',serif);color:var(--ac);letter-spacing:.06em;text-transform:uppercase}
 .wa-pic[data-dark="1"] .wp-t{color:var(--go)}
 .wp-o{width:36cqw;height:3cqw;color:var(--go);margin:1.5cqw 0 3cqw}
 .wp-ph{width:30cqw;aspect-ratio:4/5;border-radius:50%;overflow:hidden;border:.8cqw solid var(--go);background:#e7d9c8}
 .wp-ph img{width:100%;height:100%;object-fit:cover;display:block}
-.wp-n{font:700 8.4cqw/1.15 var(--font-display),serif;color:var(--ac);margin-top:3cqw}
+.wp-n{font:700 8.4cqw/1.15 var(--fh,'Cormorant Garamond',serif);color:var(--ac);margin-top:3cqw}
 .wa-pic[data-dark="1"] .wp-n{color:#fff}
-.wp-l{font:600 3.5cqw/1.5 var(--font-body),sans-serif;color:var(--ik);opacity:.85}
-.wp-btn{background:var(--ac);color:#fff;text-align:center;font:700 4cqw/1 var(--font-body),sans-serif;padding:4cqw;margin-top:2.2cqw}
+.wp-l{font:600 3.5cqw/1.5 'Mulish',sans-serif;color:var(--ik);opacity:.85}
+.wp-btn{background:var(--ac);color:#fff;text-align:center;font:700 4cqw/1 'Mulish',sans-serif;padding:4cqw;margin-top:2.2cqw}
 .wa-pic[data-dark="1"] .wp-btn{background:var(--go);color:#2a1517}
+.bd-bism{font-family:'Noto Naskh Arabic','Amiri',serif!important;font-size:1.9em!important;line-height:1.9!important;direction:rtl;unicode-bidi:isolate}
+.bd-greet{font:italic 500 1.05em/1.3 var(--f-s,var(--f-h));color:var(--muted);letter-spacing:.04em}
+.bd-bless-top{font:italic 500 1.2em/1.3 var(--f-s,var(--f-h))!important;color:var(--accent)}

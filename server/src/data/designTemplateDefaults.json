@@ -1,0 +1,428 @@
+[
+  {
+    "slug": "zari-traditional",
+    "name": "Zari Traditional",
+    "tier": "Free",
+    "cat": "Traditional",
+    "faith": [
+      "Hindu",
+      "Sikh"
+    ],
+    "blurb": "Maroon and gold zari border with rosette corners. The classic family biodata.",
+    "active": true
+  },
+  {
+    "slug": "panna-royal",
+    "name": "Panna Royal",
+    "tier": "Premium",
+    "cat": "Royal",
+    "faith": [
+      "Hindu",
+      "Muslim",
+      "Sikh"
+    ],
+    "blurb": "Deep emerald green with a gold arch frame and lattice. Rich and formal.",
+    "active": true
+  },
+  {
+    "slug": "gulab-floral",
+    "name": "Gulab Floral",
+    "tier": "Free",
+    "cat": "Floral",
+    "faith": [
+      "Hindu"
+    ],
+    "blurb": "Cream page with soft rose clusters in two corners and a round photo.",
+    "active": true
+  },
+  {
+    "slug": "kagaz-modern",
+    "name": "Kagaz Modern",
+    "tier": "Free",
+    "cat": "Modern",
+    "faith": [
+      "Hindu",
+      "Muslim",
+      "Sikh"
+    ],
+    "blurb": "Clean white page with a side rail. Easy to read, easy on the printer.",
+    "active": true
+  },
+  {
+    "slug": "suryavanshi-royal",
+    "name": "Suryavanshi Royal",
+    "tier": "Premium",
+    "cat": "Royal",
+    "faith": [
+      "Hindu"
+    ],
+    "blurb": "Maroon header with a gold temple skyline and a round photo.",
+    "active": true
+  },
+  {
+    "slug": "rangoli-floral",
+    "name": "Rangoli Floral",
+    "tier": "Free",
+    "cat": "Floral",
+    "faith": [
+      "Hindu"
+    ],
+    "blurb": "Warm cream with pink blossoms, a rangoli ring and an arched photo.",
+    "active": true
+  },
+  {
+    "slug": "varma-traditional",
+    "name": "Varma Traditional",
+    "tier": "Premium",
+    "cat": "Traditional",
+    "faith": [
+      "Hindu",
+      "Sikh"
+    ],
+    "blurb": "Full maroon panel inside an ornate triple gold frame.",
+    "active": true
+  },
+  {
+    "slug": "aarohi-modern",
+    "name": "Aarohi Modern",
+    "tier": "Free",
+    "cat": "Modern",
+    "faith": [
+      "Hindu",
+      "Muslim",
+      "Sikh"
+    ],
+    "blurb": "Soft beige, a left-aligned name and tidy cards. Calm and contemporary.",
+    "active": true
+  },
+  {
+    "slug": "kalash-mangal",
+    "name": "Kalash Mangal",
+    "tier": "Free",
+    "cat": "Traditional",
+    "faith": [
+      "Hindu"
+    ],
+    "blurb": "Saffron and cream with a kalash, mango-leaf toran and a row of diyas. A warm, classic centred biodata.",
+    "active": true
+  },
+  {
+    "slug": "kasavu-kerala",
+    "name": "Kasavu Kerala",
+    "tier": "Free",
+    "cat": "Modern",
+    "faith": [
+      "Hindu"
+    ],
+    "blurb": "Cream and gold in the manner of a kasavu border, with generous white space. Quiet, minimal and elegant.",
+    "active": true
+  },
+  {
+    "slug": "mayur-peacock",
+    "name": "Mayur Peacock",
+    "tier": "Premium",
+    "cat": "Royal",
+    "faith": [
+      "Hindu"
+    ],
+    "blurb": "Peacock teal header with hand-drawn feathers and an arched photo that overlaps the band.",
+    "active": true
+  },
+  {
+    "slug": "haldi-diya",
+    "name": "Haldi Diya",
+    "tier": "Premium",
+    "cat": "Traditional",
+    "faith": [
+      "Hindu"
+    ],
+    "blurb": "Turmeric-yellow photo rail with rangoli dots, and a line of glowing diyas along the base.",
+    "active": true
+  },
+  {
+    "slug": "mehendi-bel",
+    "name": "Mehendi Bel",
+    "tier": "Premium",
+    "cat": "Floral",
+    "faith": [
+      "Hindu"
+    ],
+    "blurb": "Henna-green vines and paisleys on a soft sage page, with tidy white cards for each section.",
+    "active": true
+  },
+  {
+    "slug": "jharokha-rajwada",
+    "name": "Jharokha Rajwada",
+    "tier": "Premium",
+    "cat": "Royal",
+    "faith": [
+      "Hindu"
+    ],
+    "blurb": "A cusped Rajasthani jharokha arch in rose-gold and rani pink frames the whole page like a certificate.",
+    "active": true
+  },
+  {
+    "slug": "gopuram-dakshin",
+    "name": "Gopuram Dakshin",
+    "tier": "Premium",
+    "cat": "Traditional",
+    "faith": [
+      "Hindu"
+    ],
+    "blurb": "Vermilion banner with a tiered gopuram silhouette, a gold temple-border zigzag and a tall photo.",
+    "active": true
+  },
+  {
+    "slug": "neel-blockprint",
+    "name": "Neel Block Print",
+    "tier": "Free",
+    "cat": "Modern",
+    "faith": [
+      "Hindu"
+    ],
+    "blurb": "Indigo hand-block-print rail on the right with cream, boxed headings and crisp ruled lists.",
+    "active": true
+  },
+  {
+    "slug": "alpona-bangla",
+    "name": "Alpona Bangla",
+    "tier": "Premium",
+    "cat": "Floral",
+    "faith": [
+      "Hindu"
+    ],
+    "blurb": "Red-and-white lal-paar bands with rice-paste alpona rosettes, and a vertical timeline for the details.",
+    "active": true
+  },
+  {
+    "slug": "maharashtri-nath",
+    "name": "Maharashtri Nath",
+    "tier": "Premium",
+    "cat": "Royal",
+    "faith": [
+      "Hindu"
+    ],
+    "blurb": "Paithani purple border with lotus-and-peacock butis, a pearl nath motif and a magazine-style layout with a polaroid photo.",
+    "active": true
+  },
+  {
+    "slug": "khatam-emerald",
+    "name": "Khatam Emerald",
+    "tier": "Free",
+    "cat": "Traditional",
+    "faith": [
+      "Muslim"
+    ],
+    "blurb": "Emerald and gold with an 8-point khatam star lattice at the head and foot of an ivory page.",
+    "active": true
+  },
+  {
+    "slug": "mihrab-midnight",
+    "name": "Mihrab Midnight",
+    "tier": "Premium",
+    "cat": "Royal",
+    "faith": [
+      "Muslim"
+    ],
+    "blurb": "Midnight navy and gold, framed by a pointed mihrab arch with a mihrab-shaped photo. Formal, nikah-card elegance.",
+    "active": true
+  },
+  {
+    "slug": "jaali-mughal",
+    "name": "Jaali Mughal",
+    "tier": "Premium",
+    "cat": "Traditional",
+    "faith": [
+      "Muslim"
+    ],
+    "blurb": "A deep teal rail patterned like a carved jaali screen, with pietra-dura flower sprays on ivory.",
+    "active": true
+  },
+  {
+    "slug": "fanoos-lantern",
+    "name": "Fanoos Lantern",
+    "tier": "Free",
+    "cat": "Floral",
+    "faith": [
+      "Muslim"
+    ],
+    "blurb": "Burgundy banner with hanging fanoos lanterns, a scalloped edge and a round photo on champagne.",
+    "active": true
+  },
+  {
+    "slug": "lale-ottoman",
+    "name": "Lale Ottoman",
+    "tier": "Premium",
+    "cat": "Floral",
+    "faith": [
+      "Muslim"
+    ],
+    "blurb": "Dusty rose header with Ottoman tulip borders in bronze and cream; an oval photo overlaps the band.",
+    "active": true
+  },
+  {
+    "slug": "zellige-tile",
+    "name": "Zellige Tile",
+    "tier": "Premium",
+    "cat": "Modern",
+    "faith": [
+      "Muslim"
+    ],
+    "blurb": "Cobalt, ochre and terracotta Moorish tile bands with white cards and a diamond-cut photo.",
+    "active": true
+  },
+  {
+    "slug": "sitara-crescent",
+    "name": "Sitara Crescent",
+    "tier": "Premium",
+    "cat": "Modern",
+    "faith": [
+      "Muslim"
+    ],
+    "blurb": "Ice-silver page with a midnight crescent-and-stars corner and a vertical timeline for the details.",
+    "active": true
+  },
+  {
+    "slug": "noir-naskh",
+    "name": "Noir Naskh",
+    "tier": "Premium",
+    "cat": "Royal",
+    "faith": [
+      "Muslim"
+    ],
+    "blurb": "Black and gold magazine layout: an oversized name, a hard-shadow photo and a faint star-geometry watermark.",
+    "active": true
+  },
+  {
+    "slug": "sabz-minimal",
+    "name": "Sabz Minimal",
+    "tier": "Free",
+    "cat": "Modern",
+    "faith": [
+      "Muslim"
+    ],
+    "blurb": "Quiet sage and white with a soft flowing arabesque band for the bismillah. Minimal and print-friendly.",
+    "active": true
+  },
+  {
+    "slug": "nikah-card-ivory",
+    "name": "Nikah Card Ivory",
+    "tier": "Free",
+    "cat": "Traditional",
+    "faith": [
+      "Muslim"
+    ],
+    "blurb": "Persian-manuscript illumination border in lapis and gold on ivory, with a script heading and a polaroid photo.",
+    "active": true
+  },
+  {
+    "slug": "olive-ivory",
+    "name": "Olive & Ivory",
+    "tier": "Free",
+    "cat": "Floral",
+    "faith": [
+      "Christian"
+    ],
+    "blurb": "Sage and ivory with an olive-branch wreath around a round photo. Calm, graceful and denomination-neutral.",
+    "active": true
+  },
+  {
+    "slug": "celtic-forest",
+    "name": "Celtic Knot Forest",
+    "tier": "Premium",
+    "cat": "Traditional",
+    "faith": [
+      "Christian"
+    ],
+    "blurb": "A full-height photo panel on forest green, with gold Celtic-inspired interlace borders and a ringed cross.",
+    "active": true
+  },
+  {
+    "slug": "rose-window",
+    "name": "Rose Window",
+    "tier": "Premium",
+    "cat": "Royal",
+    "faith": [
+      "Christian"
+    ],
+    "blurb": "Navy header flanked by two jewel-toned rose windows (pure geometry) with a round photo on the edge.",
+    "active": true
+  },
+  {
+    "slug": "dove-lily",
+    "name": "Dove & Lily",
+    "tier": "Free",
+    "cat": "Floral",
+    "faith": [
+      "Christian"
+    ],
+    "blurb": "Soft blush-grey banner with a dove carrying an olive sprig, and white lilies in the corners.",
+    "active": true
+  },
+  {
+    "slug": "watercolour-bloom",
+    "name": "Watercolour Bloom",
+    "tier": "Premium",
+    "cat": "Floral",
+    "faith": [
+      "Christian"
+    ],
+    "blurb": "Lavender and blush watercolour washes with leaf sprigs, script headings and soft frosted cards.",
+    "active": true
+  },
+  {
+    "slug": "nasrani-gold",
+    "name": "Nasrani Gold",
+    "tier": "Premium",
+    "cat": "Traditional",
+    "faith": [
+      "Christian"
+    ],
+    "blurb": "Kerala-inspired cream and gold kasavu borders with a Nasrani-style cross. Formal and framed like a certificate.",
+    "active": true
+  },
+  {
+    "slug": "engraved-scroll",
+    "name": "Engraved Scroll",
+    "tier": "Premium",
+    "cat": "Traditional",
+    "faith": [
+      "Christian"
+    ],
+    "blurb": "Vintage engraved-scroll corners and a thick-thin frame in burgundy on cream, in a magazine-style layout.",
+    "active": true
+  },
+  {
+    "slug": "nordic-cross",
+    "name": "Nordic Cross",
+    "tier": "Free",
+    "cat": "Modern",
+    "faith": [
+      "Christian"
+    ],
+    "blurb": "Ice-blue and silver minimalism: a hairline cross, a wide banner photo and plenty of air.",
+    "active": true
+  },
+  {
+    "slug": "chapel-arch",
+    "name": "Chapel Arch",
+    "tier": "Premium",
+    "cat": "Traditional",
+    "faith": [
+      "Christian"
+    ],
+    "blurb": "A pointed chapel-window arch frames an arched photo, with ivy borders and a timeline of details.",
+    "active": true
+  },
+  {
+    "slug": "azulejo-goa",
+    "name": "Azulejo Goa",
+    "tier": "Premium",
+    "cat": "Modern",
+    "faith": [
+      "Christian"
+    ],
+    "blurb": "Goan-inspired blue-and-white azulejo tile strips with a small cross medallion and a pale blue photo rail.",
+    "active": true
+  }
+]

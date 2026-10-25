@@ -9,6 +9,7 @@ import mediaRoutes from './media.routes';
 import cronRoutes from './cron.routes';
 import billingRoutes from './billing.routes';
 import adminRoutes from './admin.routes';
+import designsRoutes from './designs.routes';
 
 const v1Router = Router();
 
@@ -16,6 +17,7 @@ v1Router.use('/health', healthRoutes);
 v1Router.use('/auth', authRoutes);
 v1Router.use('/biodata', biodataRoutes);
 v1Router.use('/templates', templatesRoutes);
+v1Router.use('/designs', designsRoutes);
 v1Router.use('/translation', translationRoutes);
 v1Router.use('/export', exportRoutes);
 v1Router.use('/media', mediaRoutes);

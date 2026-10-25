@@ -32,8 +32,9 @@ export function VpThumb({
 
     void loadVp().then((VP) => {
       if (!alive || !hostRef.current) return;
-      const data: VpSample =
-        sample === 'long'
+      const data: VpSample = VP.sampleFor
+        ? VP.sampleFor(slug, sample)
+        : sample === 'long'
           ? VP.sampleLong
           : sample === 'male'
             ? VP.sampleMale
