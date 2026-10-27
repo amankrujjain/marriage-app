@@ -16,6 +16,7 @@ export async function exportController(
       imageBase64: req.body.imageBase64 as string,
       fileName: req.body.fileName as string | undefined,
       personName: req.body.personName as string | undefined,
+      designSlug: req.body.designSlug as string | undefined,
     });
     sendCreated(res, data, 'Export created successfully');
   } catch (error) {

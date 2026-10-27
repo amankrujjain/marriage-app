@@ -85,6 +85,17 @@ function toPublic(doc: {
   };
 }
 
+/** Active design tier by slug, or null if missing/inactive (fail closed). */
+export async function findActiveDesignTierBySlug(
+  slug: string,
+): Promise<'Free' | 'Premium' | null> {
+  const doc = await DesignTemplateConfigModel.findOne({ slug, active: true })
+    .select('tier')
+    .lean();
+  if (!doc?.tier) return null;
+  return doc.tier as 'Free' | 'Premium';
+}
+
 /** Public catalog: active templates only (read-only; seed runs at boot). */
 export async function listPublicDesignTemplates() {
   const items = await DesignTemplateConfigModel.find({ active: true })

@@ -6,6 +6,7 @@ export async function requestExport(input: {
   imageBase64: string;
   fileName?: string;
   personName?: string;
+  designSlug?: string;
 }): Promise<ExportResult> {
   return apiPost<ExportResult>('/export', input);
 }

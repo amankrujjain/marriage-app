@@ -6,7 +6,8 @@ import { ExportFormat, PREMIUM_AMOUNT_INR } from '@marriage/shared';
 import { useAppSelector } from '@/store/hooks';
 import { useExportBiodata } from '@/features/export/hooks/useExportBiodata';
 import { WhatsAppShareButton } from '@/features/export/components/WhatsAppShareButton';
-import { designFromSlug, slugFromTemplateId } from '@/features/biodata/components/editor/designMap';
+import { slugFromTemplateId } from '@/features/biodata/components/editor/designMap';
+import { useDesignCatalog } from '@/features/designs/hooks/useDesignCatalog';
 import { DownloadLanguageSelect } from './DownloadLanguageSelect';
 import type { DownloadPlan } from './DownloadShell';
 
@@ -18,6 +19,7 @@ type DownloadCheckoutProps = {
 export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) {
   const router = useRouter();
   const { exportAs } = useExportBiodata();
+  const { isFreeDesign, designFromSlug } = useDesignCatalog();
   const isPremium = useAppSelector((state) => state.auth.user?.isPremium ?? false);
   const premiumUntil = useAppSelector((state) => state.auth.user?.premiumUntil);
   const authStatus = useAppSelector((state) => state.auth.status);
@@ -34,6 +36,9 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
 
   const designName =
     designFromSlug(designSlug)?.name ?? slugFromTemplateId(templateId);
+  const freeDesign = isFreeDesign(designSlug);
+  // Premium plan or Premium design needs Wedding Pass; Free design + Basic does not.
+  const needsPass = !isPremium && (plan === 'premium' || !freeDesign);
 
   const busy =
     exportStatus === 'translating' ||
@@ -47,7 +52,7 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
       return;
     }
 
-    if (plan === 'premium' && !isPremium) {
+    if (needsPass) {
       router.push('/wedding-pass');
       return;
     }
@@ -60,7 +65,7 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
       router.push('/login?next=/download');
       return;
     }
-    if (plan === 'premium' && !isPremium) {
+    if (needsPass) {
       router.push('/wedding-pass');
       return;
     }
@@ -75,7 +80,7 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
     if (exportStatus === 'exporting') return 'Preparing download…';
     if (busy) return 'Preparing download…';
     if (authStatus !== 'authenticated') return 'Sign in to download';
-    if (plan === 'premium' && !isPremium) return 'Continue to Wedding Pass';
+    if (needsPass) return 'Continue to Wedding Pass';
     return 'Download PDF';
   })();
 
@@ -207,9 +212,11 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
         <p className="note" style={{ margin: '10px 0 0' }}>
           You can design freely as a guest. Sign in when you&apos;re ready to download.
         </p>
-      ) : plan === 'premium' && !isPremium ? (
+      ) : needsPass ? (
         <p className="note" style={{ margin: '10px 0 0' }}>
-          Unlock premium downloads with the{' '}
+          {!freeDesign && plan === 'free'
+            ? 'This design is Premium. Unlock it with the '
+            : 'Unlock premium downloads with the '}
           <Link href="/wedding-pass">Wedding Pass</Link> (₹{PREMIUM_AMOUNT_INR} for 30 days).
         </p>
       ) : (

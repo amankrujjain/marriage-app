@@ -5,6 +5,9 @@ export interface ExportRequest {
   /** data URL or raw base64 of the rendered biodata preview */
   imageBase64: string;
   fileName?: string;
+  /** Active design slug; Free tier skips Wedding Pass (server verifies). */
+  designSlug?: string;
+  personName?: string;
 }
 
 export interface ExportResult {

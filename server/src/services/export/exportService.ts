@@ -8,6 +8,7 @@ import {
   type ExportResult,
 } from '@marriage/shared';
 import { createExportProvider } from '../../providers/export/createExportProvider';
+import { findActiveDesignTierBySlug } from '../designs/designTemplateService';
 import { parseImageBase64 } from '../../utils/parseImageBase64';
 import { buildSignedMediaUrl } from '../../utils/signedMediaUrl';
 import { requirePremiumUser } from './requirePremiumUser';
@@ -31,8 +32,14 @@ export async function exportBiodata(input: {
   imageBase64: string;
   fileName?: string;
   personName?: string;
+  designSlug?: string;
 }): Promise<ExportResult> {
-  await requirePremiumUser(input.userId);
+  const slug = input.designSlug?.trim();
+  const tier = slug ? await findActiveDesignTierBySlug(slug) : null;
+  // Free + active → skip Pass. Premium / missing / inactive → fail closed.
+  if (tier !== 'Free') {
+    await requirePremiumUser(input.userId);
+  }
 
   const imageBuffer = parseImageBase64(input.imageBase64);
   const provider = createExportProvider(input.format);

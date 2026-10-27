@@ -8,4 +8,5 @@ export const exportSchema = Joi.object({
   imageBase64: Joi.string().min(64).required(),
   fileName: Joi.string().trim().max(80).optional(),
   personName: Joi.string().trim().max(120).optional(),
+  designSlug: Joi.string().trim().max(80).optional(),
 });

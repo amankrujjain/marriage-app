@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { ExportFormat, LanguageCode } from '@marriage/shared';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { ApiClientError } from '@/lib/apiClient';
+import { slugFromTemplateId } from '@/features/biodata/components/editor/designMap';
 import { useTranslateBiodata } from '@/features/translation/hooks/useTranslateBiodata';
 import { capturePreview } from '../utils/capturePreview';
 import { requestExport } from '../services/exportApi';
@@ -32,6 +33,11 @@ export function useExportBiodata() {
   const { translate } = useTranslateBiodata();
   const authStatus = useAppSelector((state) => state.auth.status);
   const exportLanguage = useAppSelector((state) => state.language.exportLanguage);
+  const designSlug = useAppSelector(
+    (state) =>
+      state.template.selectedDesignSlug ||
+      slugFromTemplateId(state.template.selectedTemplateId),
+  );
   const fullName = useAppSelector(
     (state) => state.biodata.content.personal.fullName ?? 'Marriage Biodata',
   );
@@ -73,6 +79,7 @@ export function useExportBiodata() {
         imageBase64,
         fileName: personName,
         personName,
+        designSlug: designSlug || undefined,
       });
       dispatch(exportSucceeded(result));
     } catch (error) {
