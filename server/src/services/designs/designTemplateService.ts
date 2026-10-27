@@ -2,38 +2,65 @@ import { NotFoundError } from '../../errors/NotFoundError';
 import { BadRequestError } from '../../errors/BadRequestError';
 import { DesignTemplateConfigModel } from '../../models/DesignTemplateConfig';
 import { DESIGN_TEMPLATE_DEFAULTS } from './designTemplateDefaults';
+import { logger } from '../../utils/logger';
 
 const CATS = new Set(['Traditional', 'Royal', 'Floral', 'Modern']);
 const TIERS = new Set(['Free', 'Premium']);
 const FAITHS = new Set(['Hindu', 'Muslim', 'Sikh', 'Christian']);
 
-export async function ensureDesignTemplatesSeeded(): Promise<void> {
-  const count = await DesignTemplateConfigModel.countDocuments();
-  if (count > 0) {
-    // Upsert any new defaults that appear later without overwriting admin edits.
-    for (const d of DESIGN_TEMPLATE_DEFAULTS) {
-      await DesignTemplateConfigModel.updateOne(
-        { slug: d.slug },
-        {
-          $setOnInsert: {
-            name: d.name,
-            tier: d.tier,
-            cat: d.cat,
-            faith: d.faith,
-            blurb: d.blurb,
-            active: d.active,
-          },
-        },
-        { upsert: true },
-      );
-    }
-    return;
-  }
+let seedPromise: Promise<void> | null = null;
 
-  await DesignTemplateConfigModel.insertMany(
-    DESIGN_TEMPLATE_DEFAULTS.map((d) => ({ ...d })),
-    { ordered: false },
-  );
+/**
+ * Idempotent boot-time seed. Inserts missing slugs only ($setOnInsert).
+ * Safe under concurrent callers via in-process mutex + unique slug index.
+ */
+export async function ensureDesignTemplatesSeeded(): Promise<void> {
+  if (!seedPromise) {
+    seedPromise = (async () => {
+      const ops = DESIGN_TEMPLATE_DEFAULTS.map((d) => ({
+        updateOne: {
+          filter: { slug: d.slug },
+          update: {
+            $setOnInsert: {
+              name: d.name,
+              tier: d.tier,
+              cat: d.cat,
+              faith: d.faith,
+              blurb: d.blurb,
+              active: d.active,
+            },
+          },
+          upsert: true,
+        },
+      }));
+
+      try {
+        const result = await DesignTemplateConfigModel.bulkWrite(ops, {
+          ordered: false,
+        });
+        logger.info('designs.seed.done', {
+          upserted: result.upsertedCount,
+          matched: result.matchedCount,
+          defaults: DESIGN_TEMPLATE_DEFAULTS.length,
+        });
+      } catch (err: unknown) {
+        // Duplicate key from a racing process is fine — unique index on slug.
+        const code =
+          err && typeof err === 'object' && 'code' in err
+            ? (err as { code?: number }).code
+            : undefined;
+        if (code === 11000) {
+          logger.info('designs.seed.duplicate_ignored');
+          return;
+        }
+        throw err;
+      }
+    })().catch((err) => {
+      seedPromise = null;
+      throw err;
+    });
+  }
+  await seedPromise;
 }
 
 function toPublic(doc: {
@@ -58,18 +85,16 @@ function toPublic(doc: {
   };
 }
 
-/** Public catalog: active templates only (for gallery / editor). */
+/** Public catalog: active templates only (read-only; seed runs at boot). */
 export async function listPublicDesignTemplates() {
-  await ensureDesignTemplatesSeeded();
   const items = await DesignTemplateConfigModel.find({ active: true })
     .sort({ name: 1 })
     .lean();
   return { items: items.map(toPublic) };
 }
 
-/** Admin catalog: all templates. */
+/** Admin catalog: all templates (read-only; seed runs at boot). */
 export async function listAdminDesignTemplates() {
-  await ensureDesignTemplatesSeeded();
   const items = await DesignTemplateConfigModel.find().sort({ name: 1 }).lean();
   return { items: items.map(toPublic) };
 }
@@ -85,7 +110,6 @@ export async function updateAdminDesignTemplate(
     faith?: string[];
   },
 ) {
-  await ensureDesignTemplatesSeeded();
   const existing = await DesignTemplateConfigModel.findOne({ slug });
   if (!existing) {
     throw new NotFoundError('Template not found', 'TEMPLATE_NOT_FOUND');

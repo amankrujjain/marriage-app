@@ -3,6 +3,7 @@ import { env } from './config/env';
 import { connectDatabase, disconnectDatabase } from './config/database';
 import { disconnectRedis } from './config/redis';
 import { seedCronConfigs } from './services/cron/seedCronConfigs';
+import { ensureDesignTemplatesSeeded } from './services/designs/designTemplateService';
 import {
   startCronScheduler,
   stopCronScheduler,
@@ -12,6 +13,7 @@ import { logger } from './utils/logger';
 async function bootstrap(): Promise<void> {
   await connectDatabase();
   await seedCronConfigs();
+  await ensureDesignTemplatesSeeded();
   await startCronScheduler();
 
   const app = createApp();
