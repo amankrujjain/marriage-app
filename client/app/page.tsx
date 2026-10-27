@@ -10,7 +10,6 @@ import { Pricing } from '@/components/landing/Pricing';
 import { Faq } from '@/components/landing/Faq';
 import { FinalCta } from '@/components/landing/FinalCta';
 import { SiteFooter } from '@/components/landing/SiteFooter';
-import { LoggedInHomeRedirect } from '@/features/auth/components/LoggedInHomeRedirect';
 import { useReveal } from '@/components/landing/useReveal';
 
 export default function HomePage() {
@@ -18,7 +17,6 @@ export default function HomePage() {
 
   return (
     <div className="landing">
-      <LoggedInHomeRedirect />
       <SiteHeader />
       <main id="main">
         <HeroSection />
