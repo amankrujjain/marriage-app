@@ -52,6 +52,8 @@ const languageSlice = createSlice({
         extras?: StructuredFields;
         cached: boolean;
         provider: string;
+        /** Soft warning (e.g. English fallback); does not block export. */
+        warning?: string;
       }>,
     ) {
       state.translatedContent = action.payload.content;
@@ -59,6 +61,7 @@ const languageSlice = createSlice({
       state.cached = action.payload.cached;
       state.provider = action.payload.provider;
       state.status = 'ready';
+      state.error = action.payload.warning ?? null;
     },
     translationFailed(state, action: PayloadAction<string>) {
       state.status = 'error';

@@ -219,7 +219,11 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
       )}
 
       {translationError ? (
-        <p className="err" style={{ marginTop: 10 }}>
+        <p
+          className={translationStatus === 'ready' ? 'note' : 'err'}
+          style={{ marginTop: 10 }}
+          role="status"
+        >
           {translationError}
         </p>
       ) : null}

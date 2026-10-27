@@ -14,7 +14,6 @@ import type { EditorSectionDef } from '@/features/biodata/components/editor/edit
 import { translateFields } from '../services/translationApi';
 import { flattenSectionsForTranslation } from '../utils/flattenSectionsForTranslation';
 import {
-  translationFailed,
   translationStarted,
   translationSucceeded,
 } from '../store/languageSlice';
@@ -32,29 +31,24 @@ function splitTranslatedFields(fields: StructuredFields): {
   return { contentFields, extras };
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+const TRANSLATE_ATTEMPTS = 2;
+const TRANSLATE_BACKOFF_MS = [400, 800];
+
 export function useTranslateBiodata() {
   const dispatch = useAppDispatch();
   const content = useAppSelector((state) => state.biodata.content);
   const exportLanguage = useAppSelector((state) => state.language.exportLanguage);
 
   const translate = useCallback(
-    async (sections?: EditorSectionDef[]): Promise<BiodataContent | null> => {
+    async (sections?: EditorSectionDef[]): Promise<BiodataContent> => {
       const editorSections = sections ?? loadEditorSections();
       const fields = flattenSectionsForTranslation(editorSections);
 
-      if (exportLanguage === LanguageCode.EN) {
-        dispatch(
-          translationSucceeded({
-            content,
-            extras: {},
-            cached: false,
-            provider: 'passthrough',
-          }),
-        );
-        return content;
-      }
-
-      if (Object.keys(fields).length === 0) {
+      if (exportLanguage === LanguageCode.EN || Object.keys(fields).length === 0) {
         dispatch(
           translationSucceeded({
             content,
@@ -67,31 +61,49 @@ export function useTranslateBiodata() {
       }
 
       dispatch(translationStarted());
-      try {
-        const result = await translateFields({
-          fields,
-          targetLanguage: exportLanguage,
-          sourceLanguage: LanguageCode.EN,
-        });
-        const { contentFields, extras } = splitTranslatedFields(result.fields);
-        const nextContent = applyTranslatedFields(content, contentFields);
-        dispatch(
-          translationSucceeded({
-            content: nextContent,
-            extras,
-            cached: result.cached,
-            provider: result.provider,
-          }),
-        );
-        return nextContent;
-      } catch (error) {
-        const message =
-          error instanceof ApiClientError || error instanceof Error
-            ? error.message
-            : 'Translation failed';
-        dispatch(translationFailed(message));
-        return null;
+      let lastMessage = 'Translation failed';
+
+      for (let attempt = 0; attempt < TRANSLATE_ATTEMPTS; attempt += 1) {
+        try {
+          const result = await translateFields({
+            fields,
+            targetLanguage: exportLanguage,
+            sourceLanguage: LanguageCode.EN,
+          });
+          const { contentFields, extras } = splitTranslatedFields(result.fields);
+          const nextContent = applyTranslatedFields(content, contentFields);
+          dispatch(
+            translationSucceeded({
+              content: nextContent,
+              extras,
+              cached: result.cached,
+              provider: result.provider,
+            }),
+          );
+          return nextContent;
+        } catch (error) {
+          lastMessage =
+            error instanceof ApiClientError || error instanceof Error
+              ? error.message
+              : 'Translation failed';
+          const wait = TRANSLATE_BACKOFF_MS[attempt];
+          if (wait !== undefined && attempt < TRANSLATE_ATTEMPTS - 1) {
+            await sleep(wait);
+          }
+        }
       }
+
+      // Fail open: English source content so download can continue.
+      dispatch(
+        translationSucceeded({
+          content,
+          extras: {},
+          cached: false,
+          provider: 'fallback-en',
+          warning: `Translation unavailable (${lastMessage}). Downloading in English.`,
+        }),
+      );
+      return content;
     },
     [content, dispatch, exportLanguage],
   );

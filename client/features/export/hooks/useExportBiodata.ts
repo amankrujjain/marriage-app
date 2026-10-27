@@ -56,15 +56,8 @@ export function useExportBiodata() {
         dispatch(exportTranslating());
       }
 
+      // Always continues: translate() falls back to English after retries.
       const translated = await translate();
-      if (!translated) {
-        dispatch(
-          exportFailed(
-            'Could not translate biodata. Try English, or retry in a moment.',
-          ),
-        );
-        return;
-      }
 
       await waitForPreviewPaint();
 
