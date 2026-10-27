@@ -100,7 +100,16 @@ var DECOR={
 
 VP.DECOR=DECOR;
 /* ---------- renderer ---------- */
-function fmtDate(v){if(!v)return '';var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v);if(!m)return v;var M=['January','February','March','April','May','June','July','August','September','October','November','December'];return parseInt(m[3],10)+' '+M[parseInt(m[2],10)-1]+' '+m[1];}
+var MONTHS_EN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var MONTHS_HI=['जनवरी','फ़रवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'];
+var MONTHS_MR=['जानेवारी','फेब्रुवारी','मार्च','एप्रिल','मे','जून','जुलै','ऑगस्ट','सप्टेंबर','ऑक्टोबर','नोव्हेंबर','डिसेंबर'];
+var localeMonths=MONTHS_EN;
+VP.setLocale=function(lang){
+ if(lang==='hi') localeMonths=MONTHS_HI;
+ else if(lang==='mr') localeMonths=MONTHS_MR;
+ else localeMonths=MONTHS_EN;
+};
+function fmtDate(v){if(!v)return '';var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v);if(!m)return v;return parseInt(m[3],10)+' '+localeMonths[parseInt(m[2],10)-1]+' '+m[1];}
 VP.fmtDate=fmtDate;
 function rows(list){var h='';list.forEach(function(r){if(r[1]&&String(r[1]).trim())h+='<div><dt>'+esc(r[0])+'</dt><dd>'+esc(r[1])+'</dd></div>';});return h;}
 function sec(cls,title,body){if(!body)return '';return '<section class="bd-sec '+cls+'"><h3 class="bd-h"><span class="bd-hm" aria-hidden="true"></span>'+esc(title)+'</h3>'+body+'</section>';}

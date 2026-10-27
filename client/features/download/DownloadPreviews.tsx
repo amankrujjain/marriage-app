@@ -85,6 +85,7 @@ export function DownloadPreviews({ credit }: DownloadPreviewsProps) {
 
     void loadVp().then((VP) => {
       if (!alive || !a4Ref.current || !waRef.current || !printRef.current) return;
+      VP.setLocale?.(exportLanguage);
       const opts = { credit, lang: vpLang };
       const stage = a4Ref.current;
       let fit: { d: number; over: boolean };
@@ -131,7 +132,7 @@ export function DownloadPreviews({ credit }: DownloadPreviewsProps) {
     return () => {
       alive = false;
     };
-  }, [vpData, designSlug, credit, vpLang, designName]);
+  }, [vpData, designSlug, credit, vpLang, designName, exportLanguage]);
 
   const name = String(vpData.name || 'Contact');
 

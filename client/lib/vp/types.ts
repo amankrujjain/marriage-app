@@ -21,6 +21,8 @@ export type VpApi = {
   sampleMale: VpSample;
   sampleFor?: (slug: string, kind?: string) => VpSample;
   ensureSprite: () => void;
+  /** Month names for fmtDate: en (default), hi, mr. */
+  setLocale?: (lang: string) => void;
   thumb: (
     host: HTMLElement,
     data: VpSample,

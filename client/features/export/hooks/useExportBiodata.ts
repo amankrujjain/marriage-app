@@ -65,6 +65,7 @@ export function useExportBiodata() {
       // Always continues: translate() falls back to English after retries.
       const translated = await translate();
 
+      window.VP?.setLocale?.(exportLanguage);
       await waitForPreviewPaint();
 
       dispatch(exportCapturing());
