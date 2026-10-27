@@ -2,21 +2,35 @@
 
 import { useEffect } from 'react';
 
-/** IntersectionObserver reveal matching ui-v1 site.js behaviour. */
+/** IntersectionObserver reveal — progressive enhancement over visible-by-default CSS. */
 export function useReveal(rootSelector = '.landing') {
   useEffect(() => {
     const root = document.querySelector(rootSelector);
     if (!root) return;
 
-    const nodes = () =>
+    const pending = () =>
       Array.from(root.querySelectorAll<HTMLElement>('.reveal:not(.in)'));
 
     const show = (el: HTMLElement) => el.classList.add('in');
 
+    const markAboveFold = () => {
+      const h = window.innerHeight;
+      pending().forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.top < h * 0.96 && r.height > 0) show(el);
+      });
+    };
+
+    // Reveal above-fold first, then enable hide styles (avoids flash).
+    markAboveFold();
+    root.classList.add('reveal-ready');
+
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) {
-      nodes().forEach(show);
-      return;
+      pending().forEach(show);
+      return () => {
+        root.classList.remove('reveal-ready');
+      };
     }
 
     const io =
@@ -35,7 +49,7 @@ export function useReveal(rootSelector = '.landing') {
         : null;
 
     const observe = () => {
-      nodes().forEach((el) => {
+      pending().forEach((el) => {
         if ((el as HTMLElement & { _o?: number })._o) return;
         (el as HTMLElement & { _o?: number })._o = 1;
         if (io) io.observe(el);
@@ -45,7 +59,7 @@ export function useReveal(rootSelector = '.landing') {
 
     const sweep = () => {
       const h = window.innerHeight;
-      nodes().forEach((el) => {
+      pending().forEach((el) => {
         const r = el.getBoundingClientRect();
         if (r.top < h * 0.96 && r.height > 0) show(el);
       });
@@ -57,7 +71,7 @@ export function useReveal(rootSelector = '.landing') {
       observe();
       sweep();
     }, 50);
-    const t2 = window.setTimeout(() => nodes().forEach(show), 3500);
+    const t2 = window.setTimeout(() => pending().forEach(show), 3500);
 
     window.addEventListener('scroll', sweep, { passive: true });
     window.addEventListener('resize', sweep);
@@ -68,6 +82,7 @@ export function useReveal(rootSelector = '.landing') {
       window.clearTimeout(t2);
       window.removeEventListener('scroll', sweep);
       window.removeEventListener('resize', sweep);
+      root.classList.remove('reveal-ready');
     };
   }, [rootSelector]);
 }
