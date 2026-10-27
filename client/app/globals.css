@@ -5353,3 +5353,41 @@ select.input{appearance:none;-webkit-appearance:none;padding-right:2em;backgroun
     grid-template-columns: 1fr;
   }
 }
+
+/* Cookie consent — analytics only after Accept */
+.cookie-consent {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 80;
+  padding: 14px 16px 18px;
+  background: var(--paper, #fffaf6);
+  border-top: 1px solid var(--line, #e8d9cf);
+  box-shadow: 0 -8px 28px rgba(40, 16, 20, 0.08);
+}
+.cookie-consent-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: center;
+  justify-content: space-between;
+}
+.cookie-consent-inner p {
+  margin: 0;
+  flex: 1 1 240px;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--ink-2, #5c4a45);
+}
+.cookie-consent-inner a {
+  color: var(--maroon, #681421);
+  font-weight: 600;
+}
+.cookie-consent-actions {
+  display: flex;
+  gap: 10px;
+  flex: 0 0 auto;
+}

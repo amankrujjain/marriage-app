@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { BiodataContent } from '@marriage/shared';
 import { normalizeDateStorage } from '@/lib/formatDate';
+import { trackFormStarted } from '@/lib/analytics';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   patchAbout,
@@ -150,6 +151,9 @@ export function useEditorSections() {
   }
 
   function updateField(sectionId: string, fieldId: string, next: Partial<EditorFieldDef>) {
+    if (next.value !== undefined) {
+      trackFormStarted();
+    }
     setSections((prev) =>
       prev.map((section) => {
         if (section.id !== sectionId) return section;

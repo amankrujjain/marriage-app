@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { clearCookieConsent } from '@/lib/analytics';
 import { BrandLogo } from './BrandLogo';
 import { Toast } from './Toast';
 import { useToast } from './useToast';
@@ -21,12 +22,16 @@ export function SiteFooter({ slim = false }: SiteFooterProps) {
             <div className="foot-bottom" style={{ border: 0, margin: 0, padding: 0 }}>
               <span>© {year} MarriageBio</span>
               <span>
+                <Link href="/privacy" style={{ color: '#BFA99C', display: 'inline' }}>
+                  Privacy
+                </Link>
+                {' · '}
                 <button
                   type="button"
                   style={{ all: 'unset', cursor: 'pointer', color: '#BFA99C', display: 'inline' }}
-                  onClick={() => toast('Privacy policy is a placeholder. It is not built yet.')}
+                  onClick={() => clearCookieConsent()}
                 >
-                  Privacy
+                  Cookie settings
                 </button>
                 {' · '}
                 <button
@@ -80,12 +85,16 @@ export function SiteFooter({ slim = false }: SiteFooterProps) {
           <div className="foot-bottom">
             <span>© {year} MarriageBio. All rights reserved.</span>
             <span>
+              <Link href="/privacy" style={{ color: '#BFA99C', display: 'inline' }}>
+                Privacy
+              </Link>
+              {' · '}
               <button
                 type="button"
                 style={{ all: 'unset', cursor: 'pointer', color: '#BFA99C', display: 'inline' }}
-                onClick={() => toast('Privacy policy is a placeholder. It is not built yet.')}
+                onClick={() => clearCookieConsent()}
               >
-                Privacy
+                Cookie settings
               </button>
               {' · '}
               <button

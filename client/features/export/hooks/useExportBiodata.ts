@@ -16,6 +16,7 @@ import {
   exportUploading,
 } from '../store/exportSlice';
 import { globalLoadingHide, globalLoadingShow } from '@/store/slices/uiSlice';
+import { trackDownload } from '@/lib/analytics';
 
 function waitForPreviewPaint(): Promise<void> {
   return new Promise((resolve) => {
@@ -83,6 +84,7 @@ export function useExportBiodata() {
         designSlug: designSlug || undefined,
       });
       dispatch(exportSucceeded(result));
+      trackDownload(format);
     } catch (error) {
       const message =
         error instanceof ApiClientError
