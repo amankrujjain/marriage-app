@@ -7,9 +7,16 @@ export const metadata: Metadata = {
   description: 'Fill in your details and preview your marriage biodata live on an A4 page.',
 };
 
+/** Thin alias of `/` so older links and CTAs keep working. */
 export default function MarriageBiodataMakerPage() {
   return (
-    <Suspense fallback={<div className="landing editor-page" style={{ padding: 48 }}>Loading editor…</div>}>
+    <Suspense
+      fallback={
+        <div className="landing editor-page" style={{ padding: 48 }}>
+          Loading editor…
+        </div>
+      }
+    >
       <BiodataEditor />
     </Suspense>
   );
