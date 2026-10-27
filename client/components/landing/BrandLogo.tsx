@@ -12,13 +12,13 @@ export function BrandLogo({ href = '/', tagline, light }: BrandLogoProps) {
     <Link
       href={href}
       className="logo"
-      aria-label="Vivah Patra home"
+      aria-label="MarriageBio home"
       style={light ? { color: '#fff' } : undefined}
     >
       <BrandMark />
       <span>
         <b style={light ? { color: '#fff' } : undefined}>
-          Vivah <i>Patra</i>
+          Marriage<i>Bio</i>
         </b>
         {tagline ? <small>{tagline}</small> : null}
       </span>

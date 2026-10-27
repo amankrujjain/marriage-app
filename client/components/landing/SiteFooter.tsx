@@ -19,7 +19,7 @@ export function SiteFooter({ slim = false }: SiteFooterProps) {
         <footer className="site-foot foot-slim">
           <div className="wrap">
             <div className="foot-bottom" style={{ border: 0, margin: 0, padding: 0 }}>
-              <span>© {year} Vivah Patra</span>
+              <span>© {year} MarriageBio</span>
               <span>
                 <button
                   type="button"
@@ -78,7 +78,7 @@ export function SiteFooter({ slim = false }: SiteFooterProps) {
             </div>
           </div>
           <div className="foot-bottom">
-            <span>© {year} Vivah Patra. All rights reserved.</span>
+            <span>© {year} MarriageBio. All rights reserved.</span>
             <span>
               <button
                 type="button"

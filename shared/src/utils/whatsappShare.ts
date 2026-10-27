@@ -9,7 +9,7 @@ export function buildBiodataShareText(params: {
   return [
     `Marriage biodata — ${params.name}`,
     '',
-    'Created with Vivah Patra',
+    'Created with MarriageBio',
     params.downloadUrl,
   ].join('\n');
 }

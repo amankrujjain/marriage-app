@@ -4,7 +4,7 @@ import { SiteFooter } from '@/components/landing/SiteFooter';
 import { TemplateGallery } from '@/features/templates/gallery/TemplateGallery';
 
 export const metadata: Metadata = {
-  title: 'Marriage biodata designs — Vivah Patra',
+  title: 'Marriage biodata designs — MarriageBio',
   description:
     'Browse traditional, royal, floral and modern A4 marriage biodata designs. Filter by community and style.',
 };

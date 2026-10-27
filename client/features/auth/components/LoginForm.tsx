@@ -77,7 +77,7 @@ export function LoginForm() {
       <AuthSubmitButton label="Sign in" loading={status === 'loading'} />
       <GoogleSignInButton />
       <p className="auth-alt">
-        New to Vivah Patra?{' '}
+        New to MarriageBio?{' '}
         <Link href="/register">
           <b>Create account</b>
         </Link>

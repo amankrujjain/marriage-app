@@ -21,7 +21,7 @@ export function BiodataWizard() {
         className={`relative z-10 mx-auto w-full ${wide ? 'max-w-2xl' : 'max-w-xl'}`}
       >
         <Link href="/" className="font-display text-2xl text-maroon">
-          Vivah Patra
+          MarriageBio
         </Link>
         <div className="mt-2 h-px w-16 bg-gold" />
         <h1 className="mt-6 font-display text-3xl text-maroon sm:text-4xl">

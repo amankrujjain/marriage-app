@@ -73,7 +73,7 @@ export function useWeddingPassCheckout() {
           key: order.keyId,
           amount: order.amountMinor,
           currency: order.currency,
-          name: 'Vivah Patra',
+          name: 'MarriageBio',
           description: order.planName,
           order_id: order.providerOrderId,
           prefill: {

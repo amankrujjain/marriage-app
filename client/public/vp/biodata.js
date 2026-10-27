@@ -136,7 +136,7 @@ VP.html=function(d,slug,o){
  var contact=dl([['Phone',d.phone],['Email',d.email],['Address',d.address]]);
  var sFaith=sec('s-horo s-faith',faithTitle,faith),sPers=sec('s-personal','Personal Details',personal),sCar=sec('s-career','Education & Career',career),sFam=sec('s-family','Family Details',fam);
  var sAbout=sec('s-about','About Me',txt(d.about)),sExp=sec('s-expect','Partner Expectations',txt(d.expectations)),sCon=contact?sec('s-contact','Contact',contact):'';
- var credit=o.credit!==false?'<div class="bd-credit">Made with Vivah Patra · vivahpatra.in</div>':'';
+ var credit=o.credit!==false?'<div class="bd-credit">Made with MarriageBio</div>':'';
  var top='';
  if(comm==='Muslim'){if(d.showBismillah!==false)top+='<div class="bd-dev bd-bism" lang="ar" dir="rtl">'+VP.BISMILLAH+'</div>';if(d.showGreeting!==false)top+='<div class="bd-greet">Assalamu Alaikum</div>';}
  else if(comm==='Christian'){if(d.blessing&&String(d.blessing).trim())top+='<div class="bd-dev bd-bless-top">'+esc(d.blessing)+'</div>';}

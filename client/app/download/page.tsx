@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { DownloadShell } from '@/features/download/DownloadShell';
 
 export const metadata: Metadata = {
-  title: 'Download your biodata — Vivah Patra',
+  title: 'Download your biodata — MarriageBio',
   description: 'Review your biodata, preview it in WhatsApp, and download the A4 PDF.',
 };
 

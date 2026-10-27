@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { BiodataEditor } from '@/features/biodata/components/editor/BiodataEditor';
 
 export const metadata: Metadata = {
-  title: 'Biodata editor — Vivah Patra',
+  title: 'Biodata editor — MarriageBio',
   description: 'Fill in your details and preview your marriage biodata live on an A4 page.',
 };
 

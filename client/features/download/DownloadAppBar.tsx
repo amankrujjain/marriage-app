@@ -5,7 +5,7 @@ export function DownloadAppBar() {
     <header className="dl-bar">
       <div className="dl-bar-inner">
         <Link href="/" className="dl-brand">
-          Vivah Patra
+          MarriageBio
         </Link>
         <ol className="dl-steps">
           <li className="dl-step is-done">

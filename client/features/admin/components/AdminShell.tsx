@@ -61,7 +61,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <Link href="/admin" onClick={() => setOpen(false)}>
             <span className="admin-side-mark">V</span>
             <span>
-              <b>Vivah Patra</b>
+              <b>MarriageBio</b>
               <small>Admin console</small>
             </span>
           </Link>

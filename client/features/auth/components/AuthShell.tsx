@@ -14,7 +14,7 @@ export function AuthShell({ title, subtitle, children }: AuthShellProps) {
         <div className="auth-box">
           <div className="auth-logo">
             <Link href="/" style={{ textDecoration: 'none' }}>
-              <b>Vivah Patra</b>
+              <b>MarriageBio</b>
             </Link>
             <OrnamentDiv className="orn" />
           </div>

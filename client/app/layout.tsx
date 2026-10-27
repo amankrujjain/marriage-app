@@ -39,7 +39,7 @@ const hindi = Tiro_Devanagari_Hindi({
 });
 
 export const metadata: Metadata = {
-  title: 'Vivah Patra — Marriage biodata maker',
+  title: 'MarriageBio — Marriage biodata maker',
   description:
     'Fill in your details once, try them on every design, and download a print-ready A4 PDF plus a WhatsApp-sized image.',
 };
