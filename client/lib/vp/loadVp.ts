@@ -4,6 +4,17 @@ import type { VpApi } from './types';
 
 let loading: Promise<VpApi> | null = null;
 
+/** Inject /vp/fonts.css once — only when a route actually loads VP templates. */
+function ensureVpFonts(): void {
+  if (typeof document === 'undefined') return;
+  if (document.querySelector('link[data-vp-fonts]')) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = '/vp/fonts.css';
+  link.dataset.vpFonts = '1';
+  document.head.appendChild(link);
+}
+
 function loadScript(src: string, dataAttr: 'vpBiodata' | 'vpBiodata30'): Promise<void> {
   return new Promise((resolve, reject) => {
     const selector =
@@ -46,6 +57,7 @@ export function loadVp(): Promise<VpApi> {
   if (typeof window === 'undefined') {
     return Promise.reject(new Error('VP requires window'));
   }
+  ensureVpFonts();
   if (
     window.VP &&
     typeof window.VP.thumb === 'function' &&
