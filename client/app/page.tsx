@@ -5,11 +5,19 @@ import { HowItWorks } from '@/components/landing/HowItWorks';
 import { DesignsStrip } from '@/components/landing/DesignsStrip';
 import { Pricing } from '@/components/landing/Pricing';
 import { Faq } from '@/components/landing/Faq';
+import {
+  languageAlternates,
+  organizationJsonLd,
+  softwareApplicationJsonLd,
+} from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'MarriageBio — Marriage biodata maker',
+  title: {
+    absolute: 'Free Marriage Biodata Maker | MarriageBio',
+  },
   description:
-    'Fill in your details once, try them on every design, and download a print-ready A4 PDF plus a WhatsApp-sized image.',
+    'Create a print-ready Indian marriage biodata online. Free A4 designs, live preview, PDF and WhatsApp download.',
+  alternates: languageAlternates('/'),
 };
 
 const FAQ_ITEMS = [
@@ -65,6 +73,16 @@ export default function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(softwareApplicationJsonLd()),
+        }}
       />
       <header className="wrap" style={{ paddingTop: 28, paddingBottom: 8 }}>
         <h1

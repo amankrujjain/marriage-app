@@ -2,15 +2,26 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SiteHeader } from '@/components/landing/SiteHeader';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { breadcrumbJsonLd, languageAlternates } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'Privacy & cookies — MarriageBio',
-  description: 'How MarriageBio uses essential and analytics cookies.',
+  title: 'Privacy & cookies',
+  description: 'How MarriageBio uses essential and analytics cookies for the biodata maker.',
+  alternates: languageAlternates('/privacy/'),
 };
+
+const crumbs = breadcrumbJsonLd([
+  { name: 'Home', path: '/' },
+  { name: 'Privacy', path: '/privacy/' },
+]);
 
 export default function PrivacyPage() {
   return (
     <div className="landing">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }}
+      />
       <SiteHeader variant="app" />
       <main id="main" className="wrap" style={{ padding: '48px 20px 72px', maxWidth: 720 }}>
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', margin: 0 }}>

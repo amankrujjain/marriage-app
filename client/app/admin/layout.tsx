@@ -1,12 +1,11 @@
-'use client';
+import type { Metadata } from 'next';
+import { AdminLayoutClient } from './AdminLayoutClient';
 
-import { AdminOnlyRoute } from '@/features/admin/components/AdminOnlyRoute';
-import { AdminShell } from '@/features/admin/components/AdminShell';
+export const metadata: Metadata = {
+  title: 'Admin',
+  robots: { index: false, follow: false },
+};
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <AdminOnlyRoute>
-      <AdminShell>{children}</AdminShell>
-    </AdminOnlyRoute>
-  );
+  return <AdminLayoutClient>{children}</AdminLayoutClient>;
 }

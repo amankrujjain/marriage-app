@@ -6,6 +6,7 @@ import {
   Tiro_Devanagari_Hindi,
 } from 'next/font/google';
 import { Providers } from './providers';
+import { SITE_URL } from '@/lib/seo';
 import './globals.css';
 import '@/styles/vp-templates/index.css';
 
@@ -39,9 +40,13 @@ const hindi = Tiro_Devanagari_Hindi({
 });
 
 export const metadata: Metadata = {
-  title: 'MarriageBio — Marriage biodata maker',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'Free Marriage Biodata Maker | MarriageBio',
+    template: '%s | MarriageBio',
+  },
   description:
-    'Fill in your details once, try them on every design, and download a print-ready A4 PDF plus a WhatsApp-sized image.',
+    'Create a print-ready Indian marriage biodata online. Free A4 designs, live preview, PDF and WhatsApp download.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
