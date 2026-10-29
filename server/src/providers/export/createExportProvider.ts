@@ -12,6 +12,11 @@ export function createExportProvider(format: ExportFormat): ExportProvider {
       return new PngExportProvider();
     case ExportFormat.JPG:
       return new JpgExportProvider();
+    case ExportFormat.DOCX:
+      throw new BadRequestError(
+        'Use /export/document for DOCX',
+        'EXPORT_FORMAT_INVALID',
+      );
     default:
       throw new BadRequestError('Unsupported export format', 'EXPORT_FORMAT_INVALID');
   }

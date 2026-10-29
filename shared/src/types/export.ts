@@ -1,4 +1,5 @@
 import type { ExportFormat } from '../enums/ExportFormat';
+import type { BiodataContent } from './biodata';
 
 export interface ExportRequest {
   format: ExportFormat;
@@ -6,6 +7,15 @@ export interface ExportRequest {
   imageBase64: string;
   fileName?: string;
   /** Active design slug; Free tier skips Wedding Pass (server verifies). */
+  designSlug?: string;
+  personName?: string;
+}
+
+/** Server-rendered selectable PDF / Word (not a screenshot). */
+export interface DocumentExportRequest {
+  format: ExportFormat.PDF | ExportFormat.DOCX;
+  content: BiodataContent;
+  fileName?: string;
   designSlug?: string;
   personName?: string;
 }

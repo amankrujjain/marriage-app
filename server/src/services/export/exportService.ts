@@ -8,14 +8,10 @@ import {
   type ExportResult,
 } from '@marriage/shared';
 import { createExportProvider } from '../../providers/export/createExportProvider';
-import { findActiveDesignTierBySlug } from '../designs/designTemplateService';
 import { parseImageBase64 } from '../../utils/parseImageBase64';
 import { buildSignedMediaUrl } from '../../utils/signedMediaUrl';
-import { isPremium } from '../../utils/isPremium';
-import { requirePremiumUser } from './requirePremiumUser';
+import { assertExportAccess } from './assertExportAccess';
 import { stampExportWatermark } from './stampExportWatermark';
-import { findUserById } from '../../repositories/userRepository';
-import { UnauthorizedError } from '../../errors/UnauthorizedError';
 
 const EXPORT_URL_TTL_SEC = 7 * 24 * 60 * 60;
 
@@ -38,23 +34,12 @@ export async function exportBiodata(input: {
   personName?: string;
   designSlug?: string;
 }): Promise<ExportResult> {
-  const slug = input.designSlug?.trim();
-  const tier = slug ? await findActiveDesignTierBySlug(slug) : null;
-
-  let hasPass = false;
-  if (tier !== 'Free') {
-    await requirePremiumUser(input.userId);
-    hasPass = true;
-  } else {
-    const user = await findUserById(input.userId);
-    if (!user) {
-      throw new UnauthorizedError('User not found', 'USER_NOT_FOUND');
-    }
-    hasPass = isPremium(user.premiumUntil);
-  }
+  const { hasPass } = await assertExportAccess({
+    userId: input.userId,
+    designSlug: input.designSlug,
+  });
 
   let imageBuffer = parseImageBase64(input.imageBase64);
-  // No active Pass → stamp watermark (closes Free-slug + Premium-render bypass).
   if (!hasPass) {
     imageBuffer = await stampExportWatermark(imageBuffer);
   }
