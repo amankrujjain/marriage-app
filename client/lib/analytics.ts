@@ -12,8 +12,26 @@ declare global {
   }
 }
 
+let missingIdWarned = false;
+
 function measurementId(): string {
-  return (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || '').trim();
+  const id = (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || '').trim();
+  if (
+    !id &&
+    !missingIdWarned &&
+    typeof process !== 'undefined' &&
+    process.env.NODE_ENV === 'development'
+  ) {
+    missingIdWarned = true;
+    console.warn(
+      '[analytics] NEXT_PUBLIC_GA_MEASUREMENT_ID is missing; GA4 events are disabled.',
+    );
+  }
+  return id;
+}
+
+function canSend(): boolean {
+  return Boolean(measurementId()) && getCookieConsent() === 'accepted';
 }
 
 export function getCookieConsent(): CookieConsentValue | null {
@@ -72,19 +90,23 @@ export function loadGa(): void {
 export function trackEvent(
   name: string,
   params?: Record<string, string | number | boolean>,
-): void {
-  if (typeof window === 'undefined') return;
-  if (!measurementId() || getCookieConsent() !== 'accepted') return;
+): boolean {
+  if (typeof window === 'undefined') return false;
+  if (!canSend()) return false;
   loadGa();
-  window.gtag?.('event', name, params);
+  if (!window.gtag) return false;
+  window.gtag('event', name, params);
+  return true;
 }
 
 /** Once per tab session, on first meaningful editor field edit. */
 export function trackFormStarted(): void {
   if (typeof window === 'undefined') return;
   if (window.sessionStorage.getItem(FORM_STARTED_KEY) === '1') return;
-  window.sessionStorage.setItem(FORM_STARTED_KEY, '1');
-  trackEvent('form_started');
+  // Set the once-flag only after the event actually sends (consent + GA ready).
+  if (trackEvent('form_started')) {
+    window.sessionStorage.setItem(FORM_STARTED_KEY, '1');
+  }
 }
 
 export function trackDownload(format?: string): void {
