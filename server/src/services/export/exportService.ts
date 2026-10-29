@@ -11,7 +11,11 @@ import { createExportProvider } from '../../providers/export/createExportProvide
 import { findActiveDesignTierBySlug } from '../designs/designTemplateService';
 import { parseImageBase64 } from '../../utils/parseImageBase64';
 import { buildSignedMediaUrl } from '../../utils/signedMediaUrl';
+import { isPremium } from '../../utils/isPremium';
 import { requirePremiumUser } from './requirePremiumUser';
+import { stampExportWatermark } from './stampExportWatermark';
+import { findUserById } from '../../repositories/userRepository';
+import { UnauthorizedError } from '../../errors/UnauthorizedError';
 
 const EXPORT_URL_TTL_SEC = 7 * 24 * 60 * 60;
 
@@ -36,12 +40,25 @@ export async function exportBiodata(input: {
 }): Promise<ExportResult> {
   const slug = input.designSlug?.trim();
   const tier = slug ? await findActiveDesignTierBySlug(slug) : null;
-  // Free + active → skip Pass. Premium / missing / inactive → fail closed.
+
+  let hasPass = false;
   if (tier !== 'Free') {
     await requirePremiumUser(input.userId);
+    hasPass = true;
+  } else {
+    const user = await findUserById(input.userId);
+    if (!user) {
+      throw new UnauthorizedError('User not found', 'USER_NOT_FOUND');
+    }
+    hasPass = isPremium(user.premiumUntil);
   }
 
-  const imageBuffer = parseImageBase64(input.imageBase64);
+  let imageBuffer = parseImageBase64(input.imageBase64);
+  // No active Pass → stamp watermark (closes Free-slug + Premium-render bypass).
+  if (!hasPass) {
+    imageBuffer = await stampExportWatermark(imageBuffer);
+  }
+
   const provider = createExportProvider(input.format);
   const artifact = await provider.create(imageBuffer);
 
