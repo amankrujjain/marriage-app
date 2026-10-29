@@ -51,9 +51,9 @@ const faqJsonLd = {
 function EditorFallback() {
   return (
     <div className="landing editor-page" style={{ padding: '48px 24px' }}>
-      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', margin: 0 }}>
-        Create your marriage biodata
-      </h1>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', margin: 0 }}>
+        Free Marriage Biodata Maker
+      </div>
       <p style={{ marginTop: 12, color: 'var(--ink-2)' }}>Loading editor…</p>
     </div>
   );
@@ -66,12 +66,20 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      {/* SSR SEO shell — present without JS; editor hydrates as the primary UI */}
-      <header className="sr-only">
-        <h1>MarriageBio — create your marriage biodata</h1>
-        <p>
-          Beautiful A4 PDF biodata designs for Indian families. Fill in your details, preview live,
-          and download a print-ready PDF or WhatsApp image.
+      <header className="wrap" style={{ paddingTop: 28, paddingBottom: 8 }}>
+        <h1
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+            margin: 0,
+            lineHeight: 1.2,
+          }}
+        >
+          Free Marriage Biodata Maker
+        </h1>
+        <p style={{ marginTop: 10, color: 'var(--ink-2)', maxWidth: 560 }}>
+          Fill in your details, preview live on A4 designs, and download a print-ready PDF or
+          WhatsApp image.
         </p>
       </header>
       <Suspense fallback={<EditorFallback />}>
