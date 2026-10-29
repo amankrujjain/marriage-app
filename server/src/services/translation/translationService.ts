@@ -9,6 +9,14 @@ import {
 } from '@marriage/shared';
 import { createTranslationProvider } from '../../providers/translation/createTranslationProvider';
 import { PassthroughTranslationProvider } from '../../providers/translation/PassthroughTranslationProvider';
+import { logger } from '../../utils/logger';
+
+/** In-process count of English fail-open fallbacks (no PII). */
+let englishFallbackCount = 0;
+
+export function getEnglishFallbackCount(): number {
+  return englishFallbackCount;
+}
 
 export async function translateStructuredFields(input: {
   fields: StructuredFields;
@@ -36,15 +44,37 @@ export async function translateStructuredFields(input: {
 
   const provider = createTranslationProvider();
   const request = { ...input, sourceLanguage };
-  const alreadyCached = provider.wasCached(request);
-  const fields = await provider.translateStructured(request);
+  try {
+    const alreadyCached = provider.wasCached(request);
+    const fields = await provider.translateStructured(request);
+    return {
+      fields,
+      targetLanguage: input.targetLanguage,
+      cached: alreadyCached,
+      provider: provider.getInnerName(),
+    };
+  } catch (error) {
+    const reason =
+      error instanceof Error ? error.message.slice(0, 200) : 'unknown_error';
+    englishFallbackCount += 1;
+    logger.warn('translation.fallback_en', {
+      targetLanguage: input.targetLanguage,
+      sourceLanguage,
+      reason,
+      fallbackCount: englishFallbackCount,
+    });
 
-  return {
-    fields,
-    targetLanguage: input.targetLanguage,
-    cached: alreadyCached,
-    provider: provider.getInnerName(),
-  };
+    const passthrough = new PassthroughTranslationProvider();
+    return {
+      fields: await passthrough.translateStructured({
+        ...input,
+        sourceLanguage,
+      }),
+      targetLanguage: input.targetLanguage,
+      cached: false,
+      provider: 'fallback-en',
+    };
+  }
 }
 
 export async function translateBiodataContent(input: {
