@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: '/marriage-biodata-maker/',
+        destination: '/',
+        permanent: true,
+      },
+      {
         source: '/marriage-biodata-maker/:path*',
         destination: '/',
         permanent: true,
