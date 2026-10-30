@@ -4,7 +4,7 @@ import { SiteFooter } from '@/components/landing/SiteFooter';
 import { BiodataEditor } from '@/features/biodata/components/editor/BiodataEditor';
 import { SpokePresetProvider } from '@/features/spokes/SpokePresetContext';
 import { sampleImageMap } from '@/features/spokes/sampleImages';
-import { breadcrumbJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, softwareApplicationJsonLd } from '@/lib/seo';
 import { SpokeFaq } from './SpokeFaq';
 import { SpokeRelatedLinks } from './SpokeRelatedLinks';
 import { SpokeSamples } from './SpokeSamples';
@@ -109,6 +109,12 @@ export function SpokePage({ page }: { page: SpokePageConfig }) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(softwareApplicationJsonLd()),
+        }}
       />
       {afterIntro ? (
         <>
