@@ -13,12 +13,13 @@ export function useDownloadLanguagePreview(): EditorSectionDef[] {
   const dispatch = useAppDispatch();
   const { translate } = useTranslateBiodata();
   const exportLanguage = useAppSelector((state) => state.language.exportLanguage);
+  const biodataId = useAppSelector((state) => state.biodata.biodataId);
   const [sections, setSections] = useState<EditorSectionDef[]>([]);
   const requestId = useRef(0);
 
   useEffect(() => {
-    setSections(loadEditorSections());
-  }, []);
+    setSections(loadEditorSections(biodataId));
+  }, [biodataId]);
 
   useEffect(() => {
     if (sections.length === 0) return;

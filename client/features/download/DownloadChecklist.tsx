@@ -27,12 +27,13 @@ function maskPhone(phone: string): string {
 
 export function DownloadChecklist() {
   const content = useAppSelector((state) => state.biodata.content);
+  const biodataId = useAppSelector((state) => state.biodata.biodataId);
   const [sections, setSections] = useState<EditorSectionDef[]>([]);
   const [editHref, setEditHref] = useState('/');
 
   useEffect(() => {
-    setSections(loadEditorSections());
-  }, []);
+    setSections(loadEditorSections(biodataId));
+  }, [biodataId]);
 
   useEffect(() => {
     const origin = getOriginPath();

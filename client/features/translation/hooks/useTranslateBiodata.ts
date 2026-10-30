@@ -41,13 +41,14 @@ const TRANSLATE_BACKOFF_MS = [400, 800];
 export function useTranslateBiodata() {
   const dispatch = useAppDispatch();
   const content = useAppSelector((state) => state.biodata.content);
+  const biodataId = useAppSelector((state) => state.biodata.biodataId);
   const exportLanguage = useAppSelector((state) => state.language.exportLanguage);
 
   const translate = useCallback(
     async (
       sections?: EditorSectionDef[],
     ): Promise<{ content: BiodataContent; extras: StructuredFields }> => {
-      const editorSections = sections ?? loadEditorSections();
+      const editorSections = sections ?? loadEditorSections(biodataId);
       const fields = flattenSectionsForTranslation(editorSections);
 
       if (exportLanguage === LanguageCode.EN || Object.keys(fields).length === 0) {
@@ -107,7 +108,7 @@ export function useTranslateBiodata() {
       );
       return { content, extras: {} };
     },
-    [content, dispatch, exportLanguage],
+    [biodataId, content, dispatch, exportLanguage],
   );
   return { translate };
 }
