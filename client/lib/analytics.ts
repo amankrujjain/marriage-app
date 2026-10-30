@@ -105,18 +105,40 @@ export function trackEvent(
 /** Remember which marketing/spoke page owns this editor session. */
 export function setPageContext(pageSlug: string, path: string): void {
   if (typeof window === 'undefined') return;
-  window.sessionStorage.setItem(PAGE_SLUG_KEY, pageSlug);
-  window.sessionStorage.setItem(ORIGIN_PATH_KEY, path);
+  try {
+    window.sessionStorage.setItem(PAGE_SLUG_KEY, pageSlug);
+    window.sessionStorage.setItem(ORIGIN_PATH_KEY, path);
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
+
+/** Set page_slug only (keeps existing origin path). */
+export function setPageSlug(pageSlug: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.setItem(PAGE_SLUG_KEY, pageSlug);
+  } catch {
+    /* ignore */
+  }
 }
 
 export function getPageSlug(): string | null {
   if (typeof window === 'undefined') return null;
-  return window.sessionStorage.getItem(PAGE_SLUG_KEY);
+  try {
+    return window.sessionStorage.getItem(PAGE_SLUG_KEY);
+  } catch {
+    return null;
+  }
 }
 
 export function getOriginPath(): string | null {
   if (typeof window === 'undefined') return null;
-  return window.sessionStorage.getItem(ORIGIN_PATH_KEY);
+  try {
+    return window.sessionStorage.getItem(ORIGIN_PATH_KEY);
+  } catch {
+    return null;
+  }
 }
 
 function pageSlugParam(): { page_slug?: string } {
@@ -149,9 +171,13 @@ export function trackDownload(format?: string): void {
 /** Spoke preset format hint for download CTA priority (`pdf` | `docx`). */
 export function setPreferredFormat(format: 'pdf' | 'docx' | null): void {
   if (typeof window === 'undefined') return;
-  if (!format) {
-    window.sessionStorage.removeItem(PREFERRED_FORMAT_KEY);
-    return;
+  try {
+    if (!format) {
+      window.sessionStorage.removeItem(PREFERRED_FORMAT_KEY);
+      return;
+    }
+    window.sessionStorage.setItem(PREFERRED_FORMAT_KEY, format);
+  } catch {
+    /* ignore */
   }
-  window.sessionStorage.setItem(PREFERRED_FORMAT_KEY, format);
 }

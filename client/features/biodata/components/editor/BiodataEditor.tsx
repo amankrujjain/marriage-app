@@ -10,7 +10,7 @@ import { selectDesign } from '@/features/templates/store/templateSlice';
 import { setExportLanguage } from '@/features/translation/store/languageSlice';
 import type { SpokePreset } from '@/content/spokes/types';
 import { isEmptyDraft } from '@/features/spokes/isEmptyDraft';
-import { setPageContext, setPreferredFormat } from '@/lib/analytics';
+import { getPageSlug, setPageContext, setPreferredFormat } from '@/lib/analytics';
 import { fetchBiodata } from '../../services/biodataApi';
 import {
   loadBiodata,
@@ -66,9 +66,28 @@ export function BiodataEditor({
   const presetApplied = useRef(false);
 
   useEffect(() => {
-    const path = pathname.endsWith('/') || pathname === '/' ? pathname : `${pathname}/`;
-    setPageContext(pageSlug ?? 'home', path === '' ? '/' : path);
-  }, [pageSlug, pathname]);
+    const path =
+      pathname === '' || pathname === '/'
+        ? '/'
+        : pathname.endsWith('/')
+          ? pathname
+          : `${pathname}/`;
+    const effectiveSlug = pageSlug ?? 'home';
+    const hasDesignOrId = Boolean(
+      searchParams.get('design') || searchParams.get('id'),
+    );
+    const existingSlug = getPageSlug();
+    // Coming from /templates/?design=…: keep page_slug=templates, only refresh origin.
+    if (
+      (effectiveSlug === 'home' || pageSlug === undefined) &&
+      hasDesignOrId &&
+      existingSlug
+    ) {
+      setPageContext(existingSlug, path);
+      return;
+    }
+    setPageContext(effectiveSlug, path);
+  }, [pageSlug, pathname, searchParams]);
 
   useEffect(() => {
     setPreferredFormat(preset?.format ?? null);
