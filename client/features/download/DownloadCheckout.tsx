@@ -9,6 +9,7 @@ import { useExportBiodata } from '@/features/export/hooks/useExportBiodata';
 import { WhatsAppShareButton } from '@/features/export/components/WhatsAppShareButton';
 import { slugFromTemplateId } from '@/features/biodata/components/editor/designMap';
 import { useDesignCatalog } from '@/features/designs/hooks/useDesignCatalog';
+import { PREFERRED_FORMAT_KEY } from '@/lib/analytics';
 import { DownloadLanguageSelect } from './DownloadLanguageSelect';
 import type { DownloadPlan } from './DownloadShell';
 
@@ -38,7 +39,7 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
 
   useEffect(() => {
     try {
-      setPreferDocx(sessionStorage.getItem('mb_preferred_format') === 'docx');
+      setPreferDocx(sessionStorage.getItem(PREFERRED_FORMAT_KEY) === 'docx');
     } catch {
       setPreferDocx(false);
     }

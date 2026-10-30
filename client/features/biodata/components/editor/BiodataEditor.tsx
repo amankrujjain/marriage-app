@@ -10,7 +10,7 @@ import { selectDesign } from '@/features/templates/store/templateSlice';
 import { setExportLanguage } from '@/features/translation/store/languageSlice';
 import type { SpokePreset } from '@/content/spokes/types';
 import { isEmptyDraft } from '@/features/spokes/isEmptyDraft';
-import { setPageContext } from '@/lib/analytics';
+import { setPageContext, setPreferredFormat } from '@/lib/analytics';
 import { fetchBiodata } from '../../services/biodataApi';
 import {
   loadBiodata,
@@ -69,6 +69,10 @@ export function BiodataEditor({
     const path = pathname.endsWith('/') || pathname === '/' ? pathname : `${pathname}/`;
     setPageContext(pageSlug ?? 'home', path === '' ? '/' : path);
   }, [pageSlug, pathname]);
+
+  useEffect(() => {
+    setPreferredFormat(preset?.format ?? null);
+  }, [preset?.format]);
 
   useEffect(() => {
     if (searchParams.get('new') === '1') {

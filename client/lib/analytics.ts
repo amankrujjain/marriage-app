@@ -6,6 +6,7 @@ const CONSENT_KEY = 'mb_cookie_consent';
 const FORM_STARTED_KEY = 'mb_form_started';
 const PAGE_SLUG_KEY = 'mb_page_slug';
 const ORIGIN_PATH_KEY = 'mb_origin_path';
+export const PREFERRED_FORMAT_KEY = 'mb_preferred_format';
 
 declare global {
   interface Window {
@@ -118,16 +119,39 @@ export function getOriginPath(): string | null {
   return window.sessionStorage.getItem(ORIGIN_PATH_KEY);
 }
 
+function pageSlugParam(): { page_slug?: string } {
+  const slug = getPageSlug();
+  return slug ? { page_slug: slug } : {};
+}
+
 /** Once per tab session, on first meaningful editor field edit. */
 export function trackFormStarted(): void {
   if (typeof window === 'undefined') return;
   if (window.sessionStorage.getItem(FORM_STARTED_KEY) === '1') return;
+  const params = pageSlugParam();
   // Set the once-flag only after the event actually sends (consent + GA ready).
-  if (trackEvent('form_started')) {
+  if (
+    trackEvent(
+      'form_started',
+      Object.keys(params).length > 0 ? params : undefined,
+    )
+  ) {
     window.sessionStorage.setItem(FORM_STARTED_KEY, '1');
   }
 }
 
 export function trackDownload(format?: string): void {
-  trackEvent('download', format ? { format } : undefined);
+  const params: Record<string, string> = { ...pageSlugParam() };
+  if (format) params.format = format;
+  trackEvent('download', Object.keys(params).length > 0 ? params : undefined);
+}
+
+/** Spoke preset format hint for download CTA priority (`pdf` | `docx`). */
+export function setPreferredFormat(format: 'pdf' | 'docx' | null): void {
+  if (typeof window === 'undefined') return;
+  if (!format) {
+    window.sessionStorage.removeItem(PREFERRED_FORMAT_KEY);
+    return;
+  }
+  window.sessionStorage.setItem(PREFERRED_FORMAT_KEY, format);
 }
