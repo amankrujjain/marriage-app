@@ -56,20 +56,20 @@ export function useExportBiodata() {
           : 'Export failed';
     dispatch(exportFailed(message));
     if (error instanceof ApiClientError && error.code === 'PREMIUM_REQUIRED') {
-      router.push('/wedding-pass');
+      router.push('/wedding-pass/');
     }
     if (error instanceof ApiClientError && error.code === 'AUTH_REQUIRED') {
       const next =
-        typeof window !== 'undefined' ? window.location.pathname : '/download';
-      router.push(`/login?next=${encodeURIComponent(next)}`);
+        typeof window !== 'undefined' ? window.location.pathname : '/download/';
+      router.push(`/login/?next=${encodeURIComponent(next)}`);
     }
   }
 
   async function exportAs(format: ExportFormat): Promise<void> {
     if (authStatus !== 'authenticated') {
       const next =
-        typeof window !== 'undefined' ? window.location.pathname : '/download';
-      router.push(`/login?next=${encodeURIComponent(next)}`);
+        typeof window !== 'undefined' ? window.location.pathname : '/download/';
+      router.push(`/login/?next=${encodeURIComponent(next)}`);
       return;
     }
 
@@ -117,8 +117,8 @@ export function useExportBiodata() {
   async function exportDocx(): Promise<void> {
     if (authStatus !== 'authenticated') {
       const next =
-        typeof window !== 'undefined' ? window.location.pathname : '/download';
-      router.push(`/login?next=${encodeURIComponent(next)}`);
+        typeof window !== 'undefined' ? window.location.pathname : '/download/';
+      router.push(`/login/?next=${encodeURIComponent(next)}`);
       return;
     }
 

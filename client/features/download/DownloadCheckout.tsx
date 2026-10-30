@@ -59,11 +59,11 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
 
   function gateDownload(): boolean {
     if (authStatus !== 'authenticated') {
-      router.push('/login?next=/download');
+      router.push('/login/?next=/download/');
       return false;
     }
     if (needsPass) {
-      router.push('/wedding-pass');
+      router.push('/wedding-pass/');
       return false;
     }
     return true;
