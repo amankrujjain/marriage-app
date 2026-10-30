@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import type { SpokePageConfig } from '@/content/spokes/types';
+import { SiteFooter } from '@/components/landing/SiteFooter';
 import { BiodataEditor } from '@/features/biodata/components/editor/BiodataEditor';
 import { SpokePresetProvider } from '@/features/spokes/SpokePresetContext';
 import { sampleImageMap } from '@/features/spokes/sampleImages';
@@ -157,6 +158,9 @@ export function SpokePage({ page }: { page: SpokePageConfig }) {
           <LandingBody page={page} imageBySlug={imageBySlug} includeIntro />
         </>
       )}
+      <div className="landing">
+        <SiteFooter />
+      </div>
     </>
   );
 
