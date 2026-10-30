@@ -37,6 +37,7 @@ export function useExportBiodata() {
   const authStatus = useAppSelector((state) => state.auth.status);
   const exportLanguage = useAppSelector((state) => state.language.exportLanguage);
   const reduxSections = useAppSelector((state) => state.biodata.editorSections);
+  const biodataId = useAppSelector((state) => state.biodata.biodataId);
   const designSlug = useAppSelector(
     (state) =>
       state.template.selectedDesignSlug ||
@@ -130,7 +131,7 @@ export function useExportBiodata() {
       const sections =
         reduxSections && reduxSections.length > 0
           ? reduxSections
-          : loadEditorSections();
+          : loadEditorSections(biodataId);
 
       const { content, extras } = await translate(sections);
       const personName = content.personal.fullName?.trim() || fullName;
