@@ -114,7 +114,6 @@ export function SpokePage({ page }: { page: SpokePageConfig }) {
         showSiteFooter={false}
         preset={page.preset}
         pageSlug={page.pageSlug}
-        heading={page.h1}
       />
     </Suspense>
   );
