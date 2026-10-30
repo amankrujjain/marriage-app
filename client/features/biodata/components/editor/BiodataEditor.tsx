@@ -10,6 +10,7 @@ import { selectDesign } from '@/features/templates/store/templateSlice';
 import { setExportLanguage } from '@/features/translation/store/languageSlice';
 import type { SpokePreset } from '@/content/spokes/types';
 import { isEmptyDraft } from '@/features/spokes/isEmptyDraft';
+import { SpokeHeading } from '@/features/spokes/components/SpokeHeading';
 import { getPageSlug, setPageContext, setPreferredFormat } from '@/lib/analytics';
 import { fetchBiodata } from '../../services/biodataApi';
 import {
@@ -214,25 +215,7 @@ export function BiodataEditor({
   return (
     <div className="landing editor-page">
       <SiteHeader variant="editor" />
-      {h1 ? (
-        <header className="wrap" style={{ paddingTop: 28, paddingBottom: 8 }}>
-          <h1
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-              margin: 0,
-              lineHeight: 1.2,
-            }}
-          >
-            {h1}
-          </h1>
-          {lede ? (
-            <p style={{ marginTop: 10, color: 'var(--ink-2)', maxWidth: 560 }}>
-              {lede}
-            </p>
-          ) : null}
-        </header>
-      ) : null}
+      {h1 ? <SpokeHeading h1={h1} lede={lede} /> : null}
       <EditorAppBar />
 
       <header className="editor-mobile-bar">

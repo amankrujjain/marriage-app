@@ -1,20 +1,26 @@
 import { Suspense } from 'react';
 import type { SpokePageConfig } from '@/content/spokes/types';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { SiteHeader } from '@/components/landing/SiteHeader';
 import { BiodataEditor } from '@/features/biodata/components/editor/BiodataEditor';
 import { SpokePresetProvider } from '@/features/spokes/SpokePresetContext';
 import { sampleImageMap } from '@/features/spokes/sampleImages';
 import { breadcrumbJsonLd, softwareApplicationJsonLd } from '@/lib/seo';
 import { SpokeFaq } from './SpokeFaq';
+import { SpokeHeading } from './SpokeHeading';
 import { SpokeRelatedLinks } from './SpokeRelatedLinks';
 import { SpokeSamples } from './SpokeSamples';
 import { SpokeSteps } from './SpokeSteps';
 import { SpokeTips } from './SpokeTips';
 
-function EditorFallback() {
+function EditorFallback({ h1, lede }: { h1: string; lede?: string }) {
   return (
-    <div className="landing editor-page" style={{ padding: '48px 24px' }}>
-      <p style={{ margin: 0, color: 'var(--ink-2)' }}>Loading editor…</p>
+    <div className="landing editor-page">
+      <SiteHeader variant="editor" />
+      <SpokeHeading h1={h1} lede={lede} />
+      <p style={{ margin: '0 24px 48px', color: 'var(--ink-2)' }}>
+        Loading editor…
+      </p>
     </div>
   );
 }
@@ -89,7 +95,11 @@ export function SpokePage({ page }: { page: SpokePageConfig }) {
   const afterIntro = page.makerPosition === 'afterIntro';
 
   const editor = (
-    <Suspense fallback={<EditorFallback />}>
+    <Suspense
+      fallback={
+        <EditorFallback h1={page.h1} lede={lede || undefined} />
+      }
+    >
       <BiodataEditor
         showSiteFooter={false}
         preset={page.preset}
