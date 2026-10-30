@@ -35,15 +35,20 @@ type BiodataEditorProps = {
   preset?: SpokePreset;
   /** GA4 page_slug (wired in analytics item 7). */
   pageSlug?: string;
-  /** Optional label under the site header on spoke pages. */
+  /** Optional label under the site header on spoke pages (legacy; unused). */
   heading?: string;
+  /** Spoke page H1 rendered under SiteHeader (home keeps its own H1). */
+  h1?: string;
+  /** Short lede under the spoke H1. */
+  lede?: string;
 };
 
 export function BiodataEditor({
   showSiteFooter = true,
   preset,
   pageSlug,
-  heading,
+  h1,
+  lede,
 }: BiodataEditorProps) {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -209,19 +214,24 @@ export function BiodataEditor({
   return (
     <div className="landing editor-page">
       <SiteHeader variant="editor" />
-      {heading ? (
-        <div className="wrap" style={{ paddingTop: 12, paddingBottom: 4 }}>
-          <p
+      {h1 ? (
+        <header className="wrap" style={{ paddingTop: 28, paddingBottom: 8 }}>
+          <h1
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(1.25rem, 3vw, 1.75rem)',
+              fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
               margin: 0,
-              lineHeight: 1.25,
+              lineHeight: 1.2,
             }}
           >
-            {heading}
-          </p>
-        </div>
+            {h1}
+          </h1>
+          {lede ? (
+            <p style={{ marginTop: 10, color: 'var(--ink-2)', maxWidth: 560 }}>
+              {lede}
+            </p>
+          ) : null}
+        </header>
       ) : null}
       <EditorAppBar />
 

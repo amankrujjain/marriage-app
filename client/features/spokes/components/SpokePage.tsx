@@ -88,32 +88,14 @@ export function SpokePage({ page }: { page: SpokePageConfig }) {
   );
   const afterIntro = page.makerPosition === 'afterIntro';
 
-  const header = (
-    <header className="wrap" style={{ paddingTop: 28, paddingBottom: 8 }}>
-      <h1
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-          margin: 0,
-          lineHeight: 1.2,
-        }}
-      >
-        {page.h1}
-      </h1>
-      {lede ? (
-        <p style={{ marginTop: 10, color: 'var(--ink-2)', maxWidth: 560 }}>
-          {lede}
-        </p>
-      ) : null}
-    </header>
-  );
-
   const editor = (
     <Suspense fallback={<EditorFallback />}>
       <BiodataEditor
         showSiteFooter={false}
         preset={page.preset}
         pageSlug={page.pageSlug}
+        h1={page.h1}
+        lede={lede || undefined}
       />
     </Suspense>
   );
@@ -128,7 +110,6 @@ export function SpokePage({ page }: { page: SpokePageConfig }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
       />
-      {header}
       {afterIntro ? (
         <>
           {page.intro ? (
