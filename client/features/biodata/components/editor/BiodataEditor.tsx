@@ -23,7 +23,12 @@ import { useEditorSections } from './useEditorSections';
 
 type MobileTab = 'details' | 'preview';
 
-export function BiodataEditor() {
+type BiodataEditorProps = {
+  /** When false, omit SiteFooter (home page appends marketing below, then its own footer). */
+  showSiteFooter?: boolean;
+};
+
+export function BiodataEditor({ showSiteFooter = true }: BiodataEditorProps) {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -184,7 +189,7 @@ export function BiodataEditor() {
         </Link>
       </footer>
 
-      <SiteFooter slim />
+      {showSiteFooter ? <SiteFooter slim /> : null}
     </div>
   );
 }

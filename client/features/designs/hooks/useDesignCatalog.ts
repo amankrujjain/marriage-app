@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import { GALLERY_TEMPLATES, type GalleryTemplate } from '@/features/templates/gallery/galleryCatalog';
 import type { EditorDesign } from '@/features/biodata/components/editor/designMap';
@@ -60,16 +60,22 @@ export function useDesignCatalog() {
     return map;
   }, [items]);
 
-  function isFreeDesign(slug: string): boolean {
-    const row = bySlug.get(slug);
-    if (row) return row.tier === 'Free';
-    return GALLERY_TEMPLATES.find((t) => t.slug === slug)?.tier === 'Free';
-  }
+  const isFreeDesign = useCallback(
+    (slug: string): boolean => {
+      const row = bySlug.get(slug);
+      if (row) return row.tier === 'Free';
+      return GALLERY_TEMPLATES.find((t) => t.slug === slug)?.tier === 'Free';
+    },
+    [bySlug],
+  );
 
-  function designFromSlug(slug: string | null | undefined): EditorDesign | null {
-    if (!slug) return null;
-    return editorDesigns.find((d) => d.slug === slug) ?? null;
-  }
+  const designFromSlug = useCallback(
+    (slug: string | null | undefined): EditorDesign | null => {
+      if (!slug) return null;
+      return editorDesigns.find((d) => d.slug === slug) ?? null;
+    },
+    [editorDesigns],
+  );
 
   return {
     status,

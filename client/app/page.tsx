@@ -5,6 +5,7 @@ import { HowItWorks } from '@/components/landing/HowItWorks';
 import { DesignsStrip } from '@/components/landing/DesignsStrip';
 import { Pricing } from '@/components/landing/Pricing';
 import { Faq } from '@/components/landing/Faq';
+import { SiteFooter } from '@/components/landing/SiteFooter';
 import {
   languageAlternates,
   organizationJsonLd,
@@ -101,13 +102,14 @@ export default function HomePage() {
         </p>
       </header>
       <Suspense fallback={<EditorFallback />}>
-        <BiodataEditor />
+        <BiodataEditor showSiteFooter={false} />
       </Suspense>
       <div className="landing">
         <HowItWorks />
         <DesignsStrip />
         <Pricing />
         <Faq />
+        <SiteFooter />
       </div>
     </>
   );

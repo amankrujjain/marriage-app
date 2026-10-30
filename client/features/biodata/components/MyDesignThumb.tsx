@@ -21,6 +21,7 @@ export function MyDesignThumb({
 }: MyDesignThumbProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const { isFreeDesign } = useDesignCatalog();
+  const credit = isFreeDesign(slug);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -31,7 +32,7 @@ export function MyDesignThumb({
     void loadVp().then((VP) => {
       if (!alive || !hostRef.current) return;
       host.innerHTML = '';
-      VP.thumb(host, data, slug, { credit: isFreeDesign(slug) });
+      VP.thumb(host, data, slug, { credit });
       requestAnimationFrame(() => {
         const bd = host.firstElementChild as HTMLElement | null;
         if (!bd?.classList.contains('bd')) return;
@@ -44,7 +45,7 @@ export function MyDesignThumb({
       alive = false;
       if (host) host.innerHTML = '';
     };
-  }, [content, sections, slug, isFreeDesign]);
+  }, [content, sections, slug, credit]);
 
   return <div ref={hostRef} className="thumb" />;
 }

@@ -61,12 +61,13 @@ export function EditorA4Preview({ sections }: EditorA4PreviewProps) {
     label: 'Fits on 1 page',
   });
 
+  const credit = isFreeDesign(designSlug);
+
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
     let alive = true;
     const data = mapBiodataToVp(content, sections);
-    const credit = isFreeDesign(designSlug);
 
     void loadVp().then((VP) => {
       if (!alive || !hostRef.current) return;
@@ -102,7 +103,7 @@ export function EditorA4Preview({ sections }: EditorA4PreviewProps) {
     return () => {
       alive = false;
     };
-  }, [content, sections, designSlug, isFreeDesign]);
+  }, [content, sections, designSlug, credit]);
 
   const fitClass = fit.over ? 'fit over' : fit.tight ? 'fit tight' : 'fit';
 
