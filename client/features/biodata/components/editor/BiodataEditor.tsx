@@ -1,15 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SiteHeader } from '@/components/landing/SiteHeader';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectDesign } from '@/features/templates/store/templateSlice';
+import { setExportLanguage } from '@/features/translation/store/languageSlice';
+import type { SpokePreset } from '@/content/spokes/types';
+import { isEmptyDraft } from '@/features/spokes/isEmptyDraft';
 import { fetchBiodata } from '../../services/biodataApi';
 import {
   loadBiodata,
+  patchPersonal,
   resetBiodataDraft,
   setDesignSlug,
 } from '../../store/biodataSlice';
@@ -26,18 +30,38 @@ type MobileTab = 'details' | 'preview';
 type BiodataEditorProps = {
   /** When false, omit SiteFooter (home page appends marketing below, then its own footer). */
   showSiteFooter?: boolean;
+  /** Spoke page preset — applied only when the draft is empty (never via updateField). */
+  preset?: SpokePreset;
+  /** GA4 page_slug (wired in analytics item 7). */
+  pageSlug?: string;
+  /** Optional label under the site header on spoke pages. */
+  heading?: string;
 };
 
-export function BiodataEditor({ showSiteFooter = true }: BiodataEditorProps) {
+export function BiodataEditor({
+  showSiteFooter = true,
+  preset,
+  pageSlug: _pageSlug,
+  heading,
+}: BiodataEditorProps) {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const sectionsApi = useEditorSections();
+  const sectionsApi = useEditorSections(
+    preset
+      ? {
+          sectionOrder: preset.sectionOrder,
+          openSectionId: preset.openSectionId,
+        }
+      : undefined,
+  );
   const { save } = useSaveBiodata();
   const [mobileTab, setMobileTab] = useState<MobileTab>('details');
   const [savingMd, setSavingMd] = useState(false);
   const authStatus = useAppSelector((state) => state.auth.status);
   const biodataId = useAppSelector((state) => state.biodata.biodataId);
+  const content = useAppSelector((state) => state.biodata.content);
+  const presetApplied = useRef(false);
 
   useEffect(() => {
     if (searchParams.get('new') === '1') {
@@ -57,6 +81,39 @@ export function BiodataEditor({ showSiteFooter = true }: BiodataEditorProps) {
       dispatch(setDesignSlug(mapped.slug));
     }
   }, [dispatch, searchParams]);
+
+  // Spoke presets: dispatch-only, empty draft only; ?design= always wins.
+  useEffect(() => {
+    if (!preset || presetApplied.current) return;
+    if (searchParams.get('design') || searchParams.get('id')) return;
+    if (!isEmptyDraft(content, biodataId)) return;
+
+    presetApplied.current = true;
+
+    if (preset.designSlug) {
+      const mapped = templateFromDesignQuery(preset.designSlug);
+      if (mapped) {
+        dispatch(selectDesign(mapped));
+        dispatch(setDesignSlug(mapped.slug));
+      }
+    }
+
+    const personalPatch: { gender?: typeof preset.gender; religion?: string } =
+      {};
+    if (preset.gender && !content.personal.gender) {
+      personalPatch.gender = preset.gender;
+    }
+    if (preset.religion && !content.personal.religion?.trim()) {
+      personalPatch.religion = preset.religion;
+    }
+    if (personalPatch.gender || personalPatch.religion) {
+      dispatch(patchPersonal(personalPatch));
+    }
+
+    if (preset.exportLanguage) {
+      dispatch(setExportLanguage(preset.exportLanguage));
+    }
+  }, [preset, content, biodataId, searchParams, dispatch]);
 
   useEffect(() => {
     const id = searchParams.get('id');
@@ -122,6 +179,20 @@ export function BiodataEditor({ showSiteFooter = true }: BiodataEditorProps) {
   return (
     <div className="landing editor-page">
       <SiteHeader variant="editor" />
+      {heading ? (
+        <div className="wrap" style={{ paddingTop: 12, paddingBottom: 4 }}>
+          <p
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(1.25rem, 3vw, 1.75rem)',
+              margin: 0,
+              lineHeight: 1.25,
+            }}
+          >
+            {heading}
+          </p>
+        </div>
+      ) : null}
       <EditorAppBar />
 
       <header className="editor-mobile-bar">

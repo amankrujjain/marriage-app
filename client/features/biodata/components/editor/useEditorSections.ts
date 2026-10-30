@@ -74,16 +74,42 @@ function loadStored(biodataId: string | null): EditorSectionDef[] | null {
   return null;
 }
 
-export function useEditorSections() {
+function reorderByPreset(
+  sections: EditorSectionDef[],
+  order?: string[],
+): EditorSectionDef[] {
+  if (!order?.length) return sections;
+  const byId = new Map(sections.map((section) => [section.id, section]));
+  const ordered: EditorSectionDef[] = [];
+  for (const id of order) {
+    const section = byId.get(id);
+    if (!section) continue;
+    ordered.push(section);
+    byId.delete(id);
+  }
+  for (const section of sections) {
+    if (byId.has(section.id)) ordered.push(section);
+  }
+  return ordered;
+}
+
+export type EditorSectionsPreset = {
+  sectionOrder?: string[];
+  openSectionId?: string;
+};
+
+export function useEditorSections(preset?: EditorSectionsPreset) {
   const dispatch = useAppDispatch();
   const content = useAppSelector((state) => state.biodata.content);
   const biodataId = useAppSelector((state) => state.biodata.biodataId);
   const savedSections = useAppSelector((state) => state.biodata.editorSections);
   const [sections, setSections] = useState<EditorSectionDef[]>(DEFAULT_EDITOR_SECTIONS);
-  const [openId, setOpenId] = useState('personal');
+  const [openId, setOpenId] = useState(preset?.openSectionId ?? 'personal');
   const [reorderMode, setReorderMode] = useState(false);
   const [ready, setReady] = useState(false);
   const lastSourceKey = useRef<string>('');
+  const sectionOrder = preset?.sectionOrder;
+  const openSectionId = preset?.openSectionId;
 
   // Load sections whenever the active biodata / server snapshot changes.
   useEffect(() => {
@@ -92,16 +118,21 @@ export function useEditorSections() {
     if (lastSourceKey.current === sourceKey) return;
     lastSourceKey.current = sourceKey;
 
+    const stored = hasServer ? null : loadStored(biodataId);
+    const usingDefaults = !hasServer && !stored;
     const base =
       (hasServer ? savedSections : null) ??
-      loadStored(biodataId) ??
-      DEFAULT_EDITOR_SECTIONS;
+      stored ??
+      reorderByPreset(DEFAULT_EDITOR_SECTIONS, sectionOrder);
     const hydrated = hydrateFromContent(base!, content);
     setSections(hydrated);
+    if (usingDefaults && openSectionId) {
+      setOpenId(openSectionId);
+    }
     dispatch(setEditorSections(hydrated));
     setReady(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [biodataId, savedSections]);
+  }, [biodataId, savedSections, sectionOrder, openSectionId]);
 
   // Persist to per-biodata local cache + Redux (for save payload).
   useEffect(() => {
