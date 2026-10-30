@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { ExportFormat, type BiodataContent } from '@marriage/shared';
+import { BadRequestError } from '../../errors/BadRequestError';
 import type { ExportArtifact } from './ExportProvider';
 import { buildBiodataPlainSections } from './buildBiodataPlainSections';
 
@@ -7,12 +8,43 @@ const A4_W = 595.28;
 const A4_H = 841.89;
 const MARGIN = 48;
 
+/** Helvetica / WinAnsi cannot encode Devanagari and other non-Latin scripts. */
+function isWinAnsiEncodable(text: string): boolean {
+  for (let i = 0; i < text.length; ) {
+    const cp = text.codePointAt(i);
+    if (cp === undefined) return false;
+    // WinAnsi is a single-byte Latin set; anything above U+00FF needs another font.
+    if (cp > 0xff) return false;
+    i += cp > 0xffff ? 2 : 1;
+  }
+  return true;
+}
+
+function collectText(input: {
+  content: BiodataContent;
+  title?: string;
+}): string[] {
+  const parts = [input.title?.trim() || 'Marriage biodata'];
+  for (const section of buildBiodataPlainSections(input.content)) {
+    parts.push(section.title, ...section.lines);
+  }
+  return parts;
+}
+
 /** Selectable-text A4 PDF from biodata fields (not a screenshot). */
 export async function createTextPdf(input: {
   content: BiodataContent;
   title?: string;
   watermark?: boolean;
 }): Promise<ExportArtifact> {
+  const texts = collectText(input);
+  if (!texts.every(isWinAnsiEncodable)) {
+    throw new BadRequestError(
+      'Text PDF does not support this script; use image PDF export',
+      'UNSUPPORTED_SCRIPT',
+    );
+  }
+
   const pdf = await PDFDocument.create();
   const font = await pdf.embedFont(StandardFonts.Helvetica);
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
@@ -48,13 +80,16 @@ export async function createTextPdf(input: {
   }
 
   if (input.watermark) {
-    page.drawText('marriagebio.in', {
-      x: A4_W - MARGIN - 90,
-      y: 24,
-      size: 10,
-      font,
-      color: rgb(0.45, 0.35, 0.35),
-    });
+    const markColor = rgb(0.45, 0.35, 0.35);
+    for (const p of pdf.getPages()) {
+      p.drawText('marriagebio.in', {
+        x: A4_W - MARGIN - 90,
+        y: 24,
+        size: 10,
+        font,
+        color: markColor,
+      });
+    }
   }
 
   const bytes = await pdf.save();
