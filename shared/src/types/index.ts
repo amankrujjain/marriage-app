@@ -45,7 +45,12 @@ export type {
   TranslateBiodataRequest,
   TranslateBiodataResponse,
 } from './translation';
-export type { ExportRequest, ExportResult } from './export';
+export type {
+  DocumentExportRequest,
+  DocumentExtraSection,
+  ExportRequest,
+  ExportResult,
+} from './export';
 export type {
   PaymentOrderStatus,
   BillingPlanPublic,

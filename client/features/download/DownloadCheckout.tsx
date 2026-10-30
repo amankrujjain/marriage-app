@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ExportFormat, PREMIUM_AMOUNT_INR } from '@marriage/shared';
@@ -18,7 +19,7 @@ type DownloadCheckoutProps = {
 
 export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) {
   const router = useRouter();
-  const { exportAs } = useExportBiodata();
+  const { exportAs, exportDocx } = useExportBiodata();
   const { isFreeDesign, designFromSlug } = useDesignCatalog();
   const isPremium = useAppSelector((state) => state.auth.user?.isPremium ?? false);
   const premiumUntil = useAppSelector((state) => state.auth.user?.premiumUntil);
@@ -33,6 +34,15 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
   const result = useAppSelector((state) => state.export.result);
   const translationStatus = useAppSelector((state) => state.language.status);
   const translationError = useAppSelector((state) => state.language.error);
+  const [preferDocx, setPreferDocx] = useState(false);
+
+  useEffect(() => {
+    try {
+      setPreferDocx(sessionStorage.getItem('mb_preferred_format') === 'docx');
+    } catch {
+      setPreferDocx(false);
+    }
+  }, []);
 
   const designName =
     designFromSlug(designSlug)?.name ?? slugFromTemplateId(templateId);
@@ -46,42 +56,55 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
     exportStatus === 'exporting' ||
     translationStatus === 'loading';
 
-  async function onDownloadPdf(): Promise<void> {
+  function gateDownload(): boolean {
     if (authStatus !== 'authenticated') {
       router.push('/login?next=/download');
-      return;
+      return false;
     }
-
     if (needsPass) {
       router.push('/wedding-pass');
-      return;
+      return false;
     }
+    return true;
+  }
 
+  async function onDownloadPdf(): Promise<void> {
+    if (!gateDownload()) return;
     await exportAs(ExportFormat.PDF);
   }
 
+  async function onDownloadDocx(): Promise<void> {
+    if (!gateDownload()) return;
+    await exportDocx();
+  }
+
   async function onDownloadWa(): Promise<void> {
-    if (authStatus !== 'authenticated') {
-      router.push('/login?next=/download');
-      return;
-    }
-    if (needsPass) {
-      router.push('/wedding-pass');
-      return;
-    }
+    if (!gateDownload()) return;
     await exportAs(ExportFormat.PNG);
   }
 
-  const primaryLabel = (() => {
+  const busyLabel = (() => {
     if (exportStatus === 'translating' || translationStatus === 'loading') {
       return 'Translating…';
     }
     if (exportStatus === 'capturing') return 'Capturing preview…';
     if (exportStatus === 'exporting') return 'Preparing download…';
     if (busy) return 'Preparing download…';
+    return null;
+  })();
+
+  const pdfLabel = (() => {
+    if (busyLabel) return busyLabel;
     if (authStatus !== 'authenticated') return 'Sign in to download';
     if (needsPass) return 'Continue to Wedding Pass';
     return 'Download PDF';
+  })();
+
+  const docxLabel = (() => {
+    if (busyLabel) return busyLabel;
+    if (authStatus !== 'authenticated') return 'Sign in to download';
+    if (needsPass) return 'Continue to Wedding Pass';
+    return 'Download Word (.docx)';
   })();
 
   const premiumPriceLabel = isPremium ? 'Included' : `₹${PREMIUM_AMOUNT_INR}`;
@@ -178,11 +201,15 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
       </div>
 
       <button
-        className="btn btn-primary btn-block"
+        className={`btn ${preferDocx ? 'btn-line' : 'btn-primary'} btn-block`}
         type="button"
         disabled={busy}
         onClick={() => void onDownloadPdf()}
-        style={{ marginTop: 16, minHeight: 54, fontSize: '1.05rem' }}
+        style={{
+          marginTop: 16,
+          minHeight: preferDocx ? undefined : 54,
+          fontSize: preferDocx ? undefined : '1.05rem',
+        }}
       >
         <svg
           viewBox="0 0 24 24"
@@ -195,7 +222,21 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
         >
           <path d="M12 4v11M7 11l5 5 5-5M5 20h14" />
         </svg>
-        {primaryLabel}
+        {pdfLabel}
+      </button>
+
+      <button
+        className={`btn ${preferDocx ? 'btn-primary' : 'btn-line'} btn-block`}
+        type="button"
+        disabled={busy}
+        onClick={() => void onDownloadDocx()}
+        style={{
+          marginTop: 10,
+          minHeight: preferDocx ? 54 : undefined,
+          fontSize: preferDocx ? '1.05rem' : undefined,
+        }}
+      >
+        {docxLabel}
       </button>
 
       <button

@@ -1,5 +1,6 @@
 import type {
   BiodataContent,
+  DocumentExtraSection,
   ExportFormat,
   ExportResult,
 } from '@marriage/shared';
@@ -21,6 +22,7 @@ export async function requestDocumentExport(input: {
   fileName?: string;
   personName?: string;
   designSlug?: string;
+  extraSections?: DocumentExtraSection[];
 }): Promise<ExportResult> {
   return apiPost<ExportResult>('/export/document', input);
 }

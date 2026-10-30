@@ -2,7 +2,10 @@ import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { ExportFormat, type BiodataContent } from '@marriage/shared';
 import { BadRequestError } from '../../errors/BadRequestError';
 import type { ExportArtifact } from './ExportProvider';
-import { buildBiodataPlainSections } from './buildBiodataPlainSections';
+import {
+  buildBiodataPlainSections,
+  type DocumentExtraSection,
+} from './buildBiodataPlainSections';
 
 const A4_W = 595.28;
 const A4_H = 841.89;
@@ -23,9 +26,13 @@ function isWinAnsiEncodable(text: string): boolean {
 function collectText(input: {
   content: BiodataContent;
   title?: string;
+  extraSections?: DocumentExtraSection[];
 }): string[] {
   const parts = [input.title?.trim() || 'Marriage biodata'];
-  for (const section of buildBiodataPlainSections(input.content)) {
+  for (const section of buildBiodataPlainSections(
+    input.content,
+    input.extraSections,
+  )) {
     parts.push(section.title, ...section.lines);
   }
   return parts;
@@ -36,6 +43,7 @@ export async function createTextPdf(input: {
   content: BiodataContent;
   title?: string;
   watermark?: boolean;
+  extraSections?: DocumentExtraSection[];
 }): Promise<ExportArtifact> {
   const texts = collectText(input);
   if (!texts.every(isWinAnsiEncodable)) {
@@ -71,7 +79,10 @@ export async function createTextPdf(input: {
   draw(input.title?.trim() || 'Marriage biodata', 18, true);
   y -= 8;
 
-  for (const section of buildBiodataPlainSections(input.content)) {
+  for (const section of buildBiodataPlainSections(
+    input.content,
+    input.extraSections,
+  )) {
     y -= 6;
     draw(section.title, 13, true);
     for (const row of section.lines) {

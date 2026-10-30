@@ -44,7 +44,9 @@ export function useTranslateBiodata() {
   const exportLanguage = useAppSelector((state) => state.language.exportLanguage);
 
   const translate = useCallback(
-    async (sections?: EditorSectionDef[]): Promise<BiodataContent> => {
+    async (
+      sections?: EditorSectionDef[],
+    ): Promise<{ content: BiodataContent; extras: StructuredFields }> => {
       const editorSections = sections ?? loadEditorSections();
       const fields = flattenSectionsForTranslation(editorSections);
 
@@ -57,7 +59,7 @@ export function useTranslateBiodata() {
             provider: 'passthrough',
           }),
         );
-        return content;
+        return { content, extras: {} };
       }
 
       dispatch(translationStarted());
@@ -80,7 +82,7 @@ export function useTranslateBiodata() {
               provider: result.provider,
             }),
           );
-          return nextContent;
+          return { content: nextContent, extras };
         } catch (error) {
           lastMessage =
             error instanceof ApiClientError || error instanceof Error
@@ -103,10 +105,9 @@ export function useTranslateBiodata() {
           warning: `Translation unavailable (${lastMessage}). Downloading in English.`,
         }),
       );
-      return content;
+      return { content, extras: {} };
     },
     [content, dispatch, exportLanguage],
   );
-
   return { translate };
 }

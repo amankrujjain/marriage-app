@@ -4,13 +4,16 @@ import {
   type EditorSectionDef,
 } from './editorSectionModel';
 
+/** Load editor sections; prefer per-draft key used by the live editor. */
 export function loadEditorSections(): EditorSectionDef[] {
   if (typeof window === 'undefined') return DEFAULT_EDITOR_SECTIONS;
   try {
-    const raw = localStorage.getItem(EDITOR_SECTIONS_KEY);
-    if (!raw) return DEFAULT_EDITOR_SECTIONS;
-    const parsed = JSON.parse(raw) as EditorSectionDef[];
-    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    for (const key of [`${EDITOR_SECTIONS_KEY}:draft`, EDITOR_SECTIONS_KEY]) {
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const parsed = JSON.parse(raw) as EditorSectionDef[];
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
   } catch {
     /* ignore */
   }

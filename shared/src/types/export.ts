@@ -11,6 +11,11 @@ export interface ExportRequest {
   personName?: string;
 }
 
+export interface DocumentExtraSection {
+  title: string;
+  lines: Array<{ label: string; value: string }>;
+}
+
 /** Server-rendered selectable PDF / Word (not a screenshot). */
 export interface DocumentExportRequest {
   format: ExportFormat.PDF | ExportFormat.DOCX;
@@ -18,6 +23,7 @@ export interface DocumentExportRequest {
   fileName?: string;
   designSlug?: string;
   personName?: string;
+  extraSections?: DocumentExtraSection[];
 }
 
 export interface ExportResult {

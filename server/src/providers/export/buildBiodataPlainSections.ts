@@ -2,6 +2,11 @@ import type { BiodataContent } from '@marriage/shared';
 
 export type PlainSection = { title: string; lines: string[] };
 
+export type DocumentExtraSection = {
+  title: string;
+  lines: Array<{ label: string; value: string }>;
+};
+
 function line(label: string, value?: string | number | null): string | null {
   if (value === undefined || value === null) return null;
   const text = String(value).trim();
@@ -9,8 +14,23 @@ function line(label: string, value?: string | number | null): string | null {
   return `${label}: ${text}`;
 }
 
+function extraToPlain(extra: DocumentExtraSection): PlainSection | null {
+  const lines = extra.lines
+    .map((row) => line(row.label, row.value))
+    .filter(Boolean) as string[];
+  if (lines.length === 0) return null;
+  return { title: extra.title.trim() || 'Details', lines };
+}
+
+function isHoroscopeTitle(title: string): boolean {
+  return title.trim().toLowerCase() === 'horoscope';
+}
+
 /** Flatten biodata content into titled sections for text PDF / DOCX. */
-export function buildBiodataPlainSections(content: BiodataContent): PlainSection[] {
+export function buildBiodataPlainSections(
+  content: BiodataContent,
+  extraSections?: DocumentExtraSection[],
+): PlainSection[] {
   const hidden = new Set(content.hiddenFields ?? []);
   const field = (
     key: string,
@@ -89,7 +109,28 @@ export function buildBiodataPlainSections(content: BiodataContent): PlainSection
         field('contact.address', 'Address', k.address),
       ].filter(Boolean) as string[],
     },
-  ];
+  ].filter((s) => s.lines.length > 0);
 
-  return sections.filter((s) => s.lines.length > 0);
+  if (!extraSections?.length) return sections;
+
+  const horoscopeExtras: PlainSection[] = [];
+  const otherExtras: PlainSection[] = [];
+  for (const extra of extraSections) {
+    const plain = extraToPlain(extra);
+    if (!plain) continue;
+    if (isHoroscopeTitle(plain.title)) horoscopeExtras.push(plain);
+    else otherExtras.push(plain);
+  }
+
+  if (horoscopeExtras.length > 0) {
+    const eduIdx = sections.findIndex((s) => s.title === 'Education');
+    if (eduIdx >= 0) {
+      sections.splice(eduIdx, 0, ...horoscopeExtras);
+    } else {
+      sections.push(...horoscopeExtras);
+    }
+  }
+
+  sections.push(...otherExtras);
+  return sections;
 }

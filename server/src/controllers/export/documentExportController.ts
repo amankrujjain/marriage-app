@@ -19,6 +19,7 @@ export async function documentExportController(
       fileName: req.body.fileName as string | undefined,
       personName: req.body.personName as string | undefined,
       designSlug: req.body.designSlug as string | undefined,
+      extraSections: req.body.extraSections,
     });
     sendCreated(res, data, 'Document export created successfully');
   } catch (error) {

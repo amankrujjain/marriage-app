@@ -7,13 +7,17 @@ import {
 } from 'docx';
 import { ExportFormat, type BiodataContent } from '@marriage/shared';
 import type { ExportArtifact } from './ExportProvider';
-import { buildBiodataPlainSections } from './buildBiodataPlainSections';
+import {
+  buildBiodataPlainSections,
+  type DocumentExtraSection,
+} from './buildBiodataPlainSections';
 
 /** DOCX biodata from structured fields. */
 export async function createDocx(input: {
   content: BiodataContent;
   title?: string;
   watermark?: boolean;
+  extraSections?: DocumentExtraSection[];
 }): Promise<ExportArtifact> {
   const children: Paragraph[] = [
     new Paragraph({
@@ -22,7 +26,10 @@ export async function createDocx(input: {
     }),
   ];
 
-  for (const section of buildBiodataPlainSections(input.content)) {
+  for (const section of buildBiodataPlainSections(
+    input.content,
+    input.extraSections,
+  )) {
     children.push(
       new Paragraph({
         text: section.title,

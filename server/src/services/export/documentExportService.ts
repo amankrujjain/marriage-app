@@ -11,6 +11,7 @@ import {
 import { BadRequestError } from '../../errors/BadRequestError';
 import { createDocx } from '../../providers/export/DocxExportProvider';
 import { createTextPdf } from '../../providers/export/TextPdfExportProvider';
+import type { DocumentExtraSection } from '../../providers/export/buildBiodataPlainSections';
 import { buildSignedMediaUrl } from '../../utils/signedMediaUrl';
 import { assertExportAccess } from './assertExportAccess';
 
@@ -33,6 +34,7 @@ export async function exportBiodataDocument(input: {
   fileName?: string;
   personName?: string;
   designSlug?: string;
+  extraSections?: DocumentExtraSection[];
 }): Promise<ExportResult> {
   const { hasPass } = await assertExportAccess({
     userId: input.userId,
@@ -50,12 +52,14 @@ export async function exportBiodataDocument(input: {
           content: input.content,
           title,
           watermark: !hasPass,
+          extraSections: input.extraSections,
         })
       : input.format === ExportFormat.PDF
         ? await createTextPdf({
             content: input.content,
             title,
             watermark: !hasPass,
+            extraSections: input.extraSections,
           })
         : (() => {
             throw new BadRequestError('Unsupported document format', 'EXPORT_FORMAT_INVALID');
