@@ -38,7 +38,7 @@ export function TemplateGallery() {
   return (
     <>
       <section className="page-head wrap">
-        <h1>Marriage biodata designs</h1>
+        <h1>Marriage Biodata Templates</h1>
         <p>
           Pick a design, then add your details. Every card below shows a sample of the real layout.
         </p>

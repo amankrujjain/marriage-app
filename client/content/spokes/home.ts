@@ -15,10 +15,10 @@ export const home: SpokePageConfig = {
   language: 'en',
   primaryKeyword: 'biodata for marriage',
   secondaryKeywords: ['marriage biodata maker'],
-  title: 'Free Marriage Biodata Maker | MarriageBio',
+  title: 'Biodata for Marriage: Free Maker, Word & PDF',
   metaDescription:
     'Create a print-ready Indian marriage biodata online. Free A4 designs, live preview, PDF and WhatsApp download.',
-  h1: 'Free Marriage Biodata Maker',
+  h1: 'Free Biodata for Marriage Maker',
   breadcrumbName: 'Home',
   makerPosition: 'top',
   preset: {},

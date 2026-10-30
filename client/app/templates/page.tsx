@@ -7,7 +7,9 @@ import { breadcrumbJsonLd, languageAlternates } from '@/lib/seo';
 import { TemplatesPageContext } from './TemplatesPageContext';
 
 export const metadata: Metadata = {
-  title: 'Marriage Biodata Designs',
+  title: {
+    absolute: 'Marriage Biodata Templates & Biodata Format Designs',
+  },
   description:
     'Browse traditional, royal, floral and modern A4 marriage biodata designs for Indian families.',
   alternates: languageAlternates('/templates/'),

@@ -15,7 +15,7 @@ import {
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'Free Marriage Biodata Maker | MarriageBio',
+    absolute: 'Biodata for Marriage: Free Maker, Word & PDF',
   },
   description:
     'Create a print-ready Indian marriage biodata online. Free A4 designs, live preview, PDF and WhatsApp download.',
@@ -39,7 +39,7 @@ function EditorFallback() {
   return (
     <div className="landing editor-page" style={{ padding: '48px 24px' }}>
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', margin: 0 }}>
-        Free Marriage Biodata Maker
+        Free Biodata for Marriage Maker
       </div>
       <p style={{ marginTop: 12, color: 'var(--ink-2)' }}>Loading editor…</p>
     </div>
@@ -72,7 +72,7 @@ export default function HomePage() {
             lineHeight: 1.2,
           }}
         >
-          Free Marriage Biodata Maker
+          Free Biodata for Marriage Maker
         </h1>
         <p style={{ marginTop: 10, color: 'var(--ink-2)', maxWidth: 560 }}>
           Fill in your details, preview live on A4 designs, and download a print-ready PDF or

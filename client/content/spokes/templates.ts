@@ -15,10 +15,10 @@ export const templates: SpokePageConfig = {
   language: 'en',
   primaryKeyword: 'marriage biodata templates',
   secondaryKeywords: ['biodata format'],
-  title: 'Marriage Biodata Designs',
+  title: 'Marriage Biodata Templates & Biodata Format Designs',
   metaDescription:
     'Browse traditional, royal, floral and modern A4 marriage biodata designs for Indian families.',
-  h1: 'Marriage Biodata Designs',
+  h1: 'Marriage Biodata Templates',
   breadcrumbName: 'Designs',
   makerPosition: 'top',
   preset: {},
