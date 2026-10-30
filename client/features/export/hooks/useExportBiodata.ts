@@ -7,7 +7,7 @@ import { ApiClientError } from '@/lib/apiClient';
 import { slugFromTemplateId } from '@/features/biodata/components/editor/designMap';
 import { useTranslateBiodata } from '@/features/translation/hooks/useTranslateBiodata';
 import { capturePreview } from '../utils/capturePreview';
-import { requestDocumentExport, requestExport } from '../services/exportApi';
+import { requestExport } from '../services/exportApi';
 import {
   exportCapturing,
   exportFailed,
@@ -71,31 +71,6 @@ export function useExportBiodata() {
 
       const personName =
         translated.personal.fullName?.trim() || fullName;
-
-      // Prefer selectable text PDF; fall back to image PDF for non-Latin scripts.
-      if (format === ExportFormat.PDF) {
-        try {
-          dispatch(exportUploading());
-          const result = await requestDocumentExport({
-            format: ExportFormat.PDF,
-            content: translated,
-            fileName: personName,
-            personName,
-            designSlug: designSlug || undefined,
-          });
-          dispatch(exportSucceeded(result));
-          trackDownload(format);
-          return;
-        } catch (error) {
-          if (
-            !(error instanceof ApiClientError) ||
-            error.code !== 'UNSUPPORTED_SCRIPT'
-          ) {
-            throw error;
-          }
-          // Fall through to image-based export (same watermark/pass rules).
-        }
-      }
 
       dispatch(exportCapturing());
       const imageBase64 = await capturePreview(node, format);

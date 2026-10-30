@@ -11,6 +11,16 @@ function line(label: string, value?: string | number | null): string | null {
 
 /** Flatten biodata content into titled sections for text PDF / DOCX. */
 export function buildBiodataPlainSections(content: BiodataContent): PlainSection[] {
+  const hidden = new Set(content.hiddenFields ?? []);
+  const field = (
+    key: string,
+    label: string,
+    value?: string | number | null,
+  ): string | null => {
+    if (hidden.has(key)) return null;
+    return line(label, value);
+  };
+
   const p = content.personal ?? {};
   const e = content.education ?? {};
   const c = content.career ?? {};
@@ -22,61 +32,61 @@ export function buildBiodataPlainSections(content: BiodataContent): PlainSection
     {
       title: 'Personal',
       lines: [
-        line('Full name', p.fullName),
-        line('Gender', p.gender),
-        line('Date of birth', p.dateOfBirth),
-        line('Age', p.age),
-        line('Height', p.height),
-        line('Religion', p.religion),
-        line('Caste', p.caste),
-        line('Mother tongue', p.motherTongue),
-        line('Marital status', p.maritalStatus),
-        line('Location', p.location),
+        field('personal.fullName', 'Full name', p.fullName),
+        field('personal.gender', 'Gender', p.gender),
+        field('personal.dateOfBirth', 'Date of birth', p.dateOfBirth),
+        field('personal.age', 'Age', p.age),
+        field('personal.height', 'Height', p.height),
+        field('personal.religion', 'Religion', p.religion),
+        field('personal.caste', 'Caste', p.caste),
+        field('personal.motherTongue', 'Mother tongue', p.motherTongue),
+        field('personal.maritalStatus', 'Marital status', p.maritalStatus),
+        field('personal.location', 'Location', p.location),
       ].filter(Boolean) as string[],
     },
     {
       title: 'Education',
       lines: [
-        line('Highest education', e.highestEducation),
-        line('Institution', e.institution),
-        line('Additional', e.additionalEducation),
+        field('education.highestEducation', 'Highest education', e.highestEducation),
+        field('education.institution', 'Institution', e.institution),
+        field('education.additionalEducation', 'Additional', e.additionalEducation),
       ].filter(Boolean) as string[],
     },
     {
       title: 'Career',
       lines: [
-        line('Profession', c.profession),
-        line('Company', c.company),
-        line('Income', c.income),
-        line('Work location', c.workLocation),
+        field('career.profession', 'Profession', c.profession),
+        field('career.company', 'Company', c.company),
+        field('career.income', 'Income', c.income),
+        field('career.workLocation', 'Work location', c.workLocation),
       ].filter(Boolean) as string[],
     },
     {
       title: 'Family',
       lines: [
-        line('Father', f.fatherName),
-        line('Father occupation', f.fatherOccupation),
-        line('Mother', f.motherName),
-        line('Mother occupation', f.motherOccupation),
-        line('Siblings', f.siblings),
-        line('Family location', f.familyLocation),
+        field('family.fatherName', 'Father', f.fatherName),
+        field('family.fatherOccupation', 'Father occupation', f.fatherOccupation),
+        field('family.motherName', 'Mother', f.motherName),
+        field('family.motherOccupation', 'Mother occupation', f.motherOccupation),
+        field('family.siblings', 'Siblings', f.siblings),
+        field('family.familyLocation', 'Family location', f.familyLocation),
       ].filter(Boolean) as string[],
     },
     {
       title: 'About',
       lines: [
-        line('About', a.aboutMe),
-        line('Hobbies', a.hobbies),
-        line('Lifestyle', a.lifestyle),
+        field('about.aboutMe', 'About', a.aboutMe),
+        field('about.hobbies', 'Hobbies', a.hobbies),
+        field('about.lifestyle', 'Lifestyle', a.lifestyle),
       ].filter(Boolean) as string[],
     },
     {
       title: 'Contact',
       lines: [
-        line('Contact name', k.contactName),
-        line('Phone', k.phone),
-        line('Email', k.email),
-        line('Address', k.address),
+        field('contact.contactName', 'Contact name', k.contactName),
+        field('contact.phone', 'Phone', k.phone),
+        field('contact.email', 'Email', k.email),
+        field('contact.address', 'Address', k.address),
       ].filter(Boolean) as string[],
     },
   ];
