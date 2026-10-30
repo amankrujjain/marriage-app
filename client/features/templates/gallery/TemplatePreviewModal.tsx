@@ -97,7 +97,7 @@ export function TemplatePreviewModal({ template, onClose }: TemplatePreviewModal
             <div className="modal-actions">
               <Link
                 className="btn btn-primary"
-                href={`/marriage-biodata-maker?design=${template.slug}`}
+                href={`/?design=${template.slug}`}
               >
                 Use this design
               </Link>

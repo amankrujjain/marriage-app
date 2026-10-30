@@ -6,6 +6,7 @@ import { useAppSelector } from '@/store/hooks';
 import { formatDateDisplay } from '@/lib/formatDate';
 import { loadEditorSections } from '@/features/biodata/components/editor/loadEditorSections';
 import type { EditorSectionDef } from '@/features/biodata/components/editor/editorSectionModel';
+import { getOriginPath } from '@/lib/analytics';
 
 function fieldBySync(sections: EditorSectionDef[], sync: string): string {
   for (const section of sections) {
@@ -27,9 +28,17 @@ function maskPhone(phone: string): string {
 export function DownloadChecklist() {
   const content = useAppSelector((state) => state.biodata.content);
   const [sections, setSections] = useState<EditorSectionDef[]>([]);
+  const [editHref, setEditHref] = useState('/');
 
   useEffect(() => {
     setSections(loadEditorSections());
+  }, []);
+
+  useEffect(() => {
+    const origin = getOriginPath();
+    if (origin && origin.startsWith('/') && !origin.startsWith('//')) {
+      setEditHref(origin);
+    }
   }, []);
 
   const items = useMemo(() => {
@@ -98,11 +107,11 @@ export function DownloadChecklist() {
                 item.value
               ) : item.label === 'Photo added' ? (
                 <>
-                  No · <Link href="/marriage-biodata-maker">Add</Link>
+                  No · <Link href={editHref}>Add</Link>
                 </>
               ) : (
                 <>
-                  Missing · <Link href="/marriage-biodata-maker">Add</Link>
+                  Missing · <Link href={editHref}>Add</Link>
                 </>
               )}
             </b>

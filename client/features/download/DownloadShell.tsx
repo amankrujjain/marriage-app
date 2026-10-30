@@ -18,7 +18,7 @@ export function DownloadShell() {
 
   useEffect(() => {
     const origin = getOriginPath();
-    if (origin && origin.startsWith('/')) {
+    if (origin && origin.startsWith('/') && !origin.startsWith('//')) {
       setBackHref(origin);
     }
   }, []);

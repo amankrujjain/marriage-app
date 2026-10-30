@@ -37,7 +37,7 @@ export function GalleryCard({ template, onPreview }: GalleryCardProps) {
         </button>
         <Link
           className="btn btn-primary btn-sm"
-          href={`/marriage-biodata-maker?design=${template.slug}`}
+          href={`/?design=${template.slug}`}
         >
           Use design
         </Link>

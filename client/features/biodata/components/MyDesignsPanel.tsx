@@ -135,7 +135,7 @@ export function MyDesignsPanel() {
         dispatch(setDesignSlug(design.slug));
       }
       router.push(
-        `/marriage-biodata-maker?id=${record.id}&design=${encodeURIComponent(slug)}`,
+        `/?id=${record.id}&design=${encodeURIComponent(slug)}`,
       );
     } finally {
       setOpeningId(null);
@@ -171,7 +171,7 @@ export function MyDesignsPanel() {
             <h1>My Designs</h1>
             <p>Biodatas you have saved</p>
           </div>
-          <Link className="btn btn-primary" href="/marriage-biodata-maker?new=1">
+          <Link className="btn btn-primary" href="/?new=1">
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
               <path d="M10 4v12M4 10h12" />
             </svg>
@@ -195,7 +195,7 @@ export function MyDesignsPanel() {
             <p style={{ color: 'var(--ink-2)' }}>
               Create your first biodata. It takes a few minutes, and it is saved to your account.
             </p>
-            <Link className="btn btn-primary" href="/marriage-biodata-maker?new=1">
+            <Link className="btn btn-primary" href="/?new=1">
               Create my biodata
             </Link>
           </div>
@@ -213,7 +213,7 @@ export function MyDesignsPanel() {
               return (
                 <article key={record.id} className="md-card">
                   <Link
-                    href={`/marriage-biodata-maker?id=${record.id}&design=${encodeURIComponent(slug)}`}
+                    href={`/?id=${record.id}&design=${encodeURIComponent(slug)}`}
                     aria-label={`Open ${name}`}
                     onClick={(e) => {
                       e.preventDefault();

@@ -1,6 +1,19 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { getOriginPath } from '@/lib/analytics';
 
 export function DownloadAppBar() {
+  const [editHref, setEditHref] = useState('/');
+
+  useEffect(() => {
+    const origin = getOriginPath();
+    if (origin && origin.startsWith('/') && !origin.startsWith('//')) {
+      setEditHref(origin);
+    }
+  }, []);
+
   return (
     <header className="dl-bar">
       <div className="dl-bar-inner">
@@ -23,7 +36,7 @@ export function DownloadAppBar() {
             Download
           </li>
         </ol>
-        <Link href="/marriage-biodata-maker" className="dl-edit-link">
+        <Link href={editHref} className="dl-edit-link">
           ← Edit details
         </Link>
       </div>
