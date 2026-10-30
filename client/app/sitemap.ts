@@ -1,12 +1,16 @@
 import type { MetadataRoute } from 'next';
-import { PUBLIC_ROUTES, SITE_URL } from '@/lib/seo';
+import { PUBLIC_ROUTES, PUBLISHED_SPOKE_PATHS, SITE_URL } from '@/lib/seo';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  return PUBLIC_ROUTES.map((path) => ({
-    url: new URL(path, SITE_URL).toString(),
-    lastModified: now,
-    changeFrequency: path === '/' ? 'weekly' : 'monthly',
-    priority: path === '/' ? 1 : 0.7,
-  }));
+  return PUBLIC_ROUTES.map((path) => {
+    const isHome = path === '/';
+    const isSpoke = PUBLISHED_SPOKE_PATHS.has(path);
+    return {
+      url: new URL(path, SITE_URL).toString(),
+      lastModified: now,
+      changeFrequency: isHome ? 'weekly' : 'monthly',
+      priority: isHome ? 1 : isSpoke ? 0.8 : 0.7,
+    };
+  });
 }

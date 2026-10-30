@@ -1,41 +1,95 @@
 import type { Metadata } from 'next';
+import { publishedPages } from '@/content/spokes';
 
 export const SITE_URL = 'https://marriagebio.in';
 
-/** Public marketing + tool routes (trailingSlash). Extend when spokes launch. */
-export const PUBLIC_ROUTES = [
+const STATIC_PUBLIC_ROUTES = [
   '/',
   '/templates/',
   '/privacy/',
   '/wedding-pass/',
 ] as const;
 
-/** Language spokes — add here when pages exist; kept out of PUBLIC_ROUTES / sitemap. */
-const LANGUAGE_SPOKES = {
+/** Language hreflang cluster paths (only when each is in PUBLIC_ROUTES). */
+const LANGUAGE_CLUSTER = {
+  'en-IN': '/',
   'hi-IN': '/hi/',
   'mr-IN': '/marathi-biodata/',
+  'x-default': '/',
 } as const;
 
-export type PublicRoute = (typeof PUBLIC_ROUTES)[number];
+const LANGUAGE_CLUSTER_PATHS = new Set<string>([
+  '/',
+  '/hi/',
+  '/marathi-biodata/',
+]);
+
+function dedupePaths(paths: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const path of paths) {
+    if (seen.has(path)) continue;
+    seen.add(path);
+    out.push(path);
+  }
+  return out;
+}
+
+/** Public marketing + tool routes (trailingSlash), including published spokes. */
+export const PUBLIC_ROUTES: string[] = dedupePaths([
+  ...STATIC_PUBLIC_ROUTES,
+  ...publishedPages().map((page) => page.path),
+]);
+
+export type PublicRoute = (typeof STATIC_PUBLIC_ROUTES)[number] | string;
 
 const EXISTING_ROUTES = new Set<string>(PUBLIC_ROUTES);
 
-/** hreflang: en-IN + x-default always; hi-IN / mr-IN only when those routes exist. */
+/** Published spoke paths (kind === 'spoke') for sitemap priority. */
+export const PUBLISHED_SPOKE_PATHS = new Set(
+  publishedPages()
+    .filter((page) => page.kind === 'spoke')
+    .map((page) => page.path),
+);
+
+function normalizePath(path: string): string {
+  if (path === '/') return '/';
+  return path.endsWith('/') ? path : `${path}/`;
+}
+
+/**
+ * Canonical is always the page's own path.
+ * hreflang cluster only for `/`, `/hi/`, `/marathi-biodata/` (each only if in PUBLIC_ROUTES).
+ * Every other page: en-IN + x-default → self.
+ */
 export function languageAlternates(path: string = '/'): Metadata['alternates'] {
-  const normalized = path.endsWith('/') || path === '/' ? path : `${path}/`;
-  const base = normalized === '/' ? '/' : normalized;
-  const languages: Record<string, string> = {
-    'en-IN': base,
-    'x-default': base,
-  };
-  for (const [hreflang, spoke] of Object.entries(LANGUAGE_SPOKES)) {
-    if (EXISTING_ROUTES.has(spoke)) {
-      languages[hreflang] = spoke;
+  const self = normalizePath(path);
+
+  if (LANGUAGE_CLUSTER_PATHS.has(self)) {
+    const languages: Record<string, string> = {};
+    for (const [hreflang, spokePath] of Object.entries(LANGUAGE_CLUSTER)) {
+      if (EXISTING_ROUTES.has(spokePath)) {
+        languages[hreflang] = spokePath;
+      }
     }
+    if (!languages['x-default']) {
+      languages['x-default'] = self;
+    }
+    if (!languages['en-IN']) {
+      languages['en-IN'] = self;
+    }
+    return {
+      canonical: self,
+      languages,
+    };
   }
+
   return {
-    canonical: base,
-    languages,
+    canonical: self,
+    languages: {
+      'en-IN': self,
+      'x-default': self,
+    },
   };
 }
 
