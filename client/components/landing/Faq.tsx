@@ -1,4 +1,4 @@
-const FAQS = [
+export const FAQ_ITEMS = [
   {
     q: 'Do I need an account?',
     a: 'You can design and preview without one. An account lets you keep your saved biodatas in My Designs.',
@@ -29,7 +29,7 @@ export function Faq() {
           <h2 id="faq-h">Questions families ask</h2>
         </div>
         <div className="faq reveal">
-          {FAQS.map((item) => (
+          {FAQ_ITEMS.map((item) => (
             <details key={item.q}>
               <summary>{item.q}</summary>
               <div className="ans">{item.a}</div>

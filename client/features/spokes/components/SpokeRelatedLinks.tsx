@@ -6,6 +6,11 @@ type SpokeRelatedLinksProps =
   | { variant?: 'related'; page: SpokePageConfig }
   | { variant: 'hub'; page?: undefined };
 
+const HOME_AND_TEMPLATES: Array<{ path: string; label: string }> = [
+  { path: '/', label: 'Home' },
+  { path: '/templates/', label: 'Designs' },
+];
+
 export function SpokeRelatedLinks(props: SpokeRelatedLinksProps) {
   if (props.variant === 'hub') {
     const byHub = hubLinks();
@@ -37,8 +42,9 @@ export function SpokeRelatedLinks(props: SpokeRelatedLinksProps) {
     );
   }
 
-  const related = relatedFor(props.page);
-  if (related.length === 0) return null;
+  const related = relatedFor(props.page).filter(
+    (page) => page.path !== '/' && page.path !== '/templates/',
+  );
 
   return (
     <section className="sec alt" aria-labelledby="spoke-related-h">
@@ -47,6 +53,11 @@ export function SpokeRelatedLinks(props: SpokeRelatedLinksProps) {
           <h2 id="spoke-related-h">Related</h2>
         </div>
         <ul className="reveal" style={{ margin: 0, paddingLeft: 18 }}>
+          {HOME_AND_TEMPLATES.map((item) => (
+            <li key={item.path}>
+              <Link href={item.path}>{item.label}</Link>
+            </li>
+          ))}
           {related.map((page) => (
             <li key={page.id}>
               <Link href={page.path}>{page.breadcrumbName}</Link>

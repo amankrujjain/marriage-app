@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { spokePages } from '@/content/spokes';
 import { clearCookieConsent } from '@/lib/analytics';
 import { BrandLogo } from './BrandLogo';
 import { Toast } from './Toast';
@@ -13,6 +14,7 @@ type SiteFooterProps = {
 export function SiteFooter({ slim = false }: SiteFooterProps) {
   const { message, toast } = useToast();
   const year = new Date().getFullYear();
+  const formatSpokes = spokePages().filter((page) => page.published);
 
   if (slim) {
     return (
@@ -22,7 +24,7 @@ export function SiteFooter({ slim = false }: SiteFooterProps) {
             <div className="foot-bottom" style={{ border: 0, margin: 0, padding: 0 }}>
               <span>© {year} MarriageBio</span>
               <span>
-                <Link href="/privacy" style={{ color: '#BFA99C', display: 'inline' }}>
+                <Link href="/privacy/" style={{ color: '#BFA99C', display: 'inline' }}>
                   Privacy
                 </Link>
                 {' · '}
@@ -64,10 +66,20 @@ export function SiteFooter({ slim = false }: SiteFooterProps) {
             </div>
             <div>
               <h4>Make</h4>
-              <Link href="/marriage-biodata-maker">Create my biodata</Link>
-              <Link href="/templates">Browse designs</Link>
-              <Link href="/wedding-pass">Wedding Pass</Link>
+              <Link href="/">Create my biodata</Link>
+              <Link href="/templates/">Browse designs</Link>
+              <Link href="/wedding-pass/">Wedding Pass</Link>
             </div>
+            {formatSpokes.length > 0 ? (
+              <div>
+                <h4>Biodata formats</h4>
+                {formatSpokes.map((page) => (
+                  <Link key={page.id} href={page.path}>
+                    {page.breadcrumbName}
+                  </Link>
+                ))}
+              </div>
+            ) : null}
             <div>
               <h4>Free tools</h4>
               <Link href="/#tools">Wedding hashtag generator</Link>
@@ -76,16 +88,16 @@ export function SiteFooter({ slim = false }: SiteFooterProps) {
             </div>
             <div>
               <h4>Account</h4>
-              <Link href="/login">Sign in</Link>
-              <Link href="/register">Sign up</Link>
-              <Link href="/my-designs">My Designs</Link>
-              <Link href="/account">Profile</Link>
+              <Link href="/login/">Sign in</Link>
+              <Link href="/register/">Sign up</Link>
+              <Link href="/my-designs/">My Designs</Link>
+              <Link href="/account/">Profile</Link>
             </div>
           </div>
           <div className="foot-bottom">
             <span>© {year} MarriageBio. All rights reserved.</span>
             <span>
-              <Link href="/privacy" style={{ color: '#BFA99C', display: 'inline' }}>
+              <Link href="/privacy/" style={{ color: '#BFA99C', display: 'inline' }}>
                 Privacy
               </Link>
               {' · '}

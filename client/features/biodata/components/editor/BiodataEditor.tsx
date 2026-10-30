@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { SiteHeader } from '@/components/landing/SiteHeader';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -10,6 +10,7 @@ import { selectDesign } from '@/features/templates/store/templateSlice';
 import { setExportLanguage } from '@/features/translation/store/languageSlice';
 import type { SpokePreset } from '@/content/spokes/types';
 import { isEmptyDraft } from '@/features/spokes/isEmptyDraft';
+import { setPageContext } from '@/lib/analytics';
 import { fetchBiodata } from '../../services/biodataApi';
 import {
   loadBiodata,
@@ -41,11 +42,12 @@ type BiodataEditorProps = {
 export function BiodataEditor({
   showSiteFooter = true,
   preset,
-  pageSlug: _pageSlug,
+  pageSlug,
   heading,
 }: BiodataEditorProps) {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const sectionsApi = useEditorSections(
     preset
@@ -62,6 +64,11 @@ export function BiodataEditor({
   const biodataId = useAppSelector((state) => state.biodata.biodataId);
   const content = useAppSelector((state) => state.biodata.content);
   const presetApplied = useRef(false);
+
+  useEffect(() => {
+    const path = pathname.endsWith('/') || pathname === '/' ? pathname : `${pathname}/`;
+    setPageContext(pageSlug ?? 'home', path === '' ? '/' : path);
+  }, [pageSlug, pathname]);
 
   useEffect(() => {
     if (searchParams.get('new') === '1') {
@@ -233,7 +240,7 @@ export function BiodataEditor({
           <EditorA4Preview sections={sectionsApi.sections} />
           <EditorDesignSwitcher />
           <div className="ed-foot">
-            <Link className="btn btn-line" href="/templates">
+            <Link className="btn btn-line" href="/templates/">
               Browse all designs
             </Link>
             <button

@@ -4,8 +4,9 @@ import { BiodataEditor } from '@/features/biodata/components/editor/BiodataEdito
 import { HowItWorks } from '@/components/landing/HowItWorks';
 import { DesignsStrip } from '@/components/landing/DesignsStrip';
 import { Pricing } from '@/components/landing/Pricing';
-import { Faq } from '@/components/landing/Faq';
+import { Faq, FAQ_ITEMS } from '@/components/landing/Faq';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { SpokeRelatedLinks } from '@/features/spokes/components/SpokeRelatedLinks';
 import {
   languageAlternates,
   organizationJsonLd,
@@ -20,29 +21,6 @@ export const metadata: Metadata = {
     'Create a print-ready Indian marriage biodata online. Free A4 designs, live preview, PDF and WhatsApp download.',
   alternates: languageAlternates('/'),
 };
-
-const FAQ_ITEMS = [
-  {
-    q: 'Do I need an account?',
-    a: 'You can design and preview without one. An account lets you keep your saved biodatas in My Designs.',
-  },
-  {
-    q: 'Can I make it in Hindi?',
-    a: 'Yes. On the download step you can choose the language for the title lines. Field labels stay in English. More languages are planned.',
-  },
-  {
-    q: 'Can I create a biodata without a photo?',
-    a: 'Yes. Skip the photo and the design shows a neutral placeholder. Fields you leave blank do not appear on the page.',
-  },
-  {
-    q: 'Will it fit on one page?',
-    a: 'Yes. The preview shows “Fits on 1 page” and scales the text gently when you write a lot. If it still cannot fit, you are told what to shorten.',
-  },
-  {
-    q: 'Can I change details after downloading?',
-    a: 'Yes. Open it from My Designs, edit and download again. With the Wedding Pass, re-downloads are free.',
-  },
-] as const;
 
 const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -102,13 +80,14 @@ export default function HomePage() {
         </p>
       </header>
       <Suspense fallback={<EditorFallback />}>
-        <BiodataEditor showSiteFooter={false} />
+        <BiodataEditor showSiteFooter={false} pageSlug="home" />
       </Suspense>
       <div className="landing">
         <HowItWorks />
         <DesignsStrip />
         <Pricing />
         <Faq />
+        <SpokeRelatedLinks variant="hub" />
         <SiteFooter />
       </div>
     </>

@@ -37,7 +37,7 @@ export function DesignsStrip() {
         ))}
       </div>
       <div style={{ textAlign: 'center', marginTop: 8 }}>
-        <Link className="btn btn-ghost" href="/templates">
+        <Link className="btn btn-ghost" href="/templates/">
           See all designs and filter
         </Link>
       </div>

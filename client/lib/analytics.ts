@@ -4,6 +4,8 @@ export type CookieConsentValue = 'accepted' | 'declined';
 
 const CONSENT_KEY = 'mb_cookie_consent';
 const FORM_STARTED_KEY = 'mb_form_started';
+const PAGE_SLUG_KEY = 'mb_page_slug';
+const ORIGIN_PATH_KEY = 'mb_origin_path';
 
 declare global {
   interface Window {
@@ -97,6 +99,23 @@ export function trackEvent(
   if (!window.gtag) return false;
   window.gtag('event', name, params);
   return true;
+}
+
+/** Remember which marketing/spoke page owns this editor session. */
+export function setPageContext(pageSlug: string, path: string): void {
+  if (typeof window === 'undefined') return;
+  window.sessionStorage.setItem(PAGE_SLUG_KEY, pageSlug);
+  window.sessionStorage.setItem(ORIGIN_PATH_KEY, path);
+}
+
+export function getPageSlug(): string | null {
+  if (typeof window === 'undefined') return null;
+  return window.sessionStorage.getItem(PAGE_SLUG_KEY);
+}
+
+export function getOriginPath(): string | null {
+  if (typeof window === 'undefined') return null;
+  return window.sessionStorage.getItem(ORIGIN_PATH_KEY);
 }
 
 /** Once per tab session, on first meaningful editor field edit. */
