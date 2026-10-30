@@ -27,7 +27,7 @@ export default function WeddingPassPage() {
     if (ok) {
       setDone(true);
       toast('Wedding Pass activated. Enjoy premium downloads!');
-      router.push('/download');
+      router.push('/download/');
     }
   }
 

@@ -200,7 +200,7 @@ export function BiodataEditor({
 
   async function onSaveMyDesigns() {
     if (authStatus !== 'authenticated') {
-      router.push('/login?next=/my-designs');
+      router.push('/login/?next=/my-designs/');
       return;
     }
     setSavingMd(true);

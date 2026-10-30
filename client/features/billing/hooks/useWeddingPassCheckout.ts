@@ -44,11 +44,11 @@ export function useWeddingPassCheckout() {
 
   const startCheckout = useCallback(async (): Promise<boolean> => {
     if (authStatus !== 'authenticated' || !user) {
-      router.push('/login?next=/wedding-pass');
+      router.push('/login/?next=/wedding-pass/');
       return false;
     }
     if (user.isPremium) {
-      router.push('/download');
+      router.push('/download/');
       return true;
     }
 
