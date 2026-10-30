@@ -18,7 +18,7 @@ export function Pricing() {
               <li>A4 PDF for print</li>
               <li>Small credit line on the page</li>
             </ul>
-            <Link className="btn btn-ghost btn-block" href="/marriage-biodata-maker">
+            <Link className="btn btn-ghost btn-block" href="/">
               Start free
             </Link>
           </div>

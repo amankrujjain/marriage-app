@@ -137,7 +137,7 @@ export function AccountPanel() {
             </Link>
             <Link
               className="btn btn-ghost btn-block"
-              href="/marriage-biodata-maker?new=1"
+              href="/?new=1"
               style={{ minHeight: 50, borderColor: 'var(--maroon)' }}
             >
               Create Marriage Biodata

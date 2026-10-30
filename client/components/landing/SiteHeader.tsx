@@ -180,7 +180,7 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
                         </svg>
                       </button>
                       <div className={`menu${menuOpen ? ' open' : ''}`} id="avm" role="menu">
-                        <Link role="menuitem" href="/marriage-biodata-maker">
+                        <Link role="menuitem" href="/">
                           Create biodata
                         </Link>
                         <Link role="menuitem" href="/my-designs">
