@@ -65,7 +65,9 @@ function normalizePath(path: string): string {
 export function languageAlternates(path: string = '/'): Metadata['alternates'] {
   const self = normalizePath(path);
 
-  if (LANGUAGE_CLUSTER_PATHS.has(self)) {
+  // Language cluster only when this page is itself public (avoids /hi/ noindex
+  // pages advertising en-IN → / while canonical is /hi/).
+  if (LANGUAGE_CLUSTER_PATHS.has(self) && EXISTING_ROUTES.has(self)) {
     const languages: Record<string, string> = {};
     for (const [hreflang, spokePath] of Object.entries(LANGUAGE_CLUSTER)) {
       if (EXISTING_ROUTES.has(spokePath)) {
