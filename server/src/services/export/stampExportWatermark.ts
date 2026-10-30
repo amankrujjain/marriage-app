@@ -2,7 +2,10 @@ import sharp from 'sharp';
 
 const MARK = 'marriagebio.in';
 
-/** Small bottom-right watermark for free (no Wedding Pass) exports. */
+/**
+ * Small bottom-right watermark for free (no Wedding Pass) exports.
+ * Uses sharp defaults (including limitInputPixels). Callers map sharp failures to 400.
+ */
 export async function stampExportWatermark(imageBuffer: Buffer): Promise<Buffer> {
   const meta = await sharp(imageBuffer).metadata();
   const width = meta.width ?? 800;

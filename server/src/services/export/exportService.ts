@@ -7,6 +7,7 @@ import {
   type ExportFormat,
   type ExportResult,
 } from '@marriage/shared';
+import { BadRequestError } from '../../errors/BadRequestError';
 import { createExportProvider } from '../../providers/export/createExportProvider';
 import { parseImageBase64 } from '../../utils/parseImageBase64';
 import { buildSignedMediaUrl } from '../../utils/signedMediaUrl';
@@ -41,7 +42,15 @@ export async function exportBiodata(input: {
 
   let imageBuffer = parseImageBase64(input.imageBase64);
   if (!hasPass) {
-    imageBuffer = await stampExportWatermark(imageBuffer);
+    try {
+      imageBuffer = await stampExportWatermark(imageBuffer);
+    } catch (error) {
+      if (error instanceof BadRequestError) throw error;
+      throw new BadRequestError(
+        'Invalid or oversized export image',
+        'EXPORT_IMAGE_INVALID',
+      );
+    }
   }
 
   const provider = createExportProvider(input.format);
