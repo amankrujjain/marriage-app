@@ -3,7 +3,6 @@ import { todoCopy, todoFaqs, todoSteps, todoTips } from './todoCopy';
 
 const kw = 'how to make biodata for marriage';
 
-/** Stub config — guide copy and afterIntro maker filled in item 2. */
 export const howToMake: SpokePageConfig = {
   id: 'P11',
   path: '/guide/how-to-make-marriage-biodata/',
@@ -21,9 +20,11 @@ export const howToMake: SpokePageConfig = {
   title: todoCopy(kw),
   metaDescription: todoCopy(kw),
   h1: todoCopy(kw),
-  breadcrumbName: todoCopy(kw),
+  breadcrumbName: 'How to make',
   makerPosition: 'afterIntro',
-  preset: {},
+  preset: {
+    designSlug: 'kagaz-modern',
+  },
   intro: todoCopy(kw),
   outlineH2s: [todoCopy(kw), todoCopy(kw), todoCopy(kw), todoCopy(kw)],
   steps: todoSteps(kw),

@@ -1,9 +1,9 @@
 import type { SpokePageConfig } from './types';
+import { Gender } from '@marriage/shared';
 import { todoCopy, todoFaqs, todoSteps, todoTips } from './todoCopy';
 
 const kw = 'biodata for marriage girl';
 
-/** Stub config — keywords, preset, and copy filled in item 2. */
 export const formatGirl: SpokePageConfig = {
   id: 'P06',
   path: '/marriage-biodata-format-for-girl/',
@@ -21,9 +21,12 @@ export const formatGirl: SpokePageConfig = {
   title: todoCopy(kw),
   metaDescription: todoCopy(kw),
   h1: todoCopy(kw),
-  breadcrumbName: todoCopy(kw),
+  breadcrumbName: 'For girl',
   makerPosition: 'top',
-  preset: {},
+  preset: {
+    designSlug: 'gulab-floral',
+    gender: Gender.FEMALE,
+  },
   intro: todoCopy(kw),
   outlineH2s: [todoCopy(kw), todoCopy(kw), todoCopy(kw), todoCopy(kw)],
   steps: todoSteps(kw),
@@ -35,5 +38,5 @@ export const formatGirl: SpokePageConfig = {
   sampleDownloads: [],
   tips: todoTips(kw),
   faqs: todoFaqs(kw),
-  relatedIds: ['P05', 'P01', 'P02', 'P03'],
+  relatedIds: ['P05', 'P01', 'P02', 'P03', 'P04'],
 };

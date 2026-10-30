@@ -3,7 +3,6 @@ import { todoCopy, todoFaqs, todoSteps, todoTips } from './todoCopy';
 
 const kw = 'muslim biodata for marriage';
 
-/** Stub config — keywords, preset, and copy filled in item 2. */
 export const muslim: SpokePageConfig = {
   id: 'P08',
   path: '/muslim-marriage-biodata/',
@@ -21,9 +20,13 @@ export const muslim: SpokePageConfig = {
   title: todoCopy(kw),
   metaDescription: todoCopy(kw),
   h1: todoCopy(kw),
-  breadcrumbName: todoCopy(kw),
+  breadcrumbName: 'Muslim',
   makerPosition: 'top',
-  preset: {},
+  preset: {
+    designSlug: 'khatam-emerald',
+    faith: 'Muslim',
+    religion: 'Muslim',
+  },
   intro: todoCopy(kw),
   outlineH2s: [todoCopy(kw), todoCopy(kw), todoCopy(kw), todoCopy(kw)],
   steps: todoSteps(kw),
@@ -35,5 +38,5 @@ export const muslim: SpokePageConfig = {
   sampleDownloads: [],
   tips: todoTips(kw),
   faqs: todoFaqs(kw),
-  relatedIds: ['P07', 'P01', 'P02', 'P03'],
+  relatedIds: ['P07', 'P01', 'P02', 'P03', 'P04'],
 };

@@ -3,7 +3,6 @@ import { todoCopy, todoFaqs, todoSteps, todoTips } from './todoCopy';
 
 const kw = 'biodata format pdf';
 
-/** Stub config — keywords, preset, and copy filled in item 2. */
 export const formatPdf: SpokePageConfig = {
   id: 'P04',
   path: '/marriage-biodata-format-pdf/',
@@ -21,9 +20,12 @@ export const formatPdf: SpokePageConfig = {
   title: todoCopy(kw),
   metaDescription: todoCopy(kw),
   h1: todoCopy(kw),
-  breadcrumbName: todoCopy(kw),
+  breadcrumbName: 'PDF format',
   makerPosition: 'top',
-  preset: {},
+  preset: {
+    designSlug: 'zari-traditional',
+    format: 'pdf',
+  },
   intro: todoCopy(kw),
   outlineH2s: [todoCopy(kw), todoCopy(kw), todoCopy(kw), todoCopy(kw)],
   steps: todoSteps(kw),

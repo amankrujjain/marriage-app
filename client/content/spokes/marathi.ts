@@ -1,9 +1,9 @@
 import type { SpokePageConfig } from './types';
+import { LanguageCode } from '@marriage/shared';
 import { todoCopy, todoFaqs, todoSteps, todoTips } from './todoCopy';
 
 const kw = 'लग्नाचा बायोडाटा';
 
-/** Stub config — Marathi copy and language preset filled in item 2. */
 export const marathi: SpokePageConfig = {
   id: 'P10',
   path: '/marathi-biodata/',
@@ -21,9 +21,12 @@ export const marathi: SpokePageConfig = {
   title: todoCopy(kw),
   metaDescription: todoCopy(kw),
   h1: todoCopy(kw),
-  breadcrumbName: todoCopy(kw),
+  breadcrumbName: 'मराठी',
   makerPosition: 'top',
-  preset: {},
+  preset: {
+    designSlug: 'zari-traditional',
+    exportLanguage: LanguageCode.MR,
+  },
   intro: todoCopy(kw),
   outlineH2s: [todoCopy(kw), todoCopy(kw), todoCopy(kw), todoCopy(kw)],
   steps: todoSteps(kw),
@@ -31,9 +34,18 @@ export const marathi: SpokePageConfig = {
     heading: todoCopy(kw),
     qualifier: todoCopy(kw),
     count: 6,
+    // maharashtri-nath first; remainder fill the sample grid
+    designSlugs: [
+      'maharashtri-nath',
+      'zari-traditional',
+      'kalash-mangal',
+      'gulab-floral',
+      'kagaz-modern',
+      'varma-traditional',
+    ],
   },
   sampleDownloads: [],
   tips: todoTips(kw),
   faqs: todoFaqs(kw),
-  relatedIds: ['P09', 'P01', 'P02', 'P03'],
+  relatedIds: ['P09', 'P01', 'P02', 'P03', 'P04'],
 };

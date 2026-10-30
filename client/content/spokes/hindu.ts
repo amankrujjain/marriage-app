@@ -3,7 +3,6 @@ import { todoCopy, todoFaqs, todoSteps, todoTips } from './todoCopy';
 
 const kw = 'hindu marriage biodata format';
 
-/** Stub config — keywords, preset, and copy filled in item 2. */
 export const hindu: SpokePageConfig = {
   id: 'P07',
   path: '/hindu-marriage-biodata/',
@@ -21,9 +20,13 @@ export const hindu: SpokePageConfig = {
   title: todoCopy(kw),
   metaDescription: todoCopy(kw),
   h1: todoCopy(kw),
-  breadcrumbName: todoCopy(kw),
+  breadcrumbName: 'Hindu',
   makerPosition: 'top',
-  preset: {},
+  preset: {
+    designSlug: 'kalash-mangal',
+    faith: 'Hindu',
+    religion: 'Hindu',
+  },
   intro: todoCopy(kw),
   outlineH2s: [todoCopy(kw), todoCopy(kw), todoCopy(kw), todoCopy(kw)],
   steps: todoSteps(kw),
@@ -35,5 +38,5 @@ export const hindu: SpokePageConfig = {
   sampleDownloads: [],
   tips: todoTips(kw),
   faqs: todoFaqs(kw),
-  relatedIds: ['P08', 'P01', 'P02', 'P03'],
+  relatedIds: ['P08', 'P01', 'P02', 'P03', 'P04'],
 };
