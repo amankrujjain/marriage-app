@@ -182,6 +182,13 @@ export function MobileNavDrawer({
               <Link className="drawer-row" href="/account/" onClick={onClose}>
                 Profile
               </Link>
+              <Link
+                className="drawer-row"
+                href="/forgot-password/"
+                onClick={onClose}
+              >
+                Reset password
+              </Link>
               {!isPremium ? (
                 <Link
                   className="drawer-row"

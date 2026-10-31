@@ -23,3 +23,12 @@ export interface LoginPayload {
 export interface GoogleAuthPayload {
   idToken: string;
 }
+
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  token: string;
+  password: string;
+}

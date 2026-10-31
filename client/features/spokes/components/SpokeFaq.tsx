@@ -1,4 +1,5 @@
 import type { SpokeFaq as SpokeFaqItem } from '@/content/spokes/types';
+import { SpokeInline } from './SpokeInline';
 
 export function SpokeFaq({ faqs }: { faqs: SpokeFaqItem[] }) {
   if (faqs.length === 0) return null;
@@ -13,7 +14,9 @@ export function SpokeFaq({ faqs }: { faqs: SpokeFaqItem[] }) {
           {faqs.map((item) => (
             <details key={item.q}>
               <summary>{item.q}</summary>
-              <div className="ans">{item.a}</div>
+              <div className="ans">
+                <SpokeInline text={item.a} />
+              </div>
             </details>
           ))}
         </div>

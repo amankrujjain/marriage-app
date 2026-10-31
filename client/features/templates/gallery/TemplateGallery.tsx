@@ -12,6 +12,7 @@ import { GalleryCard } from './GalleryCard';
 import { TemplatePreviewModal } from './TemplatePreviewModal';
 import { useReveal } from '@/components/landing/useReveal';
 import { useDesignCatalog } from '@/features/designs/hooks/useDesignCatalog';
+import { templates } from '@/content/spokes/templates';
 
 export function TemplateGallery() {
   const { activeGallery } = useDesignCatalog();
@@ -39,9 +40,7 @@ export function TemplateGallery() {
     <>
       <section className="page-head wrap">
         <h1>Marriage Biodata Templates</h1>
-        <p>
-          Pick a design, then add your details. Every card below shows a sample of the real layout.
-        </p>
+        <p>{templates.intro}</p>
         <div className="pills" role="group" aria-label="Filter by style">
           {STYLE_FILTERS.map((s) => (
             <button

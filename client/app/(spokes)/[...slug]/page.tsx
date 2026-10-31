@@ -5,6 +5,7 @@ import {
   spokePages,
 } from '@/content/spokes';
 import { SpokePage } from '@/features/spokes/components/SpokePage';
+import { publicFileExists } from '@/features/spokes/sampleImages';
 import { absoluteUrl, languageAlternates } from '@/lib/seo';
 
 export const dynamicParams = false;
@@ -20,6 +21,17 @@ export function generateStaticParams(): Array<{ slug: string[] }> {
     process.env.NODE_ENV === 'production'
       ? spokePages().filter((page) => page.published)
       : spokePages();
+
+  for (const page of spokePages()) {
+    if (!page.published) continue;
+    for (const item of page.sampleDownloads) {
+      if (!publicFileExists(item.href)) {
+        throw new Error(
+          `Published spoke ${page.id} links a missing download: ${item.href}`,
+        );
+      }
+    }
+  }
 
   return pages.map((page) => ({ slug: page.segments }));
 }

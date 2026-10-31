@@ -10,3 +10,4 @@ export { BiodataFormStep } from './BiodataFormStep';
 export { TemplateCategory } from './TemplateCategory';
 export { TemplateId } from './TemplateId';
 export { TemplateSection } from './TemplateSection';
+export { BlogPostStatus } from './BlogPostStatus';

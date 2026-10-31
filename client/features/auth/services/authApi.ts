@@ -1,9 +1,11 @@
 import type {
   AuthSessionResponse,
+  ForgotPasswordPayload,
   GoogleAuthPayload,
   LoginPayload,
   PublicUser,
   RegisterPayload,
+  ResetPasswordPayload,
 } from '@marriage/shared';
 import { apiGet, apiPost } from '@/lib/apiClient';
 import { clearLegacyAccessToken } from '@/lib/tokenStorage';
@@ -25,6 +27,18 @@ export async function googleAuthRequest(
 ): Promise<AuthSessionResponse> {
   clearLegacyAccessToken();
   return apiPost<AuthSessionResponse>('/auth/google', payload);
+}
+
+export async function forgotPasswordRequest(
+  payload: ForgotPasswordPayload,
+): Promise<void> {
+  await apiPost<null>('/auth/forgot-password', payload);
+}
+
+export async function resetPasswordRequest(
+  payload: ResetPasswordPayload,
+): Promise<void> {
+  await apiPost<null>('/auth/reset-password', payload);
 }
 
 export async function refreshSessionRequest(): Promise<AuthSessionResponse> {

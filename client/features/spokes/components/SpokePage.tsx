@@ -1,23 +1,42 @@
+import type { ReactNode } from 'react';
 import { Suspense } from 'react';
-import type { SpokePageConfig } from '@/content/spokes/types';
+import Link from 'next/link';
+import type { SpokeFaq as SpokeFaqItem, SpokePageConfig } from '@/content/spokes/types';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { SiteHeader } from '@/components/landing/SiteHeader';
 import { BiodataEditor } from '@/features/biodata/components/editor/BiodataEditor';
 import { SpokePresetProvider } from '@/features/spokes/SpokePresetContext';
 import { sampleImageMap } from '@/features/spokes/sampleImages';
-import { breadcrumbJsonLd, softwareApplicationJsonLd } from '@/lib/seo';
+import {
+  absoluteUrl,
+  breadcrumbJsonLd,
+  SITE_URL,
+  softwareApplicationJsonLd,
+} from '@/lib/seo';
+import { SpokeDownloads } from './SpokeDownloads';
 import { SpokeFaq } from './SpokeFaq';
 import { SpokeHeading } from './SpokeHeading';
+import { hasOnlyUnpublishedLinks, stripLinks } from './SpokeInline';
 import { SpokeRelatedLinks } from './SpokeRelatedLinks';
 import { SpokeSamples } from './SpokeSamples';
+import { SpokeSections } from './SpokeSections';
 import { SpokeSteps } from './SpokeSteps';
 import { SpokeTips } from './SpokeTips';
 
-function EditorFallback({ h1, lede }: { h1: string; lede?: string }) {
+function EditorFallback({
+  h1,
+  lede,
+  beforeMaker,
+}: {
+  h1: string;
+  lede?: string;
+  beforeMaker?: ReactNode;
+}) {
   return (
     <div className="landing editor-page">
       <SiteHeader variant="editor" />
       <SpokeHeading h1={h1} lede={lede} />
+      {beforeMaker}
       <p style={{ margin: '0 24px 48px', color: 'var(--ink-2)' }}>
         Loading editor…
       </p>
@@ -32,48 +51,104 @@ function shortLede(intro: string): string {
   return sentence && sentence.length <= 220 ? sentence : trimmed.slice(0, 160);
 }
 
-function faqJsonLd(page: SpokePageConfig) {
+function visibleFaqs(faqs: SpokeFaqItem[]): SpokeFaqItem[] {
+  return faqs.filter(
+    (f) => !(f.hideUnlinked && hasOnlyUnpublishedLinks(f.a)),
+  );
+}
+
+function faqJsonLd(faqs: SpokeFaqItem[]) {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: page.faqs.map((item) => ({
+    mainEntity: faqs.map((item) => ({
       '@type': 'Question',
       name: item.q,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: item.a,
+        text: stripLinks(item.a),
       },
     })),
   };
+}
+
+function articleJsonLd(page: SpokePageConfig) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: page.h1,
+    description: page.metaDescription,
+    inLanguage: 'en-IN',
+    mainEntityOfPage: absoluteUrl(page.path),
+    datePublished: page.plannedDate,
+    dateModified: page.plannedDate,
+    author: {
+      '@type': 'Organization',
+      name: 'MarriageBio',
+      url: SITE_URL,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'MarriageBio',
+      logo: {
+        '@type': 'ImageObject',
+        url: absoluteUrl('/favicon.ico'),
+      },
+    },
+  };
+}
+
+function IntroBlock({
+  intro,
+  heading,
+  compact,
+}: {
+  intro: string;
+  heading?: string;
+  /** Between H1 and maker — less padding than a full landing section. */
+  compact?: boolean;
+}) {
+  return (
+    <section
+      className={compact ? 'sec spoke-intro-pre' : 'sec'}
+      aria-labelledby="spoke-intro-h"
+    >
+      <div className="wrap">
+        <div className="sec-head reveal">
+          <h2 id="spoke-intro-h">{heading ?? 'About this format'}</h2>
+        </div>
+        <p
+          className="reveal"
+          style={{ maxWidth: 640, margin: '0 auto', color: 'var(--ink-2)' }}
+        >
+          {intro}
+        </p>
+      </div>
+    </section>
+  );
 }
 
 function LandingBody({
   page,
   imageBySlug,
   includeIntro,
+  faqs,
 }: {
   page: SpokePageConfig;
   imageBySlug: Record<string, string>;
   includeIntro: boolean;
+  faqs: SpokeFaqItem[];
 }) {
   return (
     <div className="landing">
       {includeIntro && page.intro ? (
-        <section className="sec" aria-labelledby="spoke-intro-h">
-          <div className="wrap">
-            <div className="sec-head reveal">
-              <h2 id="spoke-intro-h">About this format</h2>
-            </div>
-            <p className="reveal" style={{ maxWidth: 640, color: 'var(--ink-2)' }}>
-              {page.intro}
-            </p>
-          </div>
-        </section>
+        <IntroBlock intro={page.intro} heading={page.introHeading} />
       ) : null}
+      <SpokeSections sections={page.sections ?? []} />
       <SpokeSteps steps={page.steps} />
       <SpokeSamples page={page} imageBySlug={imageBySlug} />
       <SpokeTips tips={page.tips} />
-      <SpokeFaq faqs={page.faqs} />
+      <SpokeFaq faqs={faqs} />
       <SpokeRelatedLinks page={page} />
     </div>
   );
@@ -84,20 +159,43 @@ export function SpokePage({ page }: { page: SpokePageConfig }) {
     { name: 'Home', path: '/' },
     { name: page.breadcrumbName, path: page.path },
   ]);
-  const faqLd = faqJsonLd(page);
-  const lede = shortLede(page.intro);
+  const faqs = visibleFaqs(page.faqs);
+  const faqLd = faqJsonLd(faqs);
+  const downloadsFirst = page.makerPosition === 'afterDownloads';
+  const afterIntro = page.makerPosition === 'afterIntro';
+  const noMaker = page.makerPosition === 'none';
+  const lede = downloadsFirst
+    ? page.intro
+    : afterIntro || noMaker
+      ? undefined
+      : shortLede(page.intro);
+  const beforeMaker = downloadsFirst ? (
+    <SpokeDownloads
+      heading={page.downloadsHeading ?? ''}
+      items={page.sampleDownloads}
+    />
+  ) : afterIntro && page.intro ? (
+    <IntroBlock
+      intro={page.intro}
+      heading={page.introHeading}
+      compact
+    />
+  ) : null;
   const imageBySlug = sampleImageMap(
     page.pageSlug,
     page.samples.designSlugs?.length
       ? page.samples.designSlugs
       : [],
   );
-  const afterIntro = page.makerPosition === 'afterIntro';
 
   const editor = (
     <Suspense
       fallback={
-        <EditorFallback h1={page.h1} lede={lede || undefined} />
+        <EditorFallback
+          h1={page.h1}
+          lede={lede || undefined}
+          beforeMaker={beforeMaker}
+        />
       }
     >
       <BiodataEditor
@@ -106,8 +204,23 @@ export function SpokePage({ page }: { page: SpokePageConfig }) {
         pageSlug={page.pageSlug}
         h1={page.h1}
         lede={lede || undefined}
+        beforeMaker={beforeMaker}
       />
     </Suspense>
+  );
+
+  const articleOnly = (
+    <div className="landing">
+      <SiteHeader variant="editor" />
+      <SpokeHeading h1={page.h1} lede={page.intro} />
+      {page.introCta ? (
+        <div className="wrap" style={{ paddingBottom: 24 }}>
+          <Link className="btn btn-primary" href={page.introCta.href}>
+            {page.introCta.label}
+          </Link>
+        </div>
+      ) : null}
+    </div>
   );
 
   const body = (
@@ -126,34 +239,21 @@ export function SpokePage({ page }: { page: SpokePageConfig }) {
           __html: JSON.stringify(softwareApplicationJsonLd()),
         }}
       />
-      {afterIntro ? (
-        <>
-          {page.intro ? (
-            <div className="landing">
-              <section className="sec" aria-labelledby="spoke-intro-h">
-                <div className="wrap">
-                  <div className="sec-head reveal">
-                    <h2 id="spoke-intro-h">About this format</h2>
-                  </div>
-                  <p
-                    className="reveal"
-                    style={{ maxWidth: 640, color: 'var(--ink-2)' }}
-                  >
-                    {page.intro}
-                  </p>
-                </div>
-              </section>
-            </div>
-          ) : null}
-          {editor}
-          <LandingBody page={page} imageBySlug={imageBySlug} includeIntro={false} />
-        </>
-      ) : (
-        <>
-          {editor}
-          <LandingBody page={page} imageBySlug={imageBySlug} includeIntro />
-        </>
-      )}
+      {page.articleSchema ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(articleJsonLd(page)),
+          }}
+        />
+      ) : null}
+      {noMaker ? articleOnly : editor}
+      <LandingBody
+        page={page}
+        imageBySlug={imageBySlug}
+        includeIntro={!afterIntro && !downloadsFirst && !noMaker}
+        faqs={faqs}
+      />
       <div className="landing">
         <SiteFooter />
       </div>

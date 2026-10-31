@@ -65,3 +65,46 @@ export async function bindGoogleId(
   }
   return updated;
 }
+
+export async function setPasswordResetToken(
+  userId: string,
+  tokenHash: string,
+  expiresAt: Date,
+): Promise<void> {
+  await UserModel.findByIdAndUpdate(userId, {
+    $set: {
+      passwordResetTokenHash: tokenHash,
+      passwordResetExpires: expiresAt,
+    },
+  });
+}
+
+export async function findUserByPasswordResetTokenHash(
+  tokenHash: string,
+): Promise<UserDocument | null> {
+  return UserModel.findOne({
+    passwordResetTokenHash: tokenHash,
+    passwordResetExpires: { $gt: new Date() },
+  });
+}
+
+export async function updatePasswordAndClearReset(
+  userId: string,
+  passwordHash: string,
+): Promise<UserDocument> {
+  const updated = await UserModel.findByIdAndUpdate(
+    userId,
+    {
+      $set: { passwordHash },
+      $unset: {
+        passwordResetTokenHash: 1,
+        passwordResetExpires: 1,
+      },
+    },
+    { new: true },
+  );
+  if (!updated) {
+    throw new Error('User not found while updating password');
+  }
+  return updated;
+}

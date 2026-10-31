@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { PASSWORD_HINT } from '@marriage/shared';
 import { registerFormSchema } from '../validators/registerFormSchema';
 import { useAuthActions } from '../hooks/useAuthActions';
 import { useAppSelector } from '@/store/hooks';
@@ -92,7 +93,7 @@ export function RegisterForm() {
         placeholder="At least 8 characters"
         icon="password"
         showStrength
-        hint="Use 8 or more characters with a mix of letters and numbers."
+        hint={PASSWORD_HINT}
         error={errors.password}
       />
       <AuthField

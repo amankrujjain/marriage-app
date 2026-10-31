@@ -3,6 +3,12 @@ import path from 'path';
 
 const IMAGE_EXTS = ['webp', 'png', 'jpg', 'jpeg'] as const;
 
+/** True when `publicPath` (e.g. `/downloads/foo.docx`) exists under `client/public`. */
+export function publicFileExists(publicPath: string): boolean {
+  const relative = publicPath.replace(/^\//, '');
+  return fs.existsSync(path.join(process.cwd(), 'public', relative));
+}
+
 /** Map design slug → public URL when `public/samples/<pageSlug>/<slug>.*` exists. */
 export function sampleImageMap(
   pageSlug: string,

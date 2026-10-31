@@ -10,6 +10,7 @@ import cronRoutes from './cron.routes';
 import billingRoutes from './billing.routes';
 import adminRoutes from './admin.routes';
 import designsRoutes from './designs.routes';
+import blogRoutes from './blog.routes';
 
 const v1Router = Router();
 
@@ -18,6 +19,7 @@ v1Router.use('/auth', authRoutes);
 v1Router.use('/biodata', biodataRoutes);
 v1Router.use('/templates', templatesRoutes);
 v1Router.use('/designs', designsRoutes);
+v1Router.use('/blog', blogRoutes);
 v1Router.use('/translation', translationRoutes);
 v1Router.use('/export', exportRoutes);
 v1Router.use('/media', mediaRoutes);

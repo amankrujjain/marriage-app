@@ -16,10 +16,12 @@ export function DesignsStrip() {
       <div className="wrap">
         <div className="sec-head reveal">
           <span className="eyebrow">Designs</span>
-          <h2 id="des-h">Designs for every family</h2>
+          <h2 id="des-h">Choose a design</h2>
           <p>
-            Traditional, royal, floral or modern. Every thumbnail below is the real template,
-            rendered live.
+            Traditional designs carry a deity line and gold borders. Royal designs use deep
+            green or purple with gold. Floral designs are softer, and modern designs drop the
+            motifs entirely.{' '}
+            <Link href="/templates/">Browse all biodata templates</Link>
           </p>
         </div>
       </div>

@@ -2,12 +2,15 @@
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import { ApiClientError } from '@/lib/apiClient';
+import { forgotPasswordRequest } from '../services/authApi';
 import { AuthField } from './AuthField';
 import { AuthSubmitButton } from './AuthSubmitButton';
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
+  const [fieldError, setFieldError] = useState('');
+  const [formError, setFormError] = useState('');
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -15,27 +18,38 @@ export function ForgotPasswordForm() {
     event.preventDefault();
     const trimmed = email.trim();
     if (!trimmed) {
-      setError('Enter your email');
+      setFieldError('Enter your email');
+      setFormError('');
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-      setError('Enter a valid email like name@example.com');
+      setFieldError('Enter a valid email like name@example.com');
+      setFormError('');
       return;
     }
-    setError('');
+    setFieldError('');
+    setFormError('');
     setLoading(true);
-    // No reset-password API in this build — show confirmation UI only.
-    await new Promise((r) => setTimeout(r, 450));
-    setLoading(false);
-    setSent(true);
+    try {
+      await forgotPasswordRequest({ email: trimmed });
+      setSent(true);
+    } catch (err) {
+      const message =
+        err instanceof ApiClientError
+          ? err.message
+          : 'Could not send the reset email. Please try again.';
+      setFormError(message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (sent) {
     return (
       <div>
         <div className="form-ok show" role="status">
-          If an account exists for {email.trim()}, you will receive reset instructions shortly.
-          Password email is not connected in this build yet.
+          If an account exists for {email.trim()}, you will receive reset
+          instructions shortly. Check your inbox and spam folder.
         </div>
         <p className="auth-alt" style={{ marginTop: 18 }}>
           <Link href="/login">
@@ -48,6 +62,9 @@ export function ForgotPasswordForm() {
 
   return (
     <form onSubmit={(e) => void onSubmit(e)} noValidate>
+      <div className={`form-alert${formError ? ' show' : ''}`} role="alert">
+        {formError}
+      </div>
       <AuthField
         label="Email"
         name="email"
@@ -57,7 +74,7 @@ export function ForgotPasswordForm() {
         autoComplete="email"
         placeholder="Enter your email"
         icon="email"
-        error={error}
+        error={fieldError}
       />
       <AuthSubmitButton label="Send reset link" loading={loading} />
       <p className="auth-alt">

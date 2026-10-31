@@ -33,12 +33,19 @@ export function SpokeSamples({ page, imageBySlug = {} }: SpokeSamplesProps) {
     }
   }
 
+  const showHeading = samples.heading !== '';
+
   return (
-    <section className="sec" aria-labelledby="spoke-samples-h">
+    <section
+      className="sec"
+      aria-labelledby={showHeading ? 'spoke-samples-h' : undefined}
+    >
       <div className="wrap">
-        <div className="sec-head reveal">
-          <h2 id="spoke-samples-h">{samples.heading}</h2>
-        </div>
+        {showHeading ? (
+          <div className="sec-head reveal">
+            <h2 id="spoke-samples-h">{samples.heading}</h2>
+          </div>
+        ) : null}
         <div
           className="reveal"
           style={{
@@ -56,7 +63,10 @@ export function SpokeSamples({ page, imageBySlug = {} }: SpokeSamplesProps) {
               'name' in design && typeof design.name === 'string'
                 ? design.name
                 : realSlug;
-            const label = `${name} biodata ${samples.qualifier}`;
+            const alt = samples.alts?.[realSlug];
+            const label = alt ?? `${name} biodata ${samples.qualifier}`;
+            const imgAlt =
+              alt ?? `${name} marriage biodata ${samples.qualifier}`;
             const href = `${page.path}?design=${encodeURIComponent(realSlug)}#form`;
             const imgSrc = imageBySlug[realSlug];
 
@@ -67,7 +77,7 @@ export function SpokeSamples({ page, imageBySlug = {} }: SpokeSamplesProps) {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={imgSrc}
-                      alt={`${name} marriage biodata ${samples.qualifier}`}
+                      alt={imgAlt}
                       style={{ width: '100%', height: 'auto', display: 'block' }}
                     />
                   ) : (

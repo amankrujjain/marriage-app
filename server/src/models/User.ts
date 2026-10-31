@@ -10,6 +10,9 @@ export interface UserFields {
   googleId?: string;
   role: UserRole;
   premiumUntil?: Date | null;
+  /** sha256 of the one-time password-reset token. */
+  passwordResetTokenHash?: string | null;
+  passwordResetExpires?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -38,6 +41,8 @@ const userSchema = new Schema<UserFields>(
       default: UserRole.USER,
     },
     premiumUntil: { type: Date, default: null },
+    passwordResetTokenHash: { type: String, default: null },
+    passwordResetExpires: { type: Date, default: null },
   },
   { timestamps: true },
 );

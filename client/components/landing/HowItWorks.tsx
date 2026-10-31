@@ -3,8 +3,28 @@ import { OrnamentDivLotus } from './Ornaments';
 const STEPS = [
   {
     n: '1',
-    title: 'Choose a design',
-    body: 'Pick from beautiful, respectful templates.',
+    title: 'Fill in your details.',
+    body: 'Rashi, nakshatra and gotra are built in. Rename, reorder or add any field.',
+    icon: (
+      <svg
+        viewBox="0 0 64 64"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="10" y="8" width="34" height="46" rx="3" />
+        <path d="M17 20h20M17 29h20M17 38h12" />
+        <path d="M56 30l-16 16-3 9 9-3 16-16z" />
+      </svg>
+    ),
+  },
+  {
+    n: '2',
+    title: 'Try the designs.',
+    body: 'Your details appear live on each one. Switch until one looks right.',
     icon: (
       <svg
         viewBox="0 0 64 64"
@@ -23,29 +43,9 @@ const STEPS = [
     ),
   },
   {
-    n: '2',
-    title: 'Add your details',
-    body: 'Enter personal and family details in our simple form.',
-    icon: (
-      <svg
-        viewBox="0 0 64 64"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <rect x="10" y="8" width="34" height="46" rx="3" />
-        <path d="M17 20h20M17 29h20M17 38h12" />
-        <path d="M56 30l-16 16-3 9 9-3 16-16z" />
-      </svg>
-    ),
-  },
-  {
     n: '3',
-    title: 'Download & share',
-    body: 'Get your PDF and share via WhatsApp or print.',
+    title: 'Download and share.',
+    body: 'Get an A4 PDF for printing and a phone-sized image for WhatsApp.',
     icon: (
       <svg
         viewBox="0 0 64 64"
@@ -69,7 +69,7 @@ export function HowItWorks() {
     <section className="sec alt" id="how" aria-labelledby="how-h">
       <div className="wrap">
         <div className="sec-head reveal">
-          <h2 id="how-h">How it works</h2>
+          <h2 id="how-h">How to make your biodata here</h2>
           <OrnamentDivLotus />
         </div>
         <div className="steps">

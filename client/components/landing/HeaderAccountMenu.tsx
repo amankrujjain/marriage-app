@@ -99,6 +99,9 @@ export function HeaderAccountMenu({
         <Link href="/account/" onClick={() => onOpenChange(false)}>
           Profile
         </Link>
+        <Link href="/forgot-password/" onClick={() => onOpenChange(false)}>
+          Reset password
+        </Link>
         {!isPremium ? (
           <Link href="/wedding-pass/" onClick={() => onOpenChange(false)}>
             Get Wedding Pass

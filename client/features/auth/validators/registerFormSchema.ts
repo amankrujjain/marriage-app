@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { PASSWORD_HINT, PASSWORD_PATTERN } from '@marriage/shared';
 
 export const registerFormSchema = Joi.object({
   name: Joi.string().trim().min(2).max(80).required().messages({
@@ -7,9 +8,14 @@ export const registerFormSchema = Joi.object({
   email: Joi.string().trim().email({ tlds: false }).required().messages({
     'string.email': 'Enter a valid email',
   }),
-  password: Joi.string().min(8).max(128).required().messages({
-    'string.min': 'Password must be at least 8 characters',
-  }),
+  password: Joi.string()
+    .pattern(PASSWORD_PATTERN)
+    .required()
+    .messages({
+      'string.pattern.base': PASSWORD_HINT,
+      'string.empty': PASSWORD_HINT,
+      'any.required': PASSWORD_HINT,
+    }),
   phone: Joi.string()
     .trim()
     .allow('')

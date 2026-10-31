@@ -12,6 +12,8 @@ export type {
   RegisterPayload,
   LoginPayload,
   GoogleAuthPayload,
+  ForgotPasswordPayload,
+  ResetPasswordPayload,
 } from './auth';
 export type {
   PersonalDetails,
@@ -58,3 +60,9 @@ export type {
   VerifyPaymentPayload,
   BillingMeResponse,
 } from './billing';
+export type {
+  PublicBlogPostSummary,
+  PublicBlogPost,
+  PublicBlogPostLookup,
+  BlogSitemapEntry,
+} from './blog';

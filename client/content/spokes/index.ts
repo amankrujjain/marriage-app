@@ -19,6 +19,7 @@ export type {
   SpokePreset,
   SpokeSampleDownload,
   SpokeSamples,
+  SpokeSection,
   SpokeStep,
   SpokeTip,
 } from './types';
@@ -124,11 +125,25 @@ export function relatedFor(page: SpokePageConfig): SpokePageConfig[] {
     );
 }
 
+/**
+ * Every other spoke page, for the Related section.
+ * In production, unpublished pages are omitted (they 404).
+ * In development they stay so you can navigate while drafting.
+ */
+export function otherSpokes(page: SpokePageConfig): SpokePageConfig[] {
+  const allowUnpublished = process.env.NODE_ENV !== 'production';
+  return spokePages().filter(
+    (spoke) =>
+      spoke.id !== page.id && (spoke.published || allowUnpublished),
+  );
+}
+
 /** Published spoke pages grouped by hub (empty hubs omitted). */
 export function hubLinks(): Partial<Record<SpokeHub, SpokePageConfig[]>> {
   const out: Partial<Record<SpokeHub, SpokePageConfig[]>> = {};
+  const allowUnpublished = process.env.NODE_ENV !== 'production';
   for (const page of spokePages()) {
-    if (!page.published) continue;
+    if (!page.published && !allowUnpublished) continue;
     const list = out[page.hub] ?? [];
     list.push(page);
     out[page.hub] = list;

@@ -21,6 +21,7 @@ export type SpokePreset = {
   sectionOrder?: string[];
   openSectionId?: string;
   religion?: string;
+  ctaLabel?: string;
 };
 
 export type SpokeStep = {
@@ -34,11 +35,17 @@ export type SpokeSamples = {
   designSlugs?: string[];
   count: number;
   includeNoPhoto?: boolean;
+  /** design slug → alt / caption text */
+  alts?: Record<string, string>;
 };
 
 export type SpokeSampleDownload = {
   label: string;
   href: string;
+  holds?: string;
+  buttonLabel?: string;
+  previewSrc?: string;
+  previewAlt?: string;
 };
 
 export type SpokeTip = {
@@ -49,6 +56,21 @@ export type SpokeTip = {
 export type SpokeFaq = {
   q: string;
   a: string;
+  hideUnlinked?: boolean;
+};
+
+export type SpokeSection = {
+  id: string;
+  h2: string;
+  paras?: string[];
+  list?: string[];
+  ordered?: boolean;
+  checklist?: boolean;
+  table?: { head: string[]; rows: string[][] };
+  after?: string[];
+  image?: { src: string; alt: string };
+  hideUnlinked?: boolean;
+  cta?: { label: string; href: string };
 };
 
 export type SpokePageConfig = {
@@ -72,15 +94,20 @@ export type SpokePageConfig = {
   metaDescription: string;
   h1: string;
   breadcrumbName: string;
-  makerPosition: 'top' | 'afterIntro';
+  makerPosition: 'top' | 'afterIntro' | 'afterDownloads' | 'none';
   preset: SpokePreset;
   intro: string;
+  introHeading?: string;
+  introCta?: { label: string; href: string };
+  articleSchema?: boolean;
+  downloadsHeading?: string;
   outlineH2s: string[];
   steps: SpokeStep[];
   samples: SpokeSamples;
   sampleDownloads: SpokeSampleDownload[];
   tips: SpokeTip[];
   faqs: SpokeFaq[];
+  sections?: SpokeSection[];
   relatedIds: string[];
   wordsTarget?: number;
 };

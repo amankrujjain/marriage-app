@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
+import { home } from '@/content/spokes/home';
 import { BiodataEditor } from '@/features/biodata/components/editor/BiodataEditor';
 import { HowItWorks } from '@/components/landing/HowItWorks';
 import { DesignsStrip } from '@/components/landing/DesignsStrip';
@@ -9,6 +10,7 @@ import { SiteFooter } from '@/components/landing/SiteFooter';
 import { SiteHeader } from '@/components/landing/SiteHeader';
 import { SpokeHeading } from '@/features/spokes/components/SpokeHeading';
 import { SpokeRelatedLinks } from '@/features/spokes/components/SpokeRelatedLinks';
+import { SpokeSections } from '@/features/spokes/components/SpokeSections';
 import {
   languageAlternates,
   organizationJsonLd,
@@ -17,16 +19,14 @@ import {
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'Biodata for Marriage: Free Maker, Word & PDF',
+    absolute: home.title,
   },
-  description:
-    'Create a print-ready Indian marriage biodata online. Free A4 designs, live preview, PDF and WhatsApp download.',
+  description: home.metaDescription,
   alternates: languageAlternates('/'),
 };
 
-const HOME_H1 = 'Free Biodata for Marriage Maker';
-const HOME_LEDE =
-  'Fill in your details, preview live on A4 designs, and download a print-ready PDF or WhatsApp image.';
+const HOME_H1 = home.h1;
+const HOME_LEDE = home.intro;
 
 const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -54,6 +54,13 @@ function EditorFallback() {
 }
 
 export default function HomePage() {
+  const topSections = (home.sections ?? []).filter(
+    (s) => s.id === 'what-is' || s.id === 'what-to-put',
+  );
+  const bottomSections = (home.sections ?? []).filter(
+    (s) => s.id === 'every-family' || s.id === 'why',
+  );
+
   return (
     <>
       <script
@@ -74,13 +81,16 @@ export default function HomePage() {
         <BiodataEditor
           showSiteFooter={false}
           pageSlug="home"
+          preset={home.preset}
           h1={HOME_H1}
           lede={HOME_LEDE}
         />
       </Suspense>
       <div className="landing">
+        <SpokeSections sections={topSections} />
         <HowItWorks />
         <DesignsStrip />
+        <SpokeSections sections={bottomSections} />
         <Pricing />
         <Faq />
         <SpokeRelatedLinks variant="hub" />

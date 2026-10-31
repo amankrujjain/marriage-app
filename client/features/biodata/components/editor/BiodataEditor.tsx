@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { SiteHeader } from '@/components/landing/SiteHeader';
@@ -42,6 +42,8 @@ type BiodataEditorProps = {
   h1?: string;
   /** Short lede under the spoke H1. */
   lede?: string;
+  /** Optional content between the H1 and the editor (e.g. download cards). */
+  beforeMaker?: ReactNode;
 };
 
 export function BiodataEditor({
@@ -50,6 +52,7 @@ export function BiodataEditor({
   pageSlug,
   h1,
   lede,
+  beforeMaker,
 }: BiodataEditorProps) {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -212,10 +215,13 @@ export function BiodataEditor({
     }
   }
 
+  const ctaLabel = preset?.ctaLabel ?? 'Continue to download';
+
   return (
     <div className="landing editor-page">
       <SiteHeader variant="editor" />
       {h1 ? <SpokeHeading h1={h1} lede={lede} /> : null}
+      {beforeMaker}
 
       <header className="editor-mobile-bar">
         <div className="editor-mobile-tabs" role="tablist">
@@ -267,8 +273,8 @@ export function BiodataEditor({
             >
               {savingMd ? 'Saving…' : 'Save to My Designs'}
             </button>
-            <Link className="btn btn-primary" href="/download">
-              Continue to download{' '}
+            <Link className="btn btn-primary" href="/download/">
+              {ctaLabel}{' '}
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 10h12M11 5l5 5-5 5" />
               </svg>
@@ -278,8 +284,8 @@ export function BiodataEditor({
       </main>
 
       <footer className="editor-mobile-footer">
-        <Link href="/download" className="editor-mobile-preview-btn">
-          Continue to download
+        <Link href="/download/" className="editor-mobile-preview-btn">
+          {ctaLabel}
         </Link>
       </footer>
 
