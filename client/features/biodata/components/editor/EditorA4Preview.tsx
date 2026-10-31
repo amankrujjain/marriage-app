@@ -7,6 +7,7 @@ import { slugFromTemplateId } from './designMap';
 import { mapBiodataToVp } from './mapBiodataToVp';
 import type { EditorSectionDef } from './editorSectionModel';
 import { useDesignCatalog } from '@/features/designs/hooks/useDesignCatalog';
+import { EditorSaveStatus } from './EditorSaveStatus';
 
 type EditorA4PreviewProps = {
   sections?: EditorSectionDef[];
@@ -111,10 +112,13 @@ export function EditorA4Preview({ sections }: EditorA4PreviewProps) {
     <>
       <div className="prev-head">
         <h2>Live preview · A4</h2>
-        <span className={fitClass} role="status" aria-live="polite">
-          <i>{fit.icon}</i>
-          <span>{fit.label}</span>
-        </span>
+        <div className="prev-meta">
+          <span className={fitClass} role="status" aria-live="polite">
+            <i>{fit.icon}</i>
+            <span>{fit.label}</span>
+          </span>
+          <EditorSaveStatus />
+        </div>
       </div>
       <div className="stage">
         <div

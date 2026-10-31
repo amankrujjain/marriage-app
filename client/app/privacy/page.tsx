@@ -44,7 +44,7 @@ export default function PrivacyPage() {
           <Link href="/">← Back home</Link>
         </p>
       </main>
-      <SiteFooter slim />
+      <SiteFooter variant="mini" />
     </div>
   );
 }

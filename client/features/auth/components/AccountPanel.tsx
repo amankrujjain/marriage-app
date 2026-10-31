@@ -153,7 +153,6 @@ export function AccountPanel() {
           </div>
         </main>
       </div>
-      <SiteFooter slim />
-    </div>
+      <SiteFooter variant="mini" />    </div>
   );
 }

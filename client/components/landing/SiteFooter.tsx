@@ -1,50 +1,60 @@
 'use client';
 
 import Link from 'next/link';
-import { spokePages } from '@/content/spokes';
+import { getFooterFormatLinks } from '@/content/nav/formatsNav';
 import { clearCookieConsent } from '@/lib/analytics';
 import { BrandLogo } from './BrandLogo';
+import { BrandMark } from './BrandMark';
 import { Toast } from './Toast';
 import { useToast } from './useToast';
 
 type SiteFooterProps = {
+  /** @deprecated Prefer `variant="mini"`. */
   slim?: boolean;
+  variant?: 'full' | 'mini';
 };
 
-export function SiteFooter({ slim = false }: SiteFooterProps) {
+export function SiteFooter({ slim = false, variant }: SiteFooterProps) {
   const { message, toast } = useToast();
   const year = new Date().getFullYear();
-  const formatSpokes = spokePages().filter((page) => page.published);
+  const formatLinks = getFooterFormatLinks();
+  const mode = variant ?? (slim ? 'mini' : 'full');
 
-  if (slim) {
+  const termsBtn = (
+    <button
+      type="button"
+      className="linkish"
+      onClick={() => toast('Terms is a placeholder. It is not built yet.')}
+    >
+      Terms
+    </button>
+  );
+
+  if (mode === 'mini') {
     return (
       <>
-        <footer className="site-foot foot-slim">
+        <footer className="foot-mini">
           <div className="wrap">
-            <div className="foot-bottom" style={{ border: 0, margin: 0, padding: 0 }}>
-              <span>© {year} MarriageBio</span>
-              <span>
-                <Link href="/privacy/" style={{ color: '#BFA99C', display: 'inline' }}>
-                  Privacy
-                </Link>
-                {' · '}
-                <button
-                  type="button"
-                  style={{ all: 'unset', cursor: 'pointer', color: '#BFA99C', display: 'inline' }}
-                  onClick={() => clearCookieConsent()}
-                >
-                  Cookie settings
-                </button>
-                {' · '}
-                <button
-                  type="button"
-                  style={{ all: 'unset', cursor: 'pointer', color: '#BFA99C', display: 'inline' }}
-                  onClick={() => toast('Terms is a placeholder. It is not built yet.')}
-                >
-                  Terms
-                </button>
-              </span>
-            </div>
+            <span className="foot-mini-copy">
+              <BrandMark />© {year} MarriageBio
+            </span>
+            <nav aria-label="Legal">
+              <Link href="/privacy/">Privacy</Link>
+              {termsBtn}
+              <button
+                type="button"
+                className="linkish"
+                onClick={() => clearCookieConsent()}
+              >
+                Cookie settings
+              </button>
+              <a
+                className="foot-contact"
+                href="mailto:support@example.com"
+              >
+                Contact
+              </a>
+            </nav>
           </div>
         </footer>
         <Toast message={message} />
@@ -52,41 +62,37 @@ export function SiteFooter({ slim = false }: SiteFooterProps) {
     );
   }
 
+  const colsClass = formatLinks.length > 0 ? 'cols-4' : 'cols-3';
+
   return (
     <>
       <footer className="site-foot">
         <div className="wrap">
-          <div className="foot-grid">
-            <div>
+          <div className={`foot-grid ${colsClass}`}>
+            <div className="foot-brand">
               <BrandLogo href="/" light />
               <p style={{ marginTop: 14, maxWidth: 280 }}>
-                Marriage biodata designs, made respectfully for Indian families. Free tools for the
-                wedding ahead.
+                Marriage biodata designs, made respectfully for Indian families.
+                Free tools for the wedding ahead.
               </p>
             </div>
-            <div>
+            <div className="foot-col">
               <h4>Make</h4>
               <Link href="/">Create my biodata</Link>
               <Link href="/templates/">Browse designs</Link>
               <Link href="/wedding-pass/">Wedding Pass</Link>
             </div>
-            {formatSpokes.length > 0 ? (
-              <div>
+            {formatLinks.length > 0 ? (
+              <div className="foot-col">
                 <h4>Biodata formats</h4>
-                {formatSpokes.map((page) => (
-                  <Link key={page.id} href={page.path}>
-                    {page.breadcrumbName}
+                {formatLinks.map((link) => (
+                  <Link key={link.href} href={link.href} lang={link.lang}>
+                    {link.label}
                   </Link>
                 ))}
               </div>
             ) : null}
-            <div>
-              <h4>Free tools</h4>
-              <Link href="/#tools">Wedding hashtag generator</Link>
-              <Link href="/#tools">Wedding budget calculator</Link>
-              <Link href="/#tools">Marriage profile maker</Link>
-            </div>
-            <div>
+            <div className="foot-col">
               <h4>Account</h4>
               <Link href="/login/">Sign in</Link>
               <Link href="/register/">Sign up</Link>
@@ -96,31 +102,23 @@ export function SiteFooter({ slim = false }: SiteFooterProps) {
           </div>
           <div className="foot-bottom">
             <span>© {year} MarriageBio. All rights reserved.</span>
-            <span>
-              <Link href="/privacy/" style={{ color: '#BFA99C', display: 'inline' }}>
-                Privacy
-              </Link>
-              {' · '}
+            <nav aria-label="Legal">
+              <Link href="/privacy/">Privacy</Link>
               <button
                 type="button"
-                style={{ all: 'unset', cursor: 'pointer', color: '#BFA99C', display: 'inline' }}
+                className="linkish"
                 onClick={() => clearCookieConsent()}
               >
                 Cookie settings
               </button>
-              {' · '}
-              <button
-                type="button"
-                style={{ all: 'unset', cursor: 'pointer', color: '#BFA99C', display: 'inline' }}
-                onClick={() => toast('Terms is a placeholder. It is not built yet.')}
+              {termsBtn}
+              <a
+                className="foot-contact"
+                href="mailto:support@example.com"
               >
-                Terms
-              </button>
-              {' · '}
-              <a href="mailto:support@example.com" style={{ display: 'inline' }}>
                 Contact
               </a>
-            </span>
+            </nav>
           </div>
         </div>
       </footer>

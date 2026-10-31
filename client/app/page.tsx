@@ -6,6 +6,8 @@ import { DesignsStrip } from '@/components/landing/DesignsStrip';
 import { Pricing } from '@/components/landing/Pricing';
 import { Faq, FAQ_ITEMS } from '@/components/landing/Faq';
 import { SiteFooter } from '@/components/landing/SiteFooter';
+import { SiteHeader } from '@/components/landing/SiteHeader';
+import { SpokeHeading } from '@/features/spokes/components/SpokeHeading';
 import { SpokeRelatedLinks } from '@/features/spokes/components/SpokeRelatedLinks';
 import {
   languageAlternates,
@@ -22,6 +24,10 @@ export const metadata: Metadata = {
   alternates: languageAlternates('/'),
 };
 
+const HOME_H1 = 'Free Biodata for Marriage Maker';
+const HOME_LEDE =
+  'Fill in your details, preview live on A4 designs, and download a print-ready PDF or WhatsApp image.';
+
 const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -37,11 +43,12 @@ const faqJsonLd = {
 
 function EditorFallback() {
   return (
-    <div className="landing editor-page" style={{ padding: '48px 24px' }}>
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', margin: 0 }}>
-        Free Biodata for Marriage Maker
-      </div>
-      <p style={{ marginTop: 12, color: 'var(--ink-2)' }}>Loading editor…</p>
+    <div className="landing editor-page">
+      <SiteHeader variant="editor" />
+      <SpokeHeading h1={HOME_H1} lede={HOME_LEDE} />
+      <p style={{ margin: '0 24px 48px', color: 'var(--ink-2)' }}>
+        Loading editor…
+      </p>
     </div>
   );
 }
@@ -63,24 +70,13 @@ export default function HomePage() {
           __html: JSON.stringify(softwareApplicationJsonLd()),
         }}
       />
-      <header className="wrap" style={{ paddingTop: 28, paddingBottom: 8 }}>
-        <h1
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-            margin: 0,
-            lineHeight: 1.2,
-          }}
-        >
-          Free Biodata for Marriage Maker
-        </h1>
-        <p style={{ marginTop: 10, color: 'var(--ink-2)', maxWidth: 560 }}>
-          Fill in your details, preview live on A4 designs, and download a print-ready PDF or
-          WhatsApp image.
-        </p>
-      </header>
       <Suspense fallback={<EditorFallback />}>
-        <BiodataEditor showSiteFooter={false} pageSlug="home" />
+        <BiodataEditor
+          showSiteFooter={false}
+          pageSlug="home"
+          h1={HOME_H1}
+          lede={HOME_LEDE}
+        />
       </Suspense>
       <div className="landing">
         <HowItWorks />

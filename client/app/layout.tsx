@@ -8,6 +8,7 @@ import {
 import { Providers } from './providers';
 import { SITE_URL } from '@/lib/seo';
 import './globals.css';
+import './nav-ui.css';
 import '@/styles/vp-templates/index.css';
 
 const display = Cormorant_Garamond({

@@ -163,7 +163,7 @@ export function MyDesignsPanel() {
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
-    <div className="landing">
+    <div className="landing page-col md-page">
       <SiteHeader variant="app" />
       <section className="md-head">
         <div className="wrap">
@@ -192,7 +192,7 @@ export function MyDesignsPanel() {
           <div className="md-empty" id="empty">
             <OrnamentDivLotus />
             <h2 style={{ fontSize: '1.8rem' }}>No biodatas yet</h2>
-            <p style={{ color: 'var(--ink-2)' }}>
+            <p>
               Create your first biodata. It takes a few minutes, and it is saved to your account.
             </p>
             <Link className="btn btn-primary" href="/?new=1">
@@ -309,7 +309,7 @@ export function MyDesignsPanel() {
           </div>
         ) : null}
       </main>
-      <SiteFooter slim />
+      <SiteFooter variant="mini" />
     </div>
   );
 }

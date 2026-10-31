@@ -115,7 +115,7 @@ export default function WeddingPassPage() {
           </div>
         </main>
       </div>
-      <SiteFooter slim />
+      <SiteFooter />
       <Toast message={message} />
     </div>
   );

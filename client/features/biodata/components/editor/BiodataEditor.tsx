@@ -20,10 +20,10 @@ import {
   setDesignSlug,
 } from '../../store/biodataSlice';
 import { useSaveBiodata } from '../../hooks/useSaveBiodata';
-import { EditorAppBar } from './EditorAppBar';
 import { EditorForm } from './EditorForm';
 import { EditorA4Preview } from './EditorA4Preview';
 import { EditorDesignSwitcher } from './EditorDesignSwitcher';
+import { EditorSaveStatus } from './EditorSaveStatus';
 import { designFromSlug, templateFromDesignQuery } from './designMap';
 import { useEditorSections } from './useEditorSections';
 
@@ -38,7 +38,7 @@ type BiodataEditorProps = {
   pageSlug?: string;
   /** Optional label under the site header on spoke pages (legacy; unused). */
   heading?: string;
-  /** Spoke page H1 rendered under SiteHeader (home keeps its own H1). */
+  /** Page H1 rendered under SiteHeader. */
   h1?: string;
   /** Short lede under the spoke H1. */
   lede?: string;
@@ -216,7 +216,6 @@ export function BiodataEditor({
     <div className="landing editor-page">
       <SiteHeader variant="editor" />
       {h1 ? <SpokeHeading h1={h1} lede={lede} /> : null}
-      <EditorAppBar />
 
       <header className="editor-mobile-bar">
         <div className="editor-mobile-tabs" role="tablist">
@@ -239,6 +238,7 @@ export function BiodataEditor({
             Preview
           </button>
         </div>
+        <EditorSaveStatus />
       </header>
 
       <main id="main" className="ed">
@@ -283,7 +283,7 @@ export function BiodataEditor({
         </Link>
       </footer>
 
-      {showSiteFooter ? <SiteFooter slim /> : null}
+      {showSiteFooter ? <SiteFooter variant="mini" /> : null}
     </div>
   );
 }

@@ -30,6 +30,7 @@
   --sh-2: 0 2px 4px rgba(74, 12, 22, 0.06), 0 14px 36px rgba(74, 12, 22, 0.12);
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --wrap: 1180px;
+  --head-h: 74px;
   --f-display: var(--font-display), "Cormorant Garamond", Georgia, serif;
   --f-label: var(--font-label), Marcellus, Georgia, serif;
   --f-body: var(--font-body), Mulish, system-ui, sans-serif;

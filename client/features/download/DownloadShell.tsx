@@ -39,7 +39,7 @@ export function DownloadShell() {
             </p>
           </section>
         </main>
-        <SiteFooter slim />
+        <SiteFooter variant="mini" />
       </div>
     </ProtectedRoute>
   );
