@@ -1,0 +1,70 @@
+# Production stack: Redis + API + Next.
+# MongoDB Atlas via MONGODB_URI in .env (not run in Compose).
+#
+# Host ports (loopback only — terminate TLS on the VPS host nginx):
+#   web 127.0.0.1:4010 → container :3000
+#   api 127.0.0.1:4020 → container :4000
+#
+# Do not publish 80/443 here; Hostinger's system nginx already owns them.
+# See nginx/hostinger-proxy.conf for a server block to drop into host nginx.
+#
+# Build client with your public API URL, e.g.:
+#   docker compose build --build-arg NEXT_PUBLIC_API_URL=https://marriagebio.in/api/v1 web
+
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: '4000'
+      REDIS_URL: redis://redis:6379
+      TRUST_PROXY: '1'
+    ports:
+      - '127.0.0.1:4020:4000'
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      # Legacy local exports only; new media uses R2
+      - api_uploads:/app/server/uploads
+      - api_logs:/app/server/logs
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://marriagebio.in/api/v1}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+        NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: '3000'
+      HOSTNAME: 0.0.0.0
+    ports:
+      - '127.0.0.1:4010:3000'
+    depends_on:
+      - api
+
+volumes:
+  redis_data:
+  api_uploads:
+  api_logs:

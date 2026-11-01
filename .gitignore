@@ -18,3 +18,8 @@ Thumbs.db
 .vscode/
 .idea/
 *.zip
+nginx/certs/*.pem
+nginx/certs/*.key
+nginx/certs/*.crt
+!nginx/certs/.gitkeep
+!nginx/certs/README.md

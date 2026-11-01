@@ -1,0 +1,52 @@
+# syntax=docker/dockerfile:1
+
+FROM node:24-bookworm-slim AS builder
+WORKDIR /app
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY package.json package-lock.json ./
+COPY shared/package.json ./shared/
+COPY server/package.json ./server/
+COPY client/package.json ./client/
+
+RUN npm ci
+
+COPY shared ./shared
+COPY client ./client
+
+ARG NEXT_PUBLIC_API_URL=http://localhost:4020/api/v1
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID=
+ARG NEXT_PUBLIC_GA_MEASUREMENT_ID=
+
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+    NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID \
+    NEXT_PUBLIC_GA_MEASUREMENT_ID=$NEXT_PUBLIC_GA_MEASUREMENT_ID \
+    NEXT_TELEMETRY_DISABLED=1
+
+RUN npm run build -w shared && npm run build -w client
+
+FROM node:24-bookworm-slim AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    PORT=3000 \
+    HOSTNAME=0.0.0.0
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates \
+  && rm -rf /var/lib/apt/lists/* \
+  && addgroup --system --gid 1001 nodejs \
+  && adduser --system --uid 1001 nextjs
+
+# Next standalone output for a workspace app lives under client/
+COPY --from=builder /app/client/public ./client/public
+COPY --from=builder --chown=nextjs:nodejs /app/client/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/client/.next/static ./client/.next/static
+
+USER nextjs
+EXPOSE 3000
+CMD ["node", "client/server.js"]
