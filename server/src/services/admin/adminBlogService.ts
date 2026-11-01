@@ -2,14 +2,18 @@ import {
   BlogPostStatus,
   type AdminBlogPost,
   type AdminBlogPostSummary,
+  type BlogImageUploadResult,
   type CreateBlogPostPayload,
   type UpdateBlogPostPayload,
 } from '@marriage/shared';
 import { Types } from 'mongoose';
+import sharp from 'sharp';
+import { env } from '../../config/env';
 import { BadRequestError } from '../../errors/BadRequestError';
 import { ConflictError } from '../../errors/ConflictError';
 import { NotFoundError } from '../../errors/NotFoundError';
 import type { BlogPostFields } from '../../models/BlogPost';
+import { createBlogImageStorageProvider } from '../../providers/storage/createStorageProvider';
 import {
   createBlogPost,
   findBlogPostById,
@@ -20,11 +24,14 @@ import {
 } from '../../repositories/blogPostRepository';
 import { findUserById } from '../../repositories/userRepository';
 import { isReservedBlogSlug, slugifyBlogTitle } from '../../utils/blogSlug';
+import { detectImageMime } from '../../utils/imageMagic';
+import { logger } from '../../utils/logger';
 import { sanitizeBlogHtml } from '../../utils/sanitizeBlogHtml';
 import {
   toAdminBlogPost,
   toAdminBlogPostSummary,
 } from '../../utils/toAdminBlogPost';
+
 
 function emptyToNull(v: string | null | undefined): string | null {
   if (v == null || v === '') return null;
@@ -207,8 +214,14 @@ export async function updateAdminBlogPostService(
     set.contentHtml = sanitizeBlogHtml(payload.contentHtml);
   }
   if (payload.contentJson !== undefined) set.contentJson = payload.contentJson;
+  let oldCoverKey: string | null | undefined;
   if (payload.coverImageUrl !== undefined) {
-    set.coverImageUrl = emptyToNull(payload.coverImageUrl);
+    const nextUrl = emptyToNull(payload.coverImageUrl);
+    set.coverImageUrl = nextUrl;
+    if (post.coverImageKey && nextUrl !== post.coverImageUrl) {
+      set.coverImageKey = null;
+      oldCoverKey = post.coverImageKey;
+    }
   }
   if (payload.coverAlt !== undefined) set.coverAlt = payload.coverAlt;
   if (payload.ogImageUrl !== undefined) {
@@ -251,6 +264,9 @@ export async function updateAdminBlogPostService(
   try {
     const updated = await updateBlogPostById(id, set);
     if (!updated) notFound();
+    if (oldCoverKey) {
+      await deleteBlogImageQuietly(oldCoverKey);
+    }
     return toAdminBlogPost(updated);
   } catch (error) {
     if (isMongoDuplicateKey(error)) {
@@ -349,7 +365,7 @@ export async function deleteAdminBlogPostService(
   const post = await findBlogPostById(id);
   if (!post) notFound();
 
-  // HOOK phase 3, delete the cover and inline image files here or in a cleanup job.
+  // Phase 3: files are kept on soft delete (the post can be restored later and the slug stays reserved); unreferenced blog images are a later cleanup job.
   const updated = await updateBlogPostById(id, {
     deletedAt: new Date(),
     status: BlogPostStatus.DRAFT,
@@ -357,4 +373,113 @@ export async function deleteAdminBlogPostService(
     updatedBy: new Types.ObjectId(adminId),
   });
   if (!updated) notFound();
+}
+
+function blogImageAbsoluteUrl(publicPath: string): string {
+  const base = (
+    process.env.SERVER_PUBLIC_URL ?? `http://localhost:${env.PORT}`
+  ).replace(/\/$/, '');
+  return `${base}${publicPath}`;
+}
+
+async function deleteBlogImageQuietly(
+  key: string | null | undefined,
+): Promise<void> {
+  if (!key) return;
+  try {
+    await createBlogImageStorageProvider().delete?.(key);
+  } catch (error) {
+    logger.warn('Blog image delete failed', {
+      key,
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
+export async function storeBlogImageService(
+  file?: Express.Multer.File,
+): Promise<BlogImageUploadResult> {
+  if (!file) {
+    throw new BadRequestError('Image file is required', 'BLOG_IMAGE_REQUIRED');
+  }
+  if (detectImageMime(file.buffer) === null) {
+    throw new BadRequestError(
+      'Only JPEG, PNG, or WebP allowed',
+      'BLOG_IMAGE_TYPE_INVALID',
+    );
+  }
+
+  let data: Buffer;
+  let info: { width: number; height: number };
+  try {
+    const result = await sharp(file.buffer, { limitInputPixels: 40_000_000 })
+      .autoOrient()
+      .resize({ width: 1600, withoutEnlargement: true })
+      .webp({ quality: 80 })
+      .toBuffer({ resolveWithObject: true });
+    data = result.data;
+    info = { width: result.info.width, height: result.info.height };
+  } catch {
+    throw new BadRequestError(
+      'Image could not be processed',
+      'BLOG_IMAGE_INVALID',
+    );
+  }
+
+  const stored = await createBlogImageStorageProvider().upload({
+    buffer: data,
+    originalName: file.originalname,
+    mimeType: 'image/webp',
+  });
+
+  return {
+    url: blogImageAbsoluteUrl(stored.url),
+    key: stored.key,
+    width: info.width,
+    height: info.height,
+  };
+}
+
+export async function setAdminBlogCoverService(
+  adminId: string,
+  id: string,
+  file?: Express.Multer.File,
+): Promise<AdminBlogPost> {
+  const post = await findBlogPostById(id);
+  if (!post) notFound();
+
+  const image = await storeBlogImageService(file);
+  const updated = await updateBlogPostById(id, {
+    coverImageUrl: image.url,
+    coverImageKey: image.key,
+    updatedBy: new Types.ObjectId(adminId),
+  });
+  if (!updated) {
+    await deleteBlogImageQuietly(image.key);
+    notFound();
+  }
+
+  if (post.coverImageKey && post.coverImageKey !== image.key) {
+    await deleteBlogImageQuietly(post.coverImageKey);
+  }
+
+  return toAdminBlogPost(updated);
+}
+
+export async function removeAdminBlogCoverService(
+  adminId: string,
+  id: string,
+): Promise<AdminBlogPost> {
+  const post = await findBlogPostById(id);
+  if (!post) notFound();
+
+  const updated = await updateBlogPostById(id, {
+    coverImageUrl: null,
+    coverImageKey: null,
+    updatedBy: new Types.ObjectId(adminId),
+  });
+  if (!updated) notFound();
+
+  await deleteBlogImageQuietly(post.coverImageKey);
+  return toAdminBlogPost(updated);
 }

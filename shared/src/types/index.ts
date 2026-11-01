@@ -70,5 +70,7 @@ export type {
   CreateBlogPostPayload,
   UpdateBlogPostPayload,
   ScheduleBlogPostPayload,
+  BlogImageUploadResult,
 } from './blog';
+
 

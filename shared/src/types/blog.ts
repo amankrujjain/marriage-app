@@ -98,3 +98,10 @@ export type UpdateBlogPostPayload = Partial<CreateBlogPostPayload>;
 export interface ScheduleBlogPostPayload {
   publishAt: string;
 }
+
+export interface BlogImageUploadResult {
+  url: string;
+  key: string;
+  width: number;
+  height: number;
+}

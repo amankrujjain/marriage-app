@@ -87,3 +87,10 @@ export const verifyRateLimit = buildLimiter('verify', {
   max: 30,
   message: 'Too many payment verification attempts. Try again later.',
 });
+
+export const blogImageUploadRateLimit = buildLimiter('blog-image', {
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  message: 'Too many image uploads. Try again later.',
+});
+

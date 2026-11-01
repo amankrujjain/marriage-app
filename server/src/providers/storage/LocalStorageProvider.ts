@@ -27,4 +27,24 @@ export class LocalStorageProvider implements StorageProvider {
       size: params.buffer.length,
     };
   }
+
+  async delete(key: string): Promise<void> {
+    if (!/^[a-zA-Z0-9._-]+$/.test(key) || key.includes('..')) {
+      return;
+    }
+    try {
+      await fs.unlink(path.join(this.uploadDir, key));
+    } catch (error) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as { code: unknown }).code === 'ENOENT'
+      ) {
+        return;
+      }
+      throw error;
+    }
+  }
 }
+

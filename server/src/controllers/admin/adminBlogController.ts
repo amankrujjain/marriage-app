@@ -7,13 +7,17 @@ import {
   getAdminBlogPostService,
   listAdminBlogPostsService,
   publishAdminBlogPostService,
+  removeAdminBlogCoverService,
   scheduleAdminBlogPostService,
+  setAdminBlogCoverService,
+  storeBlogImageService,
   unpublishAdminBlogPostService,
   updateAdminBlogPostService,
 } from '../../services/admin/adminBlogService';
 import { sendCreated } from '../../utils/sendCreated';
 import { sendPaginated } from '../../utils/sendPaginated';
 import { sendSuccess } from '../../utils/sendSuccess';
+
 
 export async function adminListBlogPostsController(
   req: Request,
@@ -154,6 +158,55 @@ export async function adminDeleteBlogPostController(
     if (!req.user) throw new UnauthorizedError();
     await deleteAdminBlogPostService(req.user.id, String(req.params.id));
     sendSuccess(res, null, 'Blog post deleted');
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function adminUploadBlogImageController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    if (!req.user) throw new UnauthorizedError();
+    const data = await storeBlogImageService(req.file);
+    sendCreated(res, data, 'Image uploaded');
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function adminSetBlogCoverController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    if (!req.user) throw new UnauthorizedError();
+    const data = await setAdminBlogCoverService(
+      req.user.id,
+      String(req.params.id),
+      req.file,
+    );
+    sendSuccess(res, data, 'Cover image updated');
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function adminRemoveBlogCoverController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    if (!req.user) throw new UnauthorizedError();
+    const data = await removeAdminBlogCoverService(
+      req.user.id,
+      String(req.params.id),
+    );
+    sendSuccess(res, data, 'Cover image removed');
   } catch (error) {
     next(error);
   }

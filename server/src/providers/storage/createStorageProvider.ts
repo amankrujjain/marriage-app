@@ -12,3 +12,12 @@ export function createStorageProvider(): StorageProvider {
     '/api/v1/media/photos',
   );
 }
+
+/** Public, permanent, unsigned blog images; never biodata photos. */
+export function createBlogImageStorageProvider(): StorageProvider {
+  return new LocalStorageProvider(
+    path.resolve(process.cwd(), 'uploads', 'blog'),
+    '/api/v1/media/blog',
+  );
+}
+
