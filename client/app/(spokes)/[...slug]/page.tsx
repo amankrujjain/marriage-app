@@ -6,7 +6,7 @@ import {
 } from '@/content/spokes';
 import { SpokePage } from '@/features/spokes/components/SpokePage';
 import { publicFileExists } from '@/features/spokes/sampleImages';
-import { absoluteUrl, languageAlternates } from '@/lib/seo';
+import { absoluteUrl, INDEXABLE_ROBOTS, languageAlternates } from '@/lib/seo';
 
 export const dynamicParams = false;
 
@@ -50,8 +50,9 @@ export async function generateMetadata({
     return {};
   }
 
+  // Published spokes are in the sitemap — must stay indexable.
   const robots = page.published
-    ? undefined
+    ? INDEXABLE_ROBOTS
     : { index: false, follow: false };
 
   return {

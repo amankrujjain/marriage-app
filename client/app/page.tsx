@@ -12,6 +12,7 @@ import { SpokeHeading } from '@/features/spokes/components/SpokeHeading';
 import { SpokeRelatedLinks } from '@/features/spokes/components/SpokeRelatedLinks';
 import { SpokeSections } from '@/features/spokes/components/SpokeSections';
 import {
+  INDEXABLE_ROBOTS,
   languageAlternates,
   organizationJsonLd,
   softwareApplicationJsonLd,
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
   },
   description: home.metaDescription,
   alternates: languageAlternates('/'),
+  robots: INDEXABLE_ROBOTS,
 };
 
 const HOME_H1 = home.h1;

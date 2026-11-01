@@ -3,6 +3,28 @@ import { publishedPages } from '@/content/spokes';
 
 export const SITE_URL = 'https://marriagebio.in';
 
+/** Meta robots for every URL that belongs in the sitemap. */
+export const INDEXABLE_ROBOTS = {
+  index: true,
+  follow: true,
+} as const satisfies Metadata['robots'];
+
+/**
+ * Private / app surfaces — keep out of robots.txt crawl.
+ * Must never overlap sitemap / PUBLIC_ROUTES paths.
+ */
+export const ROBOTS_DISALLOW = [
+  '/account/',
+  '/admin/',
+  '/download/',
+  '/api/',
+  '/login/',
+  '/register/',
+  '/forgot-password/',
+  '/reset-password/',
+  '/my-designs/',
+] as const;
+
 const STATIC_PUBLIC_ROUTES = [
   '/',
   '/templates/',
@@ -42,6 +64,20 @@ export const PUBLIC_ROUTES: string[] = dedupePaths([
 ]);
 
 export type PublicRoute = (typeof STATIC_PUBLIC_ROUTES)[number] | string;
+
+function isDisallowedPath(path: string): boolean {
+  return ROBOTS_DISALLOW.some(
+    (blocked) => path === blocked || path.startsWith(blocked),
+  );
+}
+
+for (const path of PUBLIC_ROUTES) {
+  if (isDisallowedPath(path)) {
+    throw new Error(
+      `PUBLIC_ROUTES path "${path}" is listed in ROBOTS_DISALLOW — sitemap pages must be indexable`,
+    );
+  }
+}
 
 const EXISTING_ROUTES = new Set<string>(PUBLIC_ROUTES);
 

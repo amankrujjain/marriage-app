@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
-import { breadcrumbJsonLd, languageAlternates } from '@/lib/seo';
+import { breadcrumbJsonLd, INDEXABLE_ROBOTS, languageAlternates } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Wedding Pass',
   description:
     'Unlock premium biodata downloads for 30 days with the MarriageBio Wedding Pass.',
   alternates: languageAlternates('/wedding-pass/'),
+  robots: INDEXABLE_ROBOTS,
 };
 
 const crumbs = breadcrumbJsonLd([

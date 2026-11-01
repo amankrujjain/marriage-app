@@ -1,12 +1,15 @@
 import type { MetadataRoute } from 'next';
-import { SITE_URL } from '@/lib/seo';
+import { ROBOTS_DISALLOW, SITE_URL } from '@/lib/seo';
+
+export const dynamic = 'force-static';
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
+      // All marketing / spoke URLs stay allowed via Allow: /
       allow: '/',
-      disallow: ['/account', '/admin', '/download', '/api'],
+      disallow: [...ROBOTS_DISALLOW],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

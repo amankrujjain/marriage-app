@@ -2,12 +2,13 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SiteHeader } from '@/components/landing/SiteHeader';
 import { SiteFooter } from '@/components/landing/SiteFooter';
-import { breadcrumbJsonLd, languageAlternates } from '@/lib/seo';
+import { breadcrumbJsonLd, INDEXABLE_ROBOTS, languageAlternates } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Privacy & cookies',
   description: 'How MarriageBio uses essential and analytics cookies for the biodata maker.',
   alternates: languageAlternates('/privacy/'),
+  robots: INDEXABLE_ROBOTS,
 };
 
 const crumbs = breadcrumbJsonLd([

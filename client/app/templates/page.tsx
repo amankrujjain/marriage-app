@@ -7,7 +7,7 @@ import { SpokeFaq } from '@/features/spokes/components/SpokeFaq';
 import { stripLinks } from '@/features/spokes/components/SpokeInline';
 import { SpokeRelatedLinks } from '@/features/spokes/components/SpokeRelatedLinks';
 import { SpokeSections } from '@/features/spokes/components/SpokeSections';
-import { breadcrumbJsonLd, languageAlternates } from '@/lib/seo';
+import { breadcrumbJsonLd, INDEXABLE_ROBOTS, languageAlternates } from '@/lib/seo';
 import { TemplatesPageContext } from './TemplatesPageContext';
 
 export const metadata: Metadata = {
@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   },
   description: templates.metaDescription,
   alternates: languageAlternates('/templates/'),
+  robots: INDEXABLE_ROBOTS,
 };
 
 const crumbs = breadcrumbJsonLd([
