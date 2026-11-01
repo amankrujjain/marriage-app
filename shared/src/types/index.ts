@@ -65,4 +65,10 @@ export type {
   PublicBlogPost,
   PublicBlogPostLookup,
   BlogSitemapEntry,
+  AdminBlogPostSummary,
+  AdminBlogPost,
+  CreateBlogPostPayload,
+  UpdateBlogPostPayload,
+  ScheduleBlogPostPayload,
 } from './blog';
+

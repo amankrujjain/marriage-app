@@ -1,5 +1,10 @@
 import { BlogPostStatus } from '@marriage/shared';
-import { BlogPostModel, type BlogPostDocument } from '../models/BlogPost';
+import {
+  BlogPostModel,
+  type BlogPostDocument,
+  type BlogPostFields,
+} from '../models/BlogPost';
+
 
 function publicBlogFilter(now = new Date()) {
   return {
@@ -57,4 +62,80 @@ export async function listPublishedBlogSitemap(): Promise<BlogPostDocument[]> {
   })
     .select('slug publishedAt updatedAt')
     .sort({ publishedAt: -1 });
+}
+
+export async function listAdminBlogPosts(input: {
+  page: number;
+  limit: number;
+  status?: BlogPostStatus;
+  search?: string;
+}): Promise<{ items: BlogPostDocument[]; total: number }> {
+  const filter: Record<string, unknown> = { deletedAt: null };
+  if (input.status) {
+    filter.status = input.status;
+  }
+  if (input.search) {
+    const escaped = input.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    filter.$or = [
+      { title: { $regex: escaped, $options: 'i' } },
+      { slug: { $regex: escaped, $options: 'i' } },
+    ];
+  }
+
+  const [items, total] = await Promise.all([
+    BlogPostModel.find(filter)
+      .select('-contentHtml -contentJson')
+      .sort({ updatedAt: -1, _id: -1 })
+      .skip((input.page - 1) * input.limit)
+      .limit(input.limit),
+    BlogPostModel.countDocuments(filter),
+  ]);
+
+  return { items, total };
+}
+
+export async function findBlogPostById(
+  id: string,
+): Promise<BlogPostDocument | null> {
+  return BlogPostModel.findOne({ _id: id, deletedAt: null });
+}
+
+export async function isBlogSlugTaken(
+  slug: string,
+  excludeId?: string,
+): Promise<boolean> {
+  const filter: Record<string, unknown> = { slug };
+  if (excludeId) {
+    filter._id = { $ne: excludeId };
+  }
+  const found = await BlogPostModel.exists(filter);
+  return Boolean(found);
+}
+
+export async function createBlogPost(
+  input: Partial<BlogPostFields>,
+): Promise<BlogPostDocument> {
+  return BlogPostModel.create(input);
+}
+
+export async function updateBlogPostById(
+  id: string,
+  set: Partial<BlogPostFields>,
+): Promise<BlogPostDocument | null> {
+  return BlogPostModel.findOneAndUpdate(
+    { _id: id, deletedAt: null },
+    { $set: set },
+    { new: true, runValidators: true },
+  );
+}
+
+export async function pullPreviousSlugFromOtherPosts(
+  slug: string,
+  excludeId?: string,
+): Promise<void> {
+  const filter: Record<string, unknown> = { previousSlugs: slug };
+  if (excludeId) {
+    filter._id = { $ne: excludeId };
+  }
+  await BlogPostModel.updateMany(filter, { $pull: { previousSlugs: slug } });
 }
