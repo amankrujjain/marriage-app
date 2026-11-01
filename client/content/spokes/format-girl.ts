@@ -9,7 +9,7 @@ export const formatGirl: SpokePageConfig = {
   kind: 'spoke',
   week: 3,
   plannedDate: '2026-11-16',
-  published: false,
+  published: true,
   hub: 'Boy and girl',
   intent: 'girl',
   language: 'en',

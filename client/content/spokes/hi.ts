@@ -9,7 +9,7 @@ export const hi: SpokePageConfig = {
   kind: 'spoke',
   week: 6,
   plannedDate: '2026-12-07',
-  published: false,
+  published: true,
   hub: 'Languages',
   intent: 'hindi',
   language: 'hi',

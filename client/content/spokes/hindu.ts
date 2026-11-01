@@ -8,7 +8,7 @@ export const hindu: SpokePageConfig = {
   kind: 'spoke',
   week: 4,
   plannedDate: '2026-11-23',
-  published: false,
+  published: true,
   hub: 'Communities',
   intent: 'hindu',
   language: 'en',

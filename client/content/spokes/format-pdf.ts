@@ -9,7 +9,7 @@ export const formatPdf: SpokePageConfig = {
   kind: 'spoke',
   week: 2,
   plannedDate: '2026-11-09',
-  published: false,
+  published: true,
   hub: 'Formats',
   intent: 'format-pdf',
   language: 'en',

@@ -9,7 +9,7 @@ export const marathi: SpokePageConfig = {
   kind: 'spoke',
   week: 7,
   plannedDate: '2026-12-14',
-  published: false,
+  published: true,
   hub: 'Languages',
   intent: 'marathi',
   language: 'mr',

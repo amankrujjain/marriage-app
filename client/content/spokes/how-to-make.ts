@@ -8,7 +8,7 @@ export const howToMake: SpokePageConfig = {
   kind: 'spoke',
   week: 8,
   plannedDate: '2026-12-21',
-  published: false,
+  published: true,
   hub: 'Guides',
   intent: 'guide',
   language: 'en',

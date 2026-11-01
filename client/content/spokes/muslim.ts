@@ -8,7 +8,7 @@ export const muslim: SpokePageConfig = {
   kind: 'spoke',
   week: 5,
   plannedDate: '2026-11-30',
-  published: false,
+  published: true,
   hub: 'Communities',
   intent: 'muslim',
   language: 'en',

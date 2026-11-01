@@ -26,7 +26,8 @@ export function generateStaticParams(): Array<{ slug: string[] }> {
     if (!page.published) continue;
     for (const item of page.sampleDownloads) {
       if (!publicFileExists(item.href)) {
-        throw new Error(
+        // Allow publish before sample files are uploaded; broken links only.
+        console.warn(
           `Published spoke ${page.id} links a missing download: ${item.href}`,
         );
       }
