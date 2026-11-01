@@ -1,15 +1,13 @@
 import type { BiodataRecord } from '@marriage/shared';
 import type { BiodataDocument } from '../models/Biodata';
-import { resignMediaUrlIfNeeded } from './signedMediaUrl';
+import { signProfilePhotoUrl } from './profilePhotoUrlRule';
 
-const PHOTO_URL_TTL_SEC = 7 * 24 * 60 * 60;
-
-export function toBiodataRecord(doc: BiodataDocument): BiodataRecord {
+export async function toBiodataRecord(
+  doc: BiodataDocument,
+): Promise<BiodataRecord> {
   const content = { ...doc.content };
   if (content.profilePhotoUrl) {
-    content.profilePhotoUrl =
-      resignMediaUrlIfNeeded(content.profilePhotoUrl, PHOTO_URL_TTL_SEC) ??
-      content.profilePhotoUrl;
+    content.profilePhotoUrl = await signProfilePhotoUrl(content.profilePhotoUrl);
   }
   const designSlug = doc.designSlug || content.designSlug;
   if (designSlug && !content.designSlug) {
@@ -21,7 +19,9 @@ export function toBiodataRecord(doc: BiodataDocument): BiodataRecord {
     title: doc.title,
     content,
     designSlug,
-    editorSections: Array.isArray(doc.editorSections) ? doc.editorSections : undefined,
+    editorSections: Array.isArray(doc.editorSections)
+      ? doc.editorSections
+      : undefined,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };

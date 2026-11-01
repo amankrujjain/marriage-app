@@ -6,11 +6,16 @@ import {
 import { NotFoundError } from '../../errors/NotFoundError';
 import {
   findBiodataById,
+  isProfilePhotoInUse,
   updateBiodata,
 } from '../../repositories/biodataRepository';
-import { canonicalizeProfilePhotoUrl } from '../../utils/profilePhotoUrlRule';
+import {
+  canonicalizeProfilePhotoUrl,
+  parseProfilePhotoKey,
+} from '../../utils/profilePhotoUrlRule';
 import { toBiodataRecord } from '../../utils/toBiodataRecord';
 import { resolveTitle } from './resolveTitle';
+import { deleteProfilePhotoQuietly } from './uploadPhotoService';
 
 export async function updateBiodataService(
   userId: string,
@@ -39,9 +44,15 @@ export async function updateBiodataService(
     : { ...existing.content };
 
   content = mergeSectionsIntoContent(content, editorSections);
+
+  const incoming = content.profilePhotoUrl;
+  let next = canonicalizeProfilePhotoUrl(incoming, userId);
+  if (incoming && next === undefined) {
+    next = existing.content?.profilePhotoUrl;
+  }
   content = {
     ...content,
-    profilePhotoUrl: canonicalizeProfilePhotoUrl(content.profilePhotoUrl),
+    profilePhotoUrl: next,
     ...(designSlug ? { designSlug } : {}),
   };
 
@@ -59,5 +70,17 @@ export async function updateBiodataService(
       : {}),
   });
   if (!updated) throw new NotFoundError('Biodata not found', 'BIODATA_NOT_FOUND');
+
+  const oldUrl = existing.content?.profilePhotoUrl;
+  const newUrl = updated.content?.profilePhotoUrl;
+  if (
+    oldUrl &&
+    parseProfilePhotoKey(oldUrl) &&
+    oldUrl !== newUrl &&
+    !(await isProfilePhotoInUse(userId, oldUrl, id))
+  ) {
+    await deleteProfilePhotoQuietly(oldUrl);
+  }
+
   return toBiodataRecord(updated);
 }

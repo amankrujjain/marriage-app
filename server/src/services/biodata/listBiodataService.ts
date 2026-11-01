@@ -8,5 +8,6 @@ export async function listBiodataService(
   limit: number,
 ): Promise<{ items: BiodataRecord[]; total: number }> {
   const { items, total } = await listBiodataByUser(userId, page, limit);
-  return { items: items.map(toBiodataRecord), total };
+  return { items: await Promise.all(items.map(toBiodataRecord)), total };
 }
+

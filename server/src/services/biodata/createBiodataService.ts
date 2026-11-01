@@ -15,11 +15,16 @@ export async function createBiodataService(
   const designSlug =
     payload.designSlug?.trim() || payload.content.designSlug?.trim() || undefined;
   let content = mergeSectionsIntoContent(payload.content, payload.editorSections);
+  const photo = canonicalizeProfilePhotoUrl(content.profilePhotoUrl, userId);
   content = {
     ...content,
-    profilePhotoUrl: canonicalizeProfilePhotoUrl(content.profilePhotoUrl),
     ...(designSlug ? { designSlug } : {}),
   };
+  if (photo !== undefined) {
+    content.profilePhotoUrl = photo;
+  } else {
+    delete content.profilePhotoUrl;
+  }
   const title = resolveTitle(payload.title, content);
   const doc = await createBiodata({
     userId,

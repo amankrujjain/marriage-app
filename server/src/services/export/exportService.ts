@@ -1,5 +1,3 @@
-import fs from 'fs/promises';
-import path from 'path';
 import { randomUUID } from 'crypto';
 import {
   buildBiodataShareText,
@@ -9,14 +7,13 @@ import {
 } from '@marriage/shared';
 import { BadRequestError } from '../../errors/BadRequestError';
 import { createExportProvider } from '../../providers/export/createExportProvider';
+import { createStorageProvider } from '../../providers/storage/createStorageProvider';
+import { mediaKey } from '../../providers/storage/R2StorageProvider';
 import { parseImageBase64 } from '../../utils/parseImageBase64';
-import { buildSignedMediaUrl } from '../../utils/signedMediaUrl';
 import { assertExportAccess } from './assertExportAccess';
 import { stampExportWatermark } from './stampExportWatermark';
 
-const EXPORT_URL_TTL_SEC = 7 * 24 * 60 * 60;
-
-/** Must match signed-media SAFE_FILE: [a-zA-Z0-9._-]+ (no spaces). */
+/** Friendly download name (no spaces); used for Content-Disposition. */
 function sanitizeFileName(name: string): string {
   const cleaned = name
     .normalize('NFKD')
@@ -58,14 +55,18 @@ export async function exportBiodata(input: {
 
   const baseName = sanitizeFileName(input.fileName ?? 'marriage-biodata');
   const fileName = `${baseName}-${randomUUID().slice(0, 8)}.${artifact.extension}`;
-  const dir = path.resolve(process.cwd(), 'uploads', 'exports');
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(path.join(dir, fileName), artifact.buffer);
-
-  const url = buildSignedMediaUrl({
-    kind: 'exports',
-    fileName,
-    ttlSec: EXPORT_URL_TTL_SEC,
+  const storage = createStorageProvider();
+  const stored = await storage.upload({
+    buffer: artifact.buffer,
+    mimeType: artifact.mimeType,
+    key: mediaKey('userExports', artifact.extension, input.userId),
+    access: 'private',
+    cacheControl: 'private, no-store',
+    contentDisposition: `attachment; filename="${fileName}"`,
+  });
+  const url = await storage.signedUrl(stored.key, {
+    downloadName: fileName,
+    fromNow: true,
   });
   const shareText = buildBiodataShareText({
     name: input.personName ?? baseName,

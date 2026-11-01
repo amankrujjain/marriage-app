@@ -23,6 +23,13 @@ interface EnvConfig {
   SMTP_USER?: string;
   SMTP_PASS?: string;
   MAIL_FROM?: string;
+  R2_ACCOUNT_ID?: string;
+  R2_ACCESS_KEY_ID?: string;
+  R2_SECRET_ACCESS_KEY?: string;
+  R2_PUBLIC_BUCKET?: string;
+  R2_PRIVATE_BUCKET?: string;
+  R2_PUBLIC_BASE_URL?: string;
+  R2_ROOT_PREFIX: string;
 }
 
 const schema = Joi.object<EnvConfig>({
@@ -45,6 +52,24 @@ const schema = Joi.object<EnvConfig>({
   SMTP_USER: Joi.string().allow('').optional(),
   SMTP_PASS: Joi.string().allow('').optional(),
   MAIL_FROM: Joi.string().allow('').optional(),
+  R2_ACCOUNT_ID: Joi.string().pattern(/^[a-f0-9]{32}$/).allow('').optional(),
+  R2_ACCESS_KEY_ID: Joi.string().allow('').optional(),
+  R2_SECRET_ACCESS_KEY: Joi.string().allow('').optional(),
+  R2_PUBLIC_BUCKET: Joi.string()
+    .pattern(/^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/)
+    .allow('')
+    .optional(),
+  R2_PRIVATE_BUCKET: Joi.string()
+    .pattern(/^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/)
+    .allow('')
+    .optional(),
+  R2_PUBLIC_BASE_URL: Joi.string()
+    .uri({ scheme: ['https', 'http'] })
+    .allow('')
+    .optional(),
+  R2_ROOT_PREFIX: Joi.string()
+    .pattern(/^[a-z0-9_-]+$/)
+    .default('marriagebio'),
 }).unknown(true);
 
 const { value, error } = schema.validate(process.env, { abortEarly: false });

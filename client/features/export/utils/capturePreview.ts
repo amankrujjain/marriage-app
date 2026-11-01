@@ -5,8 +5,10 @@ export async function capturePreview(
   element: HTMLElement,
   format: ExportFormat,
 ): Promise<string> {
+  // Presigned R2 URLs must not get extra query params (cacheBust would break SigV4).
   const options = {
-    cacheBust: true,
+    cacheBust: false,
+    fetchRequestInit: { cache: 'no-store' as RequestCache },
     pixelRatio: 2,
     backgroundColor: '#ffffff',
   };

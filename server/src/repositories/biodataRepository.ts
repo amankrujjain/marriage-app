@@ -47,3 +47,18 @@ export async function deleteBiodata(id: string): Promise<boolean> {
   const result = await BiodataModel.findByIdAndDelete(id);
   return Boolean(result);
 }
+
+export async function isProfilePhotoInUse(
+  userId: string,
+  url: string,
+  excludeId: string,
+): Promise<boolean> {
+  return (
+    (await BiodataModel.exists({
+      userId,
+      _id: { $ne: excludeId },
+      'content.profilePhotoUrl': url,
+    })) !== null
+  );
+}
+

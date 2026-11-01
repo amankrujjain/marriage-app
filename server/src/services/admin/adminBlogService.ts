@@ -13,7 +13,8 @@ import { BadRequestError } from '../../errors/BadRequestError';
 import { ConflictError } from '../../errors/ConflictError';
 import { NotFoundError } from '../../errors/NotFoundError';
 import type { BlogPostFields } from '../../models/BlogPost';
-import { createBlogImageStorageProvider } from '../../providers/storage/createStorageProvider';
+import { createStorageProvider } from '../../providers/storage/createStorageProvider';
+import { mediaKey } from '../../providers/storage/R2StorageProvider';
 import {
   createBlogPost,
   findBlogPostById,
@@ -31,7 +32,6 @@ import {
   toAdminBlogPost,
   toAdminBlogPostSummary,
 } from '../../utils/toAdminBlogPost';
-
 
 function emptyToNull(v: string | null | undefined): string | null {
   if (v == null || v === '') return null;
@@ -375,19 +375,23 @@ export async function deleteAdminBlogPostService(
   if (!updated) notFound();
 }
 
-function blogImageAbsoluteUrl(publicPath: string): string {
-  const base = (
-    process.env.SERVER_PUBLIC_URL ?? `http://localhost:${env.PORT}`
-  ).replace(/\/$/, '');
-  return `${base}${publicPath}`;
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function isManagedBlogImageKey(key: string): boolean {
+  const root = escapeRegExp(env.R2_ROOT_PREFIX);
+  return new RegExp(
+    `^${root}/blog/(covers|inline)/[0-9a-f-]{36}\\.webp$`,
+  ).test(key);
 }
 
 async function deleteBlogImageQuietly(
   key: string | null | undefined,
 ): Promise<void> {
-  if (!key) return;
+  if (!key || !isManagedBlogImageKey(key)) return;
   try {
-    await createBlogImageStorageProvider().delete?.(key);
+    await createStorageProvider().delete(key, 'public');
   } catch (error) {
     logger.warn('Blog image delete failed', {
       key,
@@ -398,6 +402,7 @@ async function deleteBlogImageQuietly(
 
 export async function storeBlogImageService(
   file?: Express.Multer.File,
+  target: 'blogInline' | 'blogCover' = 'blogInline',
 ): Promise<BlogImageUploadResult> {
   if (!file) {
     throw new BadRequestError('Image file is required', 'BLOG_IMAGE_REQUIRED');
@@ -426,14 +431,16 @@ export async function storeBlogImageService(
     );
   }
 
-  const stored = await createBlogImageStorageProvider().upload({
+  const stored = await createStorageProvider().upload({
     buffer: data,
-    originalName: file.originalname,
     mimeType: 'image/webp',
+    key: mediaKey(target, 'webp'),
+    access: 'public',
+    cacheControl: 'public, max-age=31536000, immutable',
   });
 
   return {
-    url: blogImageAbsoluteUrl(stored.url),
+    url: stored.url,
     key: stored.key,
     width: info.width,
     height: info.height,
@@ -448,12 +455,18 @@ export async function setAdminBlogCoverService(
   const post = await findBlogPostById(id);
   if (!post) notFound();
 
-  const image = await storeBlogImageService(file);
-  const updated = await updateBlogPostById(id, {
-    coverImageUrl: image.url,
-    coverImageKey: image.key,
-    updatedBy: new Types.ObjectId(adminId),
-  });
+  const image = await storeBlogImageService(file, 'blogCover');
+  let updated;
+  try {
+    updated = await updateBlogPostById(id, {
+      coverImageUrl: image.url,
+      coverImageKey: image.key,
+      updatedBy: new Types.ObjectId(adminId),
+    });
+  } catch (error) {
+    await deleteBlogImageQuietly(image.key);
+    throw error;
+  }
   if (!updated) {
     await deleteBlogImageQuietly(image.key);
     notFound();

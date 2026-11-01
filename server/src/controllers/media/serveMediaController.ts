@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import type { NextFunction, Request, Response } from 'express';
+import { env } from '../../config/env';
 import { NotFoundError } from '../../errors/NotFoundError';
 import { UnauthorizedError } from '../../errors/UnauthorizedError';
 import { verifyAccessToken } from '../../services/tokenService';
@@ -10,7 +11,6 @@ import {
   type MediaKind,
   verifyMediaSignature,
 } from '../../utils/signedMediaUrl';
-import { env } from '../../config/env';
 
 const MIME: Record<string, string> = {
   '.jpg': 'image/jpeg',
@@ -18,20 +18,16 @@ const MIME: Record<string, string> = {
   '.png': 'image/png',
   '.webp': 'image/webp',
   '.pdf': 'application/pdf',
+  '.docx':
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 };
 
-function resolveDiskPath(kind: MediaKind, fileName: string): string | null {
+function resolveDiskPath(fileName: string): string | null {
   const root = path.resolve(process.cwd(), 'uploads');
-  const candidates =
-    kind === 'exports'
-      ? [path.join(root, 'exports', fileName)]
-      : [path.join(root, 'photos', fileName), path.join(root, fileName)];
-
-  for (const candidate of candidates) {
-    const resolved = path.resolve(candidate);
-    if (!resolved.startsWith(root + path.sep) && resolved !== root) continue;
-    if (fs.existsSync(resolved) && fs.statSync(resolved).isFile()) return resolved;
-  }
+  const candidate = path.join(root, 'exports', fileName);
+  const resolved = path.resolve(candidate);
+  if (!resolved.startsWith(root + path.sep) && resolved !== root) return null;
+  if (fs.existsSync(resolved) && fs.statSync(resolved).isFile()) return resolved;
   return null;
 }
 
@@ -66,17 +62,20 @@ export function serveMediaController(
     const kind = req.params.kind as MediaKind;
     const fileName = req.params.fileName as string;
 
-    if (kind !== 'photos' && kind !== 'exports') {
+    if (kind !== 'exports') {
       throw new NotFoundError('Media not found', 'MEDIA_NOT_FOUND');
     }
     if (!isSafeMediaFileName(fileName)) {
       throw new NotFoundError('Media not found', 'MEDIA_NOT_FOUND');
     }
     if (!hasValidAccess(req, kind, fileName)) {
-      throw new UnauthorizedError('Authentication or signed URL required', 'MEDIA_AUTH');
+      throw new UnauthorizedError(
+        'Authentication or signed URL required',
+        'MEDIA_AUTH',
+      );
     }
 
-    const diskPath = resolveDiskPath(kind, fileName);
+    const diskPath = resolveDiskPath(fileName);
     if (!diskPath) {
       throw new NotFoundError('Media not found', 'MEDIA_NOT_FOUND');
     }
@@ -89,12 +88,12 @@ export function serveMediaController(
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     res.setHeader('Access-Control-Allow-Origin', env.CLIENT_URL);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
-    if (kind === 'exports') {
-      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
-    } else {
-      res.setHeader('Content-Disposition', 'inline');
-    }
-    fs.createReadStream(diskPath).pipe(res);
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    const stream = fs.createReadStream(diskPath);
+    stream.on('error', () => {
+      next(new NotFoundError('Media not found', 'MEDIA_NOT_FOUND'));
+    });
+    stream.pipe(res);
   } catch (error) {
     next(error);
   }

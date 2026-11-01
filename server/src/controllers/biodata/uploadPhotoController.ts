@@ -10,7 +10,7 @@ export async function uploadPhotoController(
 ): Promise<void> {
   try {
     if (!req.user) throw new UnauthorizedError();
-    const data = await uploadPhotoService(req.file);
+    const data = await uploadPhotoService(req.user.id, req.file);
     sendCreated(res, data, 'Photo uploaded successfully');
   } catch (error) {
     next(error);
