@@ -16,6 +16,8 @@ RUN npm ci
 
 COPY shared ./shared
 COPY client ./client
+# Root ESLint deps resolve rules used by client/.eslintrc.json
+COPY .eslintrc.cjs ./
 
 ARG NEXT_PUBLIC_API_URL=http://localhost:4020/api/v1
 ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID=

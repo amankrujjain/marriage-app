@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   // Trace files from the monorepo root so @marriage/shared is included in standalone.
   outputFileTracingRoot: path.join(__dirname, '..'),
+  // Lint via `npm run lint -w client`; don't fail Docker/production image builds on ESLint.
+  eslint: { ignoreDuringBuilds: true },
   trailingSlash: true,
   transpilePackages: ['@marriage/shared'],
 
