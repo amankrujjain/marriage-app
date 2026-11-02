@@ -280,6 +280,14 @@ export function MobileNavDrawer({
           <Link className="drawer-row" href={pricingHref} onClick={onClose}>
             Pricing
           </Link>
+          <Link
+            className="drawer-row"
+            href="/blog/"
+            aria-current={pathMatches(pathname, '/blog') ? 'page' : undefined}
+            onClick={onClose}
+          >
+            Blog
+          </Link>
           {isAuthed ? (
             <button
               type="button"

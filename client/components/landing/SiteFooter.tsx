@@ -80,6 +80,7 @@ export function SiteFooter({ slim = false, variant }: SiteFooterProps) {
               <h4>Make</h4>
               <Link href="/">Create my biodata</Link>
               <Link href="/templates/">Browse designs</Link>
+              <Link href="/blog/">Blog</Link>
               <Link href="/wedding-pass/">Wedding Pass</Link>
             </div>
             {formatLinks.length > 0 ? (

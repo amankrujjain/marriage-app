@@ -150,6 +150,15 @@ export function SiteHeader({ variant = 'home' }: SiteHeaderProps) {
                 <Link href={pricingHref} className="nl">
                   Pricing
                 </Link>
+                <Link
+                  href="/blog/"
+                  className="nl"
+                  aria-current={
+                    pathMatches(pathname, '/blog') ? 'page' : undefined
+                  }
+                >
+                  Blog
+                </Link>
                 <span className="nav-sep" aria-hidden />
                 {isAuthed ? (
                   <HeaderAccountMenu
