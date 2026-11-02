@@ -40,6 +40,17 @@ const NAV = [
       </svg>
     ),
   },
+  {
+    href: '/admin/blog',
+    label: 'Blog',
+    exact: false,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+        <path d="M5 5h14v14H5z" />
+        <path d="M8 9h8M8 12h8M8 15h5" />
+      </svg>
+    ),
+  },
 ] as const;
 
 export function AdminShell({ children }: { children: React.ReactNode }) {

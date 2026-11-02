@@ -1,6 +1,25 @@
-import { apiGet } from '@/lib/apiClient';
+import type {
+  AdminBlogPost,
+  AdminBlogPostSummary,
+  BlogImageUploadResult,
+  BlogPostStatus,
+  BlogSeoScorePayload,
+  BlogSeoScoreResult,
+  CreateBlogPostPayload,
+  ScheduleBlogPostPayload,
+  UpdateBlogPostPayload,
+} from '@marriage/shared';
+import {
+  apiDelete,
+  apiGet,
+  apiGetPaginated,
+  apiPatch,
+  apiPost,
+  apiUpload,
+} from '@/lib/apiClient';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
+
 
 export type AdminIncomePoint = {
   period: string;
@@ -130,3 +149,102 @@ export async function downloadAdminPaymentsCsv(
   a.remove();
   URL.revokeObjectURL(url);
 }
+
+export type AdminBlogListQuery = {
+  page?: number;
+  limit?: number;
+  status?: BlogPostStatus | '';
+  search?: string;
+};
+
+export type AdminBlogListResult = {
+  items: AdminBlogPostSummary[];
+  meta: { page: number; limit: number; total: number; totalPages: number };
+};
+
+export async function listAdminBlogPosts(
+  query: AdminBlogListQuery = {},
+): Promise<AdminBlogListResult> {
+  const result = await apiGetPaginated<AdminBlogPostSummary>(
+    `/admin/blog${toQuery({
+      page: query.page ?? 1,
+      limit: query.limit ?? 25,
+      status: query.status || undefined,
+      search: query.search,
+    })}`,
+  );
+  const totalPages = Math.max(
+    1,
+    Math.ceil(result.meta.total / Math.max(1, result.meta.limit)),
+  );
+  return {
+    items: result.items,
+    meta: { ...result.meta, totalPages },
+  };
+}
+
+export async function getAdminBlogPost(id: string): Promise<AdminBlogPost> {
+  return apiGet<AdminBlogPost>(`/admin/blog/${id}`);
+}
+
+export async function createAdminBlogPost(
+  payload: CreateBlogPostPayload,
+): Promise<AdminBlogPost> {
+  return apiPost<AdminBlogPost>('/admin/blog', payload);
+}
+
+export async function updateAdminBlogPost(
+  id: string,
+  payload: UpdateBlogPostPayload,
+): Promise<AdminBlogPost> {
+  return apiPatch<AdminBlogPost>(`/admin/blog/${id}`, payload);
+}
+
+export async function deleteAdminBlogPost(id: string): Promise<null> {
+  return apiDelete<null>(`/admin/blog/${id}`);
+}
+
+export async function publishAdminBlogPost(id: string): Promise<AdminBlogPost> {
+  return apiPost<AdminBlogPost>(`/admin/blog/${id}/publish`);
+}
+
+export async function unpublishAdminBlogPost(
+  id: string,
+): Promise<AdminBlogPost> {
+  return apiPost<AdminBlogPost>(`/admin/blog/${id}/unpublish`);
+}
+
+export async function scheduleAdminBlogPost(
+  id: string,
+  payload: ScheduleBlogPostPayload,
+): Promise<AdminBlogPost> {
+  return apiPost<AdminBlogPost>(`/admin/blog/${id}/schedule`, payload);
+}
+
+export async function scoreAdminBlogPost(
+  payload: BlogSeoScorePayload,
+): Promise<BlogSeoScoreResult> {
+  return apiPost<BlogSeoScoreResult>('/admin/blog/score', payload);
+}
+
+export async function uploadAdminBlogImage(
+  file: File,
+): Promise<BlogImageUploadResult> {
+  const form = new FormData();
+  form.append('image', file);
+  return apiUpload<BlogImageUploadResult>('/admin/blog/images', form);
+}
+
+export async function setAdminBlogCover(
+  id: string,
+  file: File,
+): Promise<AdminBlogPost> {
+  const form = new FormData();
+  form.append('image', file);
+  return apiUpload<AdminBlogPost>(`/admin/blog/${id}/cover`, form);
+}
+
+export async function removeAdminBlogCover(id: string): Promise<AdminBlogPost> {
+  return apiDelete<AdminBlogPost>(`/admin/blog/${id}/cover`);
+}
+

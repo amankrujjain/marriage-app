@@ -19,11 +19,13 @@ import {
   adminPublishBlogPostController,
   adminRemoveBlogCoverController,
   adminScheduleBlogPostController,
+  adminScoreBlogPostController,
   adminSetBlogCoverController,
   adminUnpublishBlogPostController,
   adminUpdateBlogPostController,
   adminUploadBlogImageController,
 } from '../../controllers/admin/adminBlogController';
+
 import { uploadBlogImageMiddleware } from '../../middleware/uploadBlogImage';
 import { blogImageUploadRateLimit } from '../../middleware/rateLimiters';
 import {
@@ -35,8 +37,10 @@ import {
   createBlogPostSchema,
   listAdminBlogQuerySchema,
   scheduleBlogPostSchema,
+  scoreBlogPostSchema,
   updateBlogPostSchema,
 } from '../../validators/admin/blogPostSchemas';
+
 
 
 const router = Router();
@@ -62,6 +66,11 @@ router.post(
   '/blog',
   validateRequest({ body: createBlogPostSchema }),
   adminCreateBlogPostController,
+);
+router.post(
+  '/blog/score',
+  validateRequest({ body: scoreBlogPostSchema }),
+  adminScoreBlogPostController,
 );
 router.post(
   '/blog/images',

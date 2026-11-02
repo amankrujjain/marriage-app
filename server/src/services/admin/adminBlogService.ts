@@ -32,6 +32,10 @@ import {
   toAdminBlogPost,
   toAdminBlogPostSummary,
 } from '../../utils/toAdminBlogPost';
+import {
+  blogRevalidatePaths,
+  notifyBlogRevalidate,
+} from '../blog/notifyRevalidate';
 
 function emptyToNull(v: string | null | undefined): string | null {
   if (v == null || v === '') return null;
@@ -246,6 +250,10 @@ export async function updateAdminBlogPostService(
   }
 
   // A title change does NOT change the slug; URLs stay stable.
+  const previousSlug =
+    payload.slug !== undefined && payload.slug !== post.slug
+      ? post.slug
+      : null;
   if (payload.slug !== undefined && payload.slug !== post.slug) {
     assertSlugAllowed(payload.slug);
     if (await isBlogSlugTaken(payload.slug, id)) {
@@ -266,6 +274,17 @@ export async function updateAdminBlogPostService(
     if (!updated) notFound();
     if (oldCoverKey) {
       await deleteBlogImageQuietly(oldCoverKey);
+    }
+    if (
+      post.status === BlogPostStatus.PUBLISHED ||
+      updated.status === BlogPostStatus.PUBLISHED
+    ) {
+      void notifyBlogRevalidate(
+        blogRevalidatePaths({
+          slug: updated.slug,
+          previousSlug,
+        }),
+      );
     }
     return toAdminBlogPost(updated);
   } catch (error) {
@@ -298,6 +317,7 @@ export async function publishAdminBlogPostService(
     updatedBy: new Types.ObjectId(adminId),
   });
   if (!updated) notFound();
+  void notifyBlogRevalidate(blogRevalidatePaths({ slug: updated.slug }));
   return toAdminBlogPost(updated);
 }
 
@@ -314,6 +334,9 @@ export async function unpublishAdminBlogPostService(
     updatedBy: new Types.ObjectId(adminId),
   });
   if (!updated) notFound();
+  if (post.status === BlogPostStatus.PUBLISHED) {
+    void notifyBlogRevalidate(blogRevalidatePaths({ slug: updated.slug }));
+  }
   return toAdminBlogPost(updated);
 }
 
@@ -347,8 +370,6 @@ export async function scheduleAdminBlogPostService(
   }
   assertPublishableContent(post.contentHtml ?? '');
 
-  // HOOK phase 6. The cron flips due posts with an atomic findOneAndUpdate on
-  // { _id, status: scheduled, deletedAt: null }, and sets publishedAt = publishAt.
   const updated = await updateBlogPostById(id, {
     status: BlogPostStatus.SCHEDULED,
     publishAt,
@@ -373,6 +394,9 @@ export async function deleteAdminBlogPostService(
     updatedBy: new Types.ObjectId(adminId),
   });
   if (!updated) notFound();
+  if (post.status === BlogPostStatus.PUBLISHED) {
+    void notifyBlogRevalidate(blogRevalidatePaths({ slug: post.slug }));
+  }
 }
 
 function escapeRegExp(value: string): string {
@@ -476,6 +500,9 @@ export async function setAdminBlogCoverService(
     await deleteBlogImageQuietly(post.coverImageKey);
   }
 
+  if (updated.status === BlogPostStatus.PUBLISHED) {
+    void notifyBlogRevalidate(blogRevalidatePaths({ slug: updated.slug }));
+  }
   return toAdminBlogPost(updated);
 }
 
@@ -494,5 +521,8 @@ export async function removeAdminBlogCoverService(
   if (!updated) notFound();
 
   await deleteBlogImageQuietly(post.coverImageKey);
+  if (updated.status === BlogPostStatus.PUBLISHED) {
+    void notifyBlogRevalidate(blogRevalidatePaths({ slug: updated.slug }));
+  }
   return toAdminBlogPost(updated);
 }

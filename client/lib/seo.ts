@@ -23,6 +23,8 @@ export const ROBOTS_DISALLOW = [
   '/forgot-password/',
   '/reset-password/',
   '/my-designs/',
+  // Future public preview (Phase 5); harmless if unused
+  '/blog/preview/',
 ] as const;
 
 const STATIC_PUBLIC_ROUTES = [
@@ -30,6 +32,7 @@ const STATIC_PUBLIC_ROUTES = [
   '/templates/',
   '/privacy/',
   '/wedding-pass/',
+  '/blog/',
 ] as const;
 
 /** Language hreflang cluster paths (only when each is in PUBLIC_ROUTES). */

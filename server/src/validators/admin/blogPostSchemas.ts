@@ -61,3 +61,15 @@ export const listAdminBlogQuerySchema = Joi.object({
   status: Joi.string().valid(...Object.values(BlogPostStatus)),
   search: Joi.string().trim().max(100).allow(''),
 });
+
+/** Preview SEO score — no persistence. */
+export const scoreBlogPostSchema = Joi.object({
+  title: Joi.string().trim().max(200).allow('').default(''),
+  slug: Joi.string().trim().max(200).allow('').default(''),
+  excerpt: Joi.string().trim().max(500).allow('').default(''),
+  contentHtml: Joi.string().max(500000).allow('').default(''),
+  seoTitle: Joi.string().trim().max(120).allow('').default(''),
+  seoDescription: Joi.string().trim().max(300).allow('').default(''),
+  focusKeyword: Joi.string().trim().max(80).allow('').default(''),
+  coverAlt: Joi.string().trim().max(180).allow('').default(''),
+}).options(stripBodyUnknown);

@@ -36,6 +36,8 @@ services:
       PORT: '4000'
       REDIS_URL: redis://redis:6379
       TRUST_PROXY: '1'
+      # Hit Next on the Compose network (not public CLIENT_URL)
+      REVALIDATE_BASE_URL: http://web:3000
     ports:
       - '127.0.0.1:4020:4000'
     depends_on:
@@ -59,6 +61,11 @@ services:
       NODE_ENV: production
       PORT: '3000'
       HOSTNAME: 0.0.0.0
+      # RSC/sitemap/RSS fetch the API on the Compose network
+      API_INTERNAL_URL: http://api:4000/api/v1
+      # On-demand revalidate (Bearer); falls back to CRON_SECRET
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET:-}
+      CRON_SECRET: ${CRON_SECRET}
     ports:
       - '127.0.0.1:4010:3000'
     depends_on:

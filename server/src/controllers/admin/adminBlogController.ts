@@ -14,9 +14,11 @@ import {
   unpublishAdminBlogPostService,
   updateAdminBlogPostService,
 } from '../../services/admin/adminBlogService';
+import { scoreBlogSeo } from '../../utils/scoreBlogSeo';
 import { sendCreated } from '../../utils/sendCreated';
 import { sendPaginated } from '../../utils/sendPaginated';
 import { sendSuccess } from '../../utils/sendSuccess';
+
 
 
 export async function adminListBlogPostsController(
@@ -207,6 +209,29 @@ export async function adminRemoveBlogCoverController(
       String(req.params.id),
     );
     sendSuccess(res, data, 'Cover image removed');
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function adminScoreBlogPostController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    if (!req.user) throw new UnauthorizedError();
+    const data = scoreBlogSeo({
+      title: String(req.body.title ?? ''),
+      slug: String(req.body.slug ?? ''),
+      excerpt: String(req.body.excerpt ?? ''),
+      contentHtml: String(req.body.contentHtml ?? ''),
+      seoTitle: String(req.body.seoTitle ?? ''),
+      seoDescription: String(req.body.seoDescription ?? ''),
+      focusKeyword: String(req.body.focusKeyword ?? ''),
+      coverAlt: String(req.body.coverAlt ?? ''),
+    });
+    sendSuccess(res, data, 'SEO score computed');
   } catch (error) {
     next(error);
   }

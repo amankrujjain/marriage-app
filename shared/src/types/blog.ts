@@ -105,3 +105,28 @@ export interface BlogImageUploadResult {
   width: number;
   height: number;
 }
+
+export type BlogSeoCheckLevel = 'pass' | 'warn' | 'fail';
+
+export interface BlogSeoCheckResult {
+  id: string;
+  label: string;
+  level: BlogSeoCheckLevel;
+  detail: string;
+}
+
+export interface BlogSeoScorePayload {
+  title?: string;
+  slug?: string;
+  excerpt?: string;
+  contentHtml?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  focusKeyword?: string;
+  coverAlt?: string;
+}
+
+export interface BlogSeoScoreResult {
+  score: number;
+  checks: BlogSeoCheckResult[];
+}

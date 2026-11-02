@@ -71,6 +71,11 @@ export type {
   UpdateBlogPostPayload,
   ScheduleBlogPostPayload,
   BlogImageUploadResult,
+  BlogSeoCheckLevel,
+  BlogSeoCheckResult,
+  BlogSeoScorePayload,
+  BlogSeoScoreResult,
 } from './blog';
+
 
 

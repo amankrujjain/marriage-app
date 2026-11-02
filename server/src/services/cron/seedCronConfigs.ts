@@ -30,6 +30,19 @@ function defaultConfigs() {
       description:
         'Heals stale pending Razorpay orders (fulfil if captured, abandon after grace).',
     },
+    {
+      key: 'publish-scheduled-blog',
+      name: 'Publish due scheduled blog posts',
+      endpoint: '/api/v1/cron/publish-scheduled-blog',
+      method: 'POST' as const,
+      /** Every minute */
+      schedule: '* * * * *',
+      enabled: true,
+      payload: {},
+      timeoutMs: 60_000,
+      description:
+        'Atomically flips due scheduled blog posts to published and revalidates Next.js cache.',
+    },
   ];
 }
 

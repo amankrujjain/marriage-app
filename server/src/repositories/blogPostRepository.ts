@@ -139,3 +139,43 @@ export async function pullPreviousSlugFromOtherPosts(
   }
   await BlogPostModel.updateMany(filter, { $pull: { previousSlugs: slug } });
 }
+
+/** Due scheduled posts (candidate list before atomic claim). */
+export async function listDueScheduledBlogPosts(
+  now = new Date(),
+  limit = 50,
+): Promise<BlogPostDocument[]> {
+  return BlogPostModel.find({
+    status: BlogPostStatus.SCHEDULED,
+    deletedAt: null,
+    publishAt: { $ne: null, $lte: now },
+  })
+    .select('_id slug publishAt')
+    .sort({ publishAt: 1 })
+    .limit(limit);
+}
+
+/**
+ * Atomically claim a scheduled post for publish.
+ * Only one instance wins when status is still `scheduled`.
+ */
+export async function claimScheduledBlogPost(
+  id: string,
+  publishAt: Date,
+): Promise<BlogPostDocument | null> {
+  return BlogPostModel.findOneAndUpdate(
+    {
+      _id: id,
+      status: BlogPostStatus.SCHEDULED,
+      deletedAt: null,
+    },
+    {
+      $set: {
+        status: BlogPostStatus.PUBLISHED,
+        publishedAt: publishAt,
+        publishAt: null,
+      },
+    },
+    { new: true },
+  );
+}
