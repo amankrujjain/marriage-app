@@ -179,12 +179,6 @@ export function scoreBlogSeo(input: BlogSeoScoreInput): BlogSeoScoreResult {
       html.match(/<h[2-4]\b[^>]*>[\s\S]*?<\/h[2-4]>/gi)?.map(stripHtml).join(' ') ??
       '';
     const inHeadings = keywordPresent(headingBodies || headingText, focus);
-    const focusWords = countWords(focus);
-    const density =
-      focusWords > 0 && words > 0
-        ? (plain.toLowerCase().split(focus.toLowerCase()).length - 1) /
-          (words / focusWords)
-        : 0;
     // simpler density: occurrences / words
     const occ =
       plain.toLowerCase().split(focus.toLowerCase()).length - 1;

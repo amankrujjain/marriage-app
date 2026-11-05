@@ -7,7 +7,6 @@ import {
   type UpdateBlogPostPayload,
 } from '@marriage/shared';
 import { Types } from 'mongoose';
-import sharp from 'sharp';
 import { env } from '../../config/env';
 import { BadRequestError } from '../../errors/BadRequestError';
 import { ConflictError } from '../../errors/ConflictError';
@@ -27,6 +26,10 @@ import { findUserById } from '../../repositories/userRepository';
 import { isReservedBlogSlug, slugifyBlogTitle } from '../../utils/blogSlug';
 import { detectImageMime } from '../../utils/imageMagic';
 import { logger } from '../../utils/logger';
+import {
+  optimizeImage,
+  type OptimizedImage,
+} from '../../utils/optimizeImage';
 import { sanitizeBlogHtml } from '../../utils/sanitizeBlogHtml';
 import {
   toAdminBlogPost,
@@ -438,16 +441,9 @@ export async function storeBlogImageService(
     );
   }
 
-  let data: Buffer;
-  let info: { width: number; height: number };
+  let optimized: OptimizedImage;
   try {
-    const result = await sharp(file.buffer, { limitInputPixels: 40_000_000 })
-      .autoOrient()
-      .resize({ width: 1600, withoutEnlargement: true })
-      .webp({ quality: 80 })
-      .toBuffer({ resolveWithObject: true });
-    data = result.data;
-    info = { width: result.info.width, height: result.info.height };
+    optimized = await optimizeImage(file.buffer, 'blog');
   } catch {
     throw new BadRequestError(
       'Image could not be processed',
@@ -456,8 +452,8 @@ export async function storeBlogImageService(
   }
 
   const stored = await createStorageProvider().upload({
-    buffer: data,
-    mimeType: 'image/webp',
+    buffer: optimized.buffer,
+    mimeType: optimized.mimeType,
     key: mediaKey(target, 'webp'),
     access: 'public',
     cacheControl: 'public, max-age=31536000, immutable',
@@ -466,8 +462,8 @@ export async function storeBlogImageService(
   return {
     url: stored.url,
     key: stored.key,
-    width: info.width,
-    height: info.height,
+    width: optimized.width,
+    height: optimized.height,
   };
 }
 

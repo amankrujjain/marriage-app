@@ -1,24 +1,14 @@
-import sharp from 'sharp';
 import { BadRequestError } from '../../errors/BadRequestError';
 import { createStorageProvider } from '../../providers/storage/createStorageProvider';
 import { mediaKey } from '../../providers/storage/R2StorageProvider';
 import { detectImageMime } from '../../utils/imageMagic';
 import { logger } from '../../utils/logger';
+import { optimizeImage } from '../../utils/optimizeImage';
 import { parseProfilePhotoKey } from '../../utils/profilePhotoUrlRule';
-
 
 export async function processProfilePhoto(buffer: Buffer): Promise<Buffer> {
   try {
-    return await sharp(buffer, { limitInputPixels: 40_000_000 })
-      .autoOrient()
-      .resize({
-        width: 1200,
-        height: 1200,
-        fit: 'inside',
-        withoutEnlargement: true,
-      })
-      .webp({ quality: 85 })
-      .toBuffer();
+    return (await optimizeImage(buffer, 'profile')).buffer;
   } catch {
     throw new BadRequestError('Photo could not be processed', 'PHOTO_INVALID');
   }
