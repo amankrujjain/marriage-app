@@ -85,8 +85,10 @@
 .drawer-open .drawer-scrim{opacity:1;visibility:visible;transition:opacity .26s var(--ease)}
 html.drawer-open,html.drawer-open body{overflow:hidden}
 .drawer-top{display:flex;align-items:center;justify-content:space-between;min-height:var(--head-h);padding:0 16px;border-bottom:1px solid var(--line)}
-.drawer-top .logo svg{width:40px;height:40px}
+.drawer-top .logo svg,.drawer-top .logo img{width:40px;height:40px}
 .drawer-top .logo b{font-size:1.5rem}
+.logo img{width:44px;height:44px;display:block;flex-shrink:0}
+.foot-mini-copy img{width:22px;height:22px;vertical-align:middle;margin-right:8px}
 .drawer-close{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line-2);border-radius:10px;background:#fff;color:var(--maroon);cursor:pointer}
 .drawer-close svg{width:20px;height:20px}
 .drawer-body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:8px 16px 16px}
@@ -146,7 +148,7 @@ html.drawer-open,html.drawer-open body{overflow:hidden}
 .foot-mini a,.foot-mini button.linkish{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;color:var(--ink-2);font-weight:600;border-radius:6px}
 .foot-mini a:hover,.foot-mini button.linkish:hover{color:var(--maroon);text-decoration:underline;text-underline-offset:3px}
 .foot-mini .foot-mini-copy{display:inline-flex;align-items:center;gap:10px}
-.foot-mini .foot-mini-copy svg{width:22px;height:22px}
+.foot-mini .foot-mini-copy svg,.foot-mini .foot-mini-copy img{width:22px;height:22px}
 .foot-mini .foot-contact{padding:0 10px;min-height:44px}
 .foot-mini .foot-contact .ph-token{margin:0}
 .field-opt{font-weight:400}

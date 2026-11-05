@@ -137,6 +137,13 @@ export function AccountPanel() {
             </Link>
             <Link
               className="btn btn-ghost btn-block"
+              href="/account/payments"
+              style={{ minHeight: 50 }}
+            >
+              Payment history
+            </Link>
+            <Link
+              className="btn btn-ghost btn-block"
               href="/?new=1"
               style={{ minHeight: 50, borderColor: 'var(--maroon)' }}
             >

@@ -8,6 +8,9 @@ import { isPremium } from '../../utils/isPremium';
 import { appendPaymentLog } from './paymentLogService';
 import type { PaymentLogSource } from '../../models/PaymentLog';
 import { logger } from '../../utils/logger';
+import { sendPurchaseAdminEmail } from '../email/sendPurchaseAdminEmail';
+import { sendPurchaseInvoiceEmail } from '../email/sendPurchaseInvoiceEmail';
+import { issueInvoiceForOrder } from './issueInvoiceForOrder';
 
 function nextPremiumUntil(current: Date | null | undefined): Date {
   const now = Date.now();
@@ -95,6 +98,43 @@ export async function fulfilPaymentOrder(input: {
     premiumUntil: user.premiumUntil?.toISOString(),
     source,
   });
+
+  // Notify admin once — only on this newly-fulfilled claim path.
+  await sendPurchaseAdminEmail({
+    user: { name: user.name, email: user.email, phone: user.phone },
+    order: {
+      id: claimed._id.toString(),
+      planSlug: claimed.planSlug,
+      amountMinor: claimed.amountMinor,
+      currency: claimed.currency,
+      providerOrderId: claimed.providerOrderId,
+      providerPaymentId: claimed.providerPaymentId,
+      paymentMethod: claimed.paymentMethod,
+      paymentMethodDetail: claimed.paymentMethodDetail,
+      paidAt: claimed.paidAt,
+      fulfilledAt: claimed.fulfilledAt,
+    },
+  });
+
+  try {
+    const invoice = await issueInvoiceForOrder({
+      order: claimed,
+      user: { name: user.name, email: user.email, phone: user.phone },
+    });
+    await sendPurchaseInvoiceEmail({
+      to: user.email,
+      invoiceNumber: invoice.invoiceNumber,
+      planSlug: claimed.planSlug,
+      amountMinor: claimed.amountMinor,
+      currency: claimed.currency,
+      downloadUrl: invoice.downloadUrl,
+    });
+  } catch (error) {
+    logger.error('billing.fulfil.invoice_failed', {
+      orderId: claimed._id.toString(),
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 
   return claimed;
 }

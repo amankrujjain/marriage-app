@@ -325,7 +325,9 @@ a:hover {
   color: var(--maroon-900);
 }
 .site-head .logo svg,
-.logo svg {
+.logo svg,
+.site-head .logo img,
+.logo img {
   width: 44px;
   height: 44px;
   flex: none;

@@ -4,7 +4,7 @@ import { SiteFooter } from '@/components/landing/SiteFooter';
 import { SiteHeader } from '@/components/landing/SiteHeader';
 import { BlogList } from '@/features/blog/components/BlogList';
 import { listPublicBlogPosts, BlogFetchError } from '@/lib/blogApi';
-import { INDEXABLE_ROBOTS, SITE_URL, absoluteUrl } from '@/lib/seo';
+import { INDEXABLE_ROBOTS, SITE_URL } from '@/lib/seo';
 
 type BlogPageProps = {
   searchParams: Promise<{ page?: string }>;

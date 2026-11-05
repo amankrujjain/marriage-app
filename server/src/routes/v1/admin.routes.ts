@@ -25,9 +25,14 @@ import {
   adminUpdateBlogPostController,
   adminUploadBlogImageController,
 } from '../../controllers/admin/adminBlogController';
+import { adminUploadAssetController } from '../../controllers/admin/adminAssetController';
 
 import { uploadBlogImageMiddleware } from '../../middleware/uploadBlogImage';
-import { blogImageUploadRateLimit } from '../../middleware/rateLimiters';
+import { uploadAdminAssetMiddleware } from '../../middleware/uploadAdminAsset';
+import {
+  assetUploadRateLimit,
+  blogImageUploadRateLimit,
+} from '../../middleware/rateLimiters';
 import {
   templateSlugParamsSchema,
   updateTemplateSchema,
@@ -48,6 +53,12 @@ const router = Router();
 router.use(authenticate, requireAdmin);
 
 router.get('/overview', adminOverviewController);
+router.post(
+  '/assets',
+  assetUploadRateLimit,
+  uploadAdminAssetMiddleware,
+  adminUploadAssetController,
+);
 router.get('/payments/export', adminPaymentsExportController);
 router.get('/payments', adminPaymentsController);
 router.get('/templates', adminListTemplatesController);

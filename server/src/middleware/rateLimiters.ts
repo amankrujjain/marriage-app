@@ -94,3 +94,9 @@ export const blogImageUploadRateLimit = buildLimiter('blog-image', {
   message: 'Too many image uploads. Try again later.',
 });
 
+export const assetUploadRateLimit = buildLimiter('asset-upload', {
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  message: 'Too many asset uploads. Try again later.',
+});
+

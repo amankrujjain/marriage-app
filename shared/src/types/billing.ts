@@ -38,3 +38,28 @@ export interface BillingMeResponse {
   premiumUntil: string | null;
   planSlug: string | null;
 }
+
+export interface UserPaymentListItem {
+  id: string;
+  planSlug: string;
+  amountMinor: number;
+  amountInr: number;
+  currency: string;
+  status: PaymentOrderStatus;
+  paymentMethod: string | null;
+  paymentMethodDetail: string | null;
+  providerPaymentId: string | null;
+  paidAt: string | null;
+  fulfilledAt: string | null;
+  createdAt: string;
+  hasInvoice: boolean;
+  invoiceNumber: string | null;
+}
+
+export interface UserPaymentListResponse {
+  items: UserPaymentListItem[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}

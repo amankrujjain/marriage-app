@@ -27,7 +27,7 @@ export function blogPostingJsonLd(post: PublicBlogPost): Record<string, unknown>
       name: 'MarriageBio',
       logo: {
         '@type': 'ImageObject',
-        url: absoluteUrl('/favicon.ico'),
+        url: absoluteUrl('/icon-512.png'),
       },
     },
     keywords: post.keywords.length

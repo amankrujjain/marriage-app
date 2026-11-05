@@ -1,6 +1,6 @@
 import sharp, { type ResizeOptions } from 'sharp';
 
-export type ImageOptimizePreset = 'profile' | 'blog';
+export type ImageOptimizePreset = 'profile' | 'blog' | 'og';
 
 export interface OptimizedImage {
   buffer: Buffer;
@@ -17,6 +17,7 @@ const RESIZE: Record<ImageOptimizePreset, ResizeOptions> = {
     withoutEnlargement: true,
   },
   blog: { width: 1600, withoutEnlargement: true },
+  og: { width: 1200, withoutEnlargement: true },
 };
 
 /** Single sharp pipeline for every user image upload; callers map failures to their own 400 code. */

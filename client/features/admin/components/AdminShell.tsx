@@ -51,6 +51,17 @@ const NAV = [
       </svg>
     ),
   },
+  {
+    href: '/admin/assets',
+    label: 'Assets',
+    exact: false,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+        <path d="M4 16l5-5 3 3 5-6 3 4" />
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+      </svg>
+    ),
+  },
 ] as const;
 
 export function AdminShell({ children }: { children: React.ReactNode }) {

@@ -1,3 +1,24 @@
+/** Detect SVG MIME from text start (BOM stripped; first 256 bytes). */
+export function detectSvgMime(buffer: Buffer): 'image/svg+xml' | null {
+  let start = 0;
+  if (
+    buffer.length >= 3 &&
+    buffer[0] === 0xef &&
+    buffer[1] === 0xbb &&
+    buffer[2] === 0xbf
+  ) {
+    start = 3;
+  }
+  const head = buffer
+    .subarray(start, Math.min(buffer.length, start + 256))
+    .toString('utf8')
+    .trimStart()
+    .toLowerCase();
+  if (head.startsWith('<svg')) return 'image/svg+xml';
+  if (head.startsWith('<?xml') && head.includes('<svg')) return 'image/svg+xml';
+  return null;
+}
+
 /** Detect image MIME from magic bytes (do not trust client Content-Type). */
 export function detectImageMime(
   buffer: Buffer,

@@ -248,3 +248,23 @@ export async function removeAdminBlogCover(id: string): Promise<AdminBlogPost> {
   return apiDelete<AdminBlogPost>(`/admin/blog/${id}/cover`);
 }
 
+export type AdminAssetUploadResult = {
+  url: string;
+  key: string;
+  mimeType: string;
+  size: number;
+  width?: number;
+  height?: number;
+  kind: 'logos' | 'og' | 'misc';
+};
+
+export async function uploadAdminAsset(
+  file: File,
+  kind: 'logos' | 'og' | 'misc',
+): Promise<AdminAssetUploadResult> {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('kind', kind);
+  return apiUpload<AdminAssetUploadResult>('/admin/assets', form);
+}
+

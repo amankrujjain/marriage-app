@@ -20,6 +20,9 @@ export interface PaymentOrderFields {
   failedAt?: Date | null;
   lastError?: string | null;
   metadata?: Record<string, unknown> | null;
+  invoiceNumber?: string | null;
+  invoiceKey?: string | null;
+  invoiceGeneratedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -47,6 +50,9 @@ const paymentOrderSchema = new Schema<PaymentOrderFields>(
     failedAt: { type: Date, default: null },
     lastError: { type: String, default: null },
     metadata: { type: Schema.Types.Mixed, default: null },
+    invoiceNumber: { type: String, trim: true, default: null },
+    invoiceKey: { type: String, trim: true, default: null },
+    invoiceGeneratedAt: { type: Date, default: null },
   },
   { timestamps: true },
 );
@@ -57,6 +63,10 @@ paymentOrderSchema.index(
   { unique: true, partialFilterExpression: { providerOrderId: { $type: 'string' } } },
 );
 paymentOrderSchema.index({ status: 1, createdAt: -1 });
+paymentOrderSchema.index(
+  { invoiceNumber: 1 },
+  { unique: true, sparse: true },
+);
 
 export type PaymentOrderDocument = HydratedDocument<PaymentOrderFields> & {
   _id: Types.ObjectId;

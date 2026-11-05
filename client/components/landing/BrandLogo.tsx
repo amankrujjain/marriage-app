@@ -15,7 +15,7 @@ export function BrandLogo({ href = '/', tagline, light }: BrandLogoProps) {
       aria-label="MarriageBio home"
       style={light ? { color: '#fff' } : undefined}
     >
-      <BrandMark />
+      <BrandMark light={light} />
       <span>
         <b style={light ? { color: '#fff' } : undefined}>
           Marriage<i>Bio</i>

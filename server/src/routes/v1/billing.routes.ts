@@ -11,11 +11,15 @@ import { listPlansController } from '../../controllers/billing/plansController';
 import { checkoutController } from '../../controllers/billing/checkoutController';
 import { verifyPaymentController } from '../../controllers/billing/verifyController';
 import { billingMeController } from '../../controllers/billing/billingMeController';
+import { listUserPaymentsController } from '../../controllers/billing/listUserPaymentsController';
+import { getUserInvoiceController } from '../../controllers/billing/getUserInvoiceController';
 
 const router = Router();
 
 router.get('/plans', listPlansController);
 router.get('/me', authenticate, billingMeController);
+router.get('/orders', authenticate, listUserPaymentsController);
+router.get('/orders/:id/invoice', authenticate, getUserInvoiceController);
 router.post(
   '/checkout',
   authenticate,

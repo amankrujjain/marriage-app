@@ -23,6 +23,8 @@ interface EnvConfig {
   SMTP_USER?: string;
   SMTP_PASS?: string;
   MAIL_FROM?: string;
+  /** Purchase notify inbox; blank falls back to SMTP_USER. */
+  ADMIN_NOTIFY_EMAIL?: string;
   R2_ACCOUNT_ID?: string;
   R2_ACCESS_KEY_ID?: string;
   R2_SECRET_ACCESS_KEY?: string;
@@ -52,6 +54,7 @@ const schema = Joi.object<EnvConfig>({
   SMTP_USER: Joi.string().allow('').optional(),
   SMTP_PASS: Joi.string().allow('').optional(),
   MAIL_FROM: Joi.string().allow('').optional(),
+  ADMIN_NOTIFY_EMAIL: Joi.string().email().allow('').optional(),
   R2_ACCOUNT_ID: Joi.string().pattern(/^[a-f0-9]{32}$/).allow('').optional(),
   R2_ACCESS_KEY_ID: Joi.string().allow('').optional(),
   R2_SECRET_ACCESS_KEY: Joi.string().allow('').optional(),

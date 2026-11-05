@@ -59,6 +59,8 @@ export type {
   CheckoutResponse,
   VerifyPaymentPayload,
   BillingMeResponse,
+  UserPaymentListItem,
+  UserPaymentListResponse,
 } from './billing';
 export type {
   PublicBlogPostSummary,

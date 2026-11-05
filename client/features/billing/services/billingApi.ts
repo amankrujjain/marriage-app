@@ -3,6 +3,7 @@ import type {
   BillingPlanPublic,
   CheckoutResponse,
   PublicUser,
+  UserPaymentListResponse,
   VerifyPaymentPayload,
 } from '@marriage/shared';
 import { apiGet, apiPost } from '@/lib/apiClient';
@@ -15,6 +16,23 @@ export async function listBillingPlans(): Promise<BillingPlanPublic[]> {
 
 export async function fetchBillingMe(): Promise<BillingMeResponse> {
   return apiGet<BillingMeResponse>('/billing/me');
+}
+
+export async function listMyPayments(
+  page = 1,
+  limit = 20,
+): Promise<UserPaymentListResponse> {
+  return apiGet<UserPaymentListResponse>(
+    `/billing/orders?page=${page}&limit=${limit}`,
+  );
+}
+
+export async function getInvoiceUrl(
+  orderId: string,
+): Promise<{ url: string; invoiceNumber: string; expiresInDays: number }> {
+  return apiGet<{ url: string; invoiceNumber: string; expiresInDays: number }>(
+    `/billing/orders/${orderId}/invoice`,
+  );
 }
 
 export async function checkoutWeddingPass(

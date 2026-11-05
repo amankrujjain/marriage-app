@@ -92,7 +92,7 @@ function articleJsonLd(page: SpokePageConfig) {
       name: 'MarriageBio',
       logo: {
         '@type': 'ImageObject',
-        url: absoluteUrl('/favicon.ico'),
+        url: absoluteUrl('/icon-512.png'),
       },
     },
   };

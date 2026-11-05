@@ -160,7 +160,7 @@ export function organizationJsonLd(): Record<string, unknown> {
     '@type': 'Organization',
     name: 'MarriageBio',
     url: SITE_URL,
-    logo: absoluteUrl('/favicon.ico'),
+    logo: absoluteUrl('/icon-512.png'),
   };
 }
 

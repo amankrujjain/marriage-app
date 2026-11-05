@@ -16,9 +16,13 @@ export const MEDIA_KEYS = {
   blogInline: 'blog/inline',
   userPhotos: 'users/:userId/photos',
   userExports: 'exports/:userId',
+  userInvoices: 'invoices/:userId',
+  assetsLogos: 'assets/logos',
+  assetsOg: 'assets/og',
+  assetsMisc: 'assets/misc',
 } as const;
 
-const ALLOWED_EXTS = new Set(['webp', 'png', 'jpg', 'pdf', 'docx']);
+const ALLOWED_EXTS = new Set(['webp', 'png', 'jpg', 'pdf', 'docx', 'svg']);
 const USER_ID_RE = /^[0-9a-f]{24}$/;
 
 export function mediaKey(
