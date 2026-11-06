@@ -20,9 +20,18 @@ function applyValidated(req: Request, key: 'body' | 'params' | 'query', value: u
 export function validateRequest(schemas: Schemas) {
   return (req: Request, _res: Response, next: NextFunction): void => {
     if (schemas.body) {
-      const { error, value } = schemas.body.validate(req.body, { abortEarly: false });
+      const { error, value } = schemas.body.validate(req.body, {
+        abortEarly: false,
+        stripUnknown: true,
+      });
       if (error) {
-        next(new ValidationError('Invalid request body', error.details));
+        const first = error.details[0]?.message;
+        next(
+          new ValidationError(
+            first ? `Invalid request: ${first}` : 'Invalid request body',
+            error.details,
+          ),
+        );
         return;
       }
       applyValidated(req, 'body', value);

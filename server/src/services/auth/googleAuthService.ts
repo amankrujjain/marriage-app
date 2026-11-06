@@ -1,4 +1,3 @@
-import { AuthProvider } from '@marriage/shared';
 import { ConflictError } from '../../errors/ConflictError';
 import { UnauthorizedError } from '../../errors/UnauthorizedError';
 import type { UserDocument } from '../../models/User';
@@ -20,12 +19,6 @@ async function resolveGoogleUser(profile: {
 
   const byEmail = await findUserByEmail(profile.email);
   if (byEmail) {
-    if (byEmail.authProvider !== AuthProvider.GOOGLE) {
-      throw new ConflictError(
-        'Email already registered with password login',
-        'EMAIL_PROVIDER_CONFLICT',
-      );
-    }
     // Never open a session on email match alone — bind or require googleId.
     if (byEmail.googleId && byEmail.googleId !== profile.googleId) {
       throw new ConflictError(

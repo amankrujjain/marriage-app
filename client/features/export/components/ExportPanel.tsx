@@ -38,13 +38,9 @@ export function ExportPanel() {
         {error ? <p className="text-sm text-maroon">{error}</p> : null}
         {result ? (
           <div className="flex flex-col gap-2">
-            <a
-              href={result.url}
-              download={result.fileName}
-              className="font-body text-sm text-maroon underline decoration-gold"
-            >
-              Open {result.format.toUpperCase()} file
-            </a>
+            <p className="font-body text-sm text-ink/70">
+              {result.fileName} downloaded.
+            </p>
             <WhatsAppShareButton />
           </div>
         ) : null}

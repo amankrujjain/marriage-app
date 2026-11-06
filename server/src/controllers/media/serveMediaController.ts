@@ -4,8 +4,6 @@ import type { NextFunction, Request, Response } from 'express';
 import { env } from '../../config/env';
 import { NotFoundError } from '../../errors/NotFoundError';
 import { UnauthorizedError } from '../../errors/UnauthorizedError';
-import { verifyAccessToken } from '../../services/tokenService';
-import { readAccessTokenFromRequest } from '../../utils/authCookies';
 import {
   isSafeMediaFileName,
   type MediaKind,
@@ -31,26 +29,14 @@ function resolveDiskPath(fileName: string): string | null {
   return null;
 }
 
+/** Legacy disk exports: signed URL only (no “any logged-in user” bypass). */
 function hasValidAccess(req: Request, kind: MediaKind, fileName: string): boolean {
-  if (
-    verifyMediaSignature({
-      kind,
-      fileName,
-      exp: typeof req.query.exp === 'string' ? req.query.exp : undefined,
-      sig: typeof req.query.sig === 'string' ? req.query.sig : undefined,
-    })
-  ) {
-    return true;
-  }
-
-  try {
-    const token = readAccessTokenFromRequest(req);
-    if (!token) return false;
-    verifyAccessToken(token);
-    return true;
-  } catch {
-    return false;
-  }
+  return verifyMediaSignature({
+    kind,
+    fileName,
+    exp: typeof req.query.exp === 'string' ? req.query.exp : undefined,
+    sig: typeof req.query.sig === 'string' ? req.query.sig : undefined,
+  });
 }
 
 export function serveMediaController(
@@ -70,7 +56,7 @@ export function serveMediaController(
     }
     if (!hasValidAccess(req, kind, fileName)) {
       throw new UnauthorizedError(
-        'Authentication or signed URL required',
+        'Valid signed URL required',
         'MEDIA_AUTH',
       );
     }

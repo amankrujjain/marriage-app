@@ -19,6 +19,7 @@ import {
   resetBiodataDraft,
   setDesignSlug,
 } from '../../store/biodataSlice';
+import { useAutosaveBiodata } from '../../hooks/useAutosaveBiodata';
 import { useSaveBiodata } from '../../hooks/useSaveBiodata';
 import { EditorForm } from './EditorForm';
 import { EditorA4Preview } from './EditorA4Preview';
@@ -67,10 +68,13 @@ export function BiodataEditor({
       : undefined,
   );
   const { save } = useSaveBiodata();
+  useAutosaveBiodata();
   const [mobileTab, setMobileTab] = useState<MobileTab>('details');
   const [savingMd, setSavingMd] = useState(false);
+  const [continuing, setContinuing] = useState(false);
   const authStatus = useAppSelector((state) => state.auth.status);
   const biodataId = useAppSelector((state) => state.biodata.biodataId);
+  const saveError = useAppSelector((state) => state.biodata.saveError);
   const content = useAppSelector((state) => state.biodata.content);
   const presetApplied = useRef(false);
 
@@ -208,10 +212,23 @@ export function BiodataEditor({
     }
     setSavingMd(true);
     try {
-      await save();
-      router.push('/my-designs');
+      const ok = await save();
+      if (ok) router.push('/my-designs');
     } finally {
       setSavingMd(false);
+    }
+  }
+
+  async function onContinueToDownload() {
+    setContinuing(true);
+    try {
+      if (authStatus === 'authenticated') {
+        const ok = await save();
+        if (!ok) return;
+      }
+      router.push('/download/');
+    } finally {
+      setContinuing(false);
     }
   }
 
@@ -273,20 +290,35 @@ export function BiodataEditor({
             >
               {savingMd ? 'Saving…' : 'Save to My Designs'}
             </button>
-            <Link className="btn btn-primary" href="/download/">
-              {ctaLabel}{' '}
+            <button
+              className="btn btn-primary"
+              type="button"
+              disabled={continuing || savingMd}
+              onClick={() => void onContinueToDownload()}
+            >
+              {continuing ? 'Saving…' : ctaLabel}{' '}
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 10h12M11 5l5 5-5 5" />
               </svg>
-            </Link>
+            </button>
           </div>
+          {saveError ? (
+            <p className="err" style={{ marginTop: 10 }} role="alert">
+              {saveError}
+            </p>
+          ) : null}
         </aside>
       </main>
 
       <footer className="editor-mobile-footer">
-        <Link href="/download/" className="editor-mobile-preview-btn">
-          {ctaLabel}
-        </Link>
+        <button
+          type="button"
+          className="editor-mobile-preview-btn"
+          disabled={continuing || savingMd}
+          onClick={() => void onContinueToDownload()}
+        >
+          {continuing ? 'Saving…' : ctaLabel}
+        </button>
       </footer>
 
       {showSiteFooter ? <SiteFooter variant="mini" /> : null}

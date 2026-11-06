@@ -42,21 +42,24 @@ export function GoogleSignInButton() {
   const [note, setNote] = useState<string | null>(null);
   const nextPath = safeNextPath(searchParams.get('next'));
 
+  const nextPathRef = useRef(nextPath);
+  nextPathRef.current = nextPath;
+
   useEffect(() => {
     if (!clientId || !buttonRef.current) return;
 
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.onload = () => {
-      window.google?.accounts.id.initialize({
+    let cancelled = false;
+
+    function mountButton(): void {
+      if (cancelled || !buttonRef.current || !window.google?.accounts?.id) return;
+      window.google.accounts.id.initialize({
         client_id: clientId,
         callback: async (response) => {
           dispatch(authLoading());
           try {
             const data = await googleAuthRequest({ idToken: response.credential });
             dispatch(authSuccess(data.user));
-            router.push(nextPath);
+            router.push(nextPathRef.current);
           } catch (error) {
             const message =
               error instanceof ApiClientError ? error.message : 'Google sign-in failed';
@@ -64,18 +67,37 @@ export function GoogleSignInButton() {
           }
         },
       });
-      if (buttonRef.current) {
-        window.google?.accounts.id.renderButton(buttonRef.current, {
-          theme: 'outline',
-          size: 'large',
-          width: 380,
-          text: 'continue_with',
-        });
-        setReady(true);
-      }
-    };
+      buttonRef.current.innerHTML = '';
+      window.google.accounts.id.renderButton(buttonRef.current, {
+        theme: 'outline',
+        size: 'large',
+        width: 380,
+        text: 'continue_with',
+      });
+      setReady(true);
+    }
+
+    const existing = document.querySelector<HTMLScriptElement>(
+      'script[data-google-gsi="1"]',
+    );
+    if (existing) {
+      if (window.google?.accounts?.id) mountButton();
+      else existing.addEventListener('load', mountButton, { once: true });
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.dataset.googleGsi = '1';
+    script.onload = () => mountButton();
     document.body.appendChild(script);
-  }, [dispatch, router, nextPath]);
+    return () => {
+      cancelled = true;
+    };
+  }, [dispatch, router]);
 
   if (!clientId) {
     return (

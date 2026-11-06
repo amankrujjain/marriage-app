@@ -7,6 +7,12 @@ import { hashPassword } from '../passwordService';
 export async function registerUser(payload: RegisterPayload): Promise<UserDocument> {
   const existing = await findUserByEmail(payload.email);
   if (existing) {
+    if (!existing.passwordHash) {
+      throw new ConflictError(
+        'This email already has a Google account. Sign in with Google, or use Forgot password to set a login password.',
+        'EMAIL_EXISTS_GOOGLE',
+      );
+    }
     throw new ConflictError('Email already registered', 'EMAIL_EXISTS');
   }
 

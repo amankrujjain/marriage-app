@@ -10,6 +10,8 @@ interface EnvConfig {
   PORT: number;
   MONGODB_URI: string;
   JWT_SECRET: string;
+  /** HMAC for legacy /media/exports signed URLs. Falls back to JWT_SECRET if empty. */
+  MEDIA_SIGNING_SECRET?: string;
   CLIENT_URL: string;
   CRON_SECRET: string;
   LOG_RETENTION_DAYS: number;
@@ -41,6 +43,7 @@ const schema = Joi.object<EnvConfig>({
   PORT: Joi.number().port().default(4000),
   MONGODB_URI: Joi.string().min(1).required(),
   JWT_SECRET: Joi.string().min(16).required(),
+  MEDIA_SIGNING_SECRET: Joi.string().min(16).allow('').optional(),
   CLIENT_URL: Joi.string().uri().required(),
   CRON_SECRET: Joi.string().min(16).required(),
   LOG_RETENTION_DAYS: Joi.number().integer().min(1).max(30).default(3),

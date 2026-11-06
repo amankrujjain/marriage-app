@@ -261,11 +261,7 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
             : 'Unlock premium downloads with the '}
           <Link href="/wedding-pass">Wedding Pass</Link> (₹{PREMIUM_AMOUNT_INR} for 30 days).
         </p>
-      ) : (
-        <p className="note" style={{ margin: '10px 0 0' }}>
-          Downloads start on this device. You can re-open the file anytime.
-        </p>
-      )}
+      ) : null}
 
       {translationError ? (
         <p
@@ -282,11 +278,11 @@ export function DownloadCheckout({ plan, onPlanChange }: DownloadCheckoutProps) 
         </p>
       ) : null}
 
-      {result ? (
+      {result && !exportError ? (
         <div style={{ marginTop: 14, display: 'grid', gap: 8 }}>
-          <a href={result.url} download={result.fileName} className="btn btn-line btn-block">
-            Open {result.format.toUpperCase()} file
-          </a>
+          <p className="note" style={{ margin: 0 }} role="status">
+            {result.fileName} downloaded.
+          </p>
           <WhatsAppShareButton />
         </div>
       ) : null}

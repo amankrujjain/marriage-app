@@ -9,7 +9,10 @@ import {
 } from '../../providers/razorpay/razorpayClient';
 import { PREMIUM_AMOUNT_MINOR } from '@marriage/shared';
 import { appendPaymentLog } from './paymentLogService';
-import { fulfilPaymentOrder } from './fulfilPremiumService';
+import {
+  fulfilPaymentOrder,
+  healPremiumIfMissing,
+} from './fulfilPremiumService';
 import { toPublicUser } from '../../utils/toPublicUser';
 import { extractRazorpayPaymentMethod } from '../../utils/razorpayPaymentMethod';
 
@@ -57,6 +60,7 @@ export async function verifyRazorpayPayment(input: {
         },
       );
     }
+    await healPremiumIfMissing(input.userId);
     const user = await findUserById(input.userId);
     if (!user) throw new NotFoundError('User not found', 'USER_NOT_FOUND');
     return { orderId: order._id.toString(), user: toPublicUser(user) };

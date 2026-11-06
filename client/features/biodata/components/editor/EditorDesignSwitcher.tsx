@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectDesign } from '@/features/templates/store/templateSlice';
 import { setDesignSlug } from '../../store/biodataSlice';
+import { useSaveBiodata } from '../../hooks/useSaveBiodata';
 import { loadVp } from '@/lib/vp/loadVp';
 import { slugFromTemplateId } from './designMap';
 import { useDesignCatalog } from '@/features/designs/hooks/useDesignCatalog';
@@ -28,6 +29,8 @@ function paintThumb(
 
 export function EditorDesignSwitcher() {
   const dispatch = useAppDispatch();
+  const { save } = useSaveBiodata();
+  const authStatus = useAppSelector((state) => state.auth.status);
   const { editorDesigns } = useDesignCatalog();
   const selectedSlug = useAppSelector(
     (state) =>
@@ -85,6 +88,9 @@ export function EditorDesignSwitcher() {
           onClick={() => {
             dispatch(selectDesign({ templateId: design.templateId, slug: design.slug }));
             dispatch(setDesignSlug(design.slug));
+            if (authStatus === 'authenticated') {
+              void save();
+            }
           }}
         >
           <div className="thumb" />

@@ -1,6 +1,5 @@
 import crypto from 'crypto';
 import type { ForgotPasswordPayload } from '@marriage/shared';
-import { AuthProvider } from '@marriage/shared';
 import { env } from '../../config/env';
 import { findUserByEmail, setPasswordResetToken } from '../../repositories/userRepository';
 import { sendPasswordResetEmail } from '../email/sendPasswordResetEmail';
@@ -13,7 +12,7 @@ function hashToken(raw: string): string {
 
 /**
  * Always succeeds from the caller's view (no email enumeration).
- * Sends mail only for email/password accounts that exist.
+ * Sends mail for any existing account (email/password or Google-only).
  */
 export async function requestPasswordReset(
   payload: ForgotPasswordPayload,
@@ -21,11 +20,7 @@ export async function requestPasswordReset(
   const email = payload.email.trim().toLowerCase();
   const user = await findUserByEmail(email);
 
-  if (
-    !user ||
-    user.authProvider !== AuthProvider.EMAIL ||
-    !user.passwordHash
-  ) {
+  if (!user) {
     return;
   }
 

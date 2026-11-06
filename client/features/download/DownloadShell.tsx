@@ -29,10 +29,10 @@ export function DownloadShell() {
         <SiteHeader variant="app" />
         <main id="main" className="dl">
           <DownloadPreviews credit={plan === 'free'} />
-          <section aria-label="Download options">
+          <section className="dl-options" aria-label="Download options">
             <DownloadChecklist />
             <DownloadCheckout plan={plan} onPlanChange={setPlan} />
-            <p style={{ textAlign: 'center', marginTop: 18 }}>
+            <p className="dl-backlinks">
               <Link href={backHref}>← Back to editor</Link>
               {' · '}
               <Link href="/wedding-pass/">About the Wedding Pass</Link>

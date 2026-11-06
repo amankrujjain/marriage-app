@@ -1,7 +1,11 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { ExportFormat, LanguageCode } from '@marriage/shared';
+import {
+  ExportFormat,
+  LanguageCode,
+  mergeSectionsIntoContent,
+} from '@marriage/shared';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { ApiClientError } from '@/lib/apiClient';
 import { slugFromTemplateId } from '@/features/biodata/components/editor/designMap';
@@ -10,6 +14,7 @@ import { useTranslateBiodata } from '@/features/translation/hooks/useTranslateBi
 import { capturePreview } from '../utils/capturePreview';
 import { requestDocumentExport, requestExport } from '../services/exportApi';
 import { buildExtraSections } from '../utils/buildExtraSections';
+import { triggerFileDownload } from '../utils/triggerFileDownload';
 import {
   exportCapturing,
   exportFailed,
@@ -106,6 +111,7 @@ export function useExportBiodata() {
         designSlug: designSlug || undefined,
       });
       dispatch(exportSucceeded(result));
+      triggerFileDownload(result.url, result.fileName);
       trackDownload(format);
     } catch (error) {
       handleExportError(error);
@@ -133,7 +139,9 @@ export function useExportBiodata() {
           ? reduxSections
           : loadEditorSections(biodataId);
 
-      const { content, extras } = await translate(sections);
+      const { content: translated, extras } = await translate(sections);
+      // Editor sections are source of truth — merge synced fields into content.
+      const content = mergeSectionsIntoContent(translated, sections);
       const personName = content.personal.fullName?.trim() || fullName;
       const extraSections = buildExtraSections(sections, content, extras);
 
@@ -147,6 +155,7 @@ export function useExportBiodata() {
         designSlug: designSlug || undefined,
       });
       dispatch(exportSucceeded(result));
+      triggerFileDownload(result.url, result.fileName);
       trackDownload('docx');
     } catch (error) {
       handleExportError(error);

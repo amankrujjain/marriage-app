@@ -14,8 +14,11 @@ export function csrfOriginCheck(req: Request, _res: Response, next: NextFunction
     return;
   }
 
-  // Provider webhooks have no browser Origin; signature is verified separately.
-  if (req.path.includes('/billing/webhooks/')) {
+  // Provider webhooks / internal cron have no browser Origin; auth is separate.
+  if (
+    req.path.includes('/billing/webhooks/') ||
+    req.path.includes('/cron/')
+  ) {
     next();
     return;
   }
@@ -47,6 +50,7 @@ export function csrfOriginCheck(req: Request, _res: Response, next: NextFunction
     return;
   }
 
-  // Non-browser clients (no Origin/Referer) — allow; cookie CSRF requires a browser.
-  next();
+  // Cookie sessions use SameSite=None — require Origin or Referer on mutations.
+  // (Previously allowed missing both, which let stolen-cookie clients skip CSRF.)
+  next(new ForbiddenError('Missing request origin', 'CSRF_ORIGIN'));
 }

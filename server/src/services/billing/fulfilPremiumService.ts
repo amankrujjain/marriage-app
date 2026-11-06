@@ -12,15 +12,84 @@ import { sendPurchaseAdminEmail } from '../email/sendPurchaseAdminEmail';
 import { sendPurchaseInvoiceEmail } from '../email/sendPurchaseInvoiceEmail';
 import { issueInvoiceForOrder } from './issueInvoiceForOrder';
 
-function nextPremiumUntil(current: Date | null | undefined): Date {
+export function nextPremiumUntil(current: Date | null | undefined): Date {
   const now = Date.now();
   const base =
     current && isPremium(current) ? current.getTime() : now;
   return new Date(base + PREMIUM_DURATION_DAYS * 24 * 60 * 60 * 1000);
 }
 
+/** If a fulfilled order exists but premium was never saved (crash mid-fulfil), grant once. */
+export async function healPremiumIfMissing(userId: string): Promise<void> {
+  const user = await UserModel.findById(userId);
+  if (!user) return;
+  if (isPremium(user.premiumUntil)) return;
+
+  const hasFulfilled = await PaymentOrderModel.exists({
+    userId: user._id,
+    status: 'fulfilled',
+  });
+  if (!hasFulfilled) return;
+
+  user.premiumUntil = nextPremiumUntil(user.premiumUntil);
+  await user.save();
+  logger.warn('billing.fulfil.premium_healed', {
+    userId: user._id.toString(),
+    premiumUntil: user.premiumUntil?.toISOString(),
+  });
+}
+
+async function notifyPurchaseAsync(
+  claimed: PaymentOrderDocument,
+  user: { name: string; email: string; phone?: string | null },
+): Promise<void> {
+  try {
+    await sendPurchaseAdminEmail({
+      user: { name: user.name, email: user.email, phone: user.phone },
+      order: {
+        id: claimed._id.toString(),
+        planSlug: claimed.planSlug,
+        amountMinor: claimed.amountMinor,
+        currency: claimed.currency,
+        providerOrderId: claimed.providerOrderId,
+        providerPaymentId: claimed.providerPaymentId,
+        paymentMethod: claimed.paymentMethod,
+        paymentMethodDetail: claimed.paymentMethodDetail,
+        paidAt: claimed.paidAt,
+        fulfilledAt: claimed.fulfilledAt,
+      },
+    });
+  } catch (error) {
+    logger.error('billing.fulfil.admin_email_failed', {
+      orderId: claimed._id.toString(),
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  try {
+    const invoice = await issueInvoiceForOrder({
+      order: claimed,
+      user: { name: user.name, email: user.email, phone: user.phone },
+    });
+    await sendPurchaseInvoiceEmail({
+      to: user.email,
+      invoiceNumber: invoice.invoiceNumber,
+      planSlug: claimed.planSlug,
+      amountMinor: claimed.amountMinor,
+      currency: claimed.currency,
+      downloadUrl: invoice.downloadUrl,
+    });
+  } catch (error) {
+    logger.error('billing.fulfil.invoice_failed', {
+      orderId: claimed._id.toString(),
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
 /**
  * Idempotent fulfilment: claim pending/paid → fulfilled, then grant/extend Wedding Pass.
+ * Emails/invoice run after premium is saved so verify can return the updated user quickly.
  */
 export async function fulfilPaymentOrder(input: {
   order: PaymentOrderDocument;
@@ -49,6 +118,7 @@ export async function fulfilPaymentOrder(input: {
       if (paymentMethod) order.paymentMethod = paymentMethod;
       if (paymentMethodDetail) order.paymentMethodDetail = paymentMethodDetail;
     }
+    await healPremiumIfMissing(order.userId.toString());
     return order;
   }
 
@@ -70,7 +140,10 @@ export async function fulfilPaymentOrder(input: {
 
   if (!claimed) {
     const latest = await PaymentOrderModel.findById(order._id);
-    if (latest?.status === 'fulfilled') return latest;
+    if (latest?.status === 'fulfilled') {
+      await healPremiumIfMissing(latest.userId.toString());
+      return latest;
+    }
     throw new Error(`Cannot fulfil order in status ${order.status}`);
   }
 
@@ -99,42 +172,12 @@ export async function fulfilPaymentOrder(input: {
     source,
   });
 
-  // Notify admin once — only on this newly-fulfilled claim path.
-  await sendPurchaseAdminEmail({
-    user: { name: user.name, email: user.email, phone: user.phone },
-    order: {
-      id: claimed._id.toString(),
-      planSlug: claimed.planSlug,
-      amountMinor: claimed.amountMinor,
-      currency: claimed.currency,
-      providerOrderId: claimed.providerOrderId,
-      providerPaymentId: claimed.providerPaymentId,
-      paymentMethod: claimed.paymentMethod,
-      paymentMethodDetail: claimed.paymentMethodDetail,
-      paidAt: claimed.paidAt,
-      fulfilledAt: claimed.fulfilledAt,
-    },
+  // Do not block payment verify on SMTP / PDF — client needs isPremium immediately.
+  void notifyPurchaseAsync(claimed, {
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
   });
-
-  try {
-    const invoice = await issueInvoiceForOrder({
-      order: claimed,
-      user: { name: user.name, email: user.email, phone: user.phone },
-    });
-    await sendPurchaseInvoiceEmail({
-      to: user.email,
-      invoiceNumber: invoice.invoiceNumber,
-      planSlug: claimed.planSlug,
-      amountMinor: claimed.amountMinor,
-      currency: claimed.currency,
-      downloadUrl: invoice.downloadUrl,
-    });
-  } catch (error) {
-    logger.error('billing.fulfil.invoice_failed', {
-      orderId: claimed._id.toString(),
-      error: error instanceof Error ? error.message : String(error),
-    });
-  }
 
   return claimed;
 }

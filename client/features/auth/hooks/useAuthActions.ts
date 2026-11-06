@@ -43,8 +43,13 @@ export function useAuthActions() {
   }
 
   async function logout(): Promise<void> {
-    await logoutRequest();
-    dispatch(authCleared());
+    try {
+      await logoutRequest();
+    } catch {
+      /* still clear local session if API is down / rate-limited */
+    } finally {
+      dispatch(authCleared());
+    }
   }
 
   return { register, login, logout };

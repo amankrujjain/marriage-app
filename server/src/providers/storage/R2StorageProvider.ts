@@ -9,7 +9,12 @@ import { randomUUID } from 'crypto';
 import { env } from '../../config/env';
 import { AppError } from '../../errors/AppError';
 import { logger } from '../../utils/logger';
-import type { MediaAccess, StorageProvider, StoredFile } from './StorageProvider';
+import type {
+  MediaAccess,
+  StorageProvider,
+  StoredFile,
+  StoredObject,
+} from './StorageProvider';
 
 export const MEDIA_KEYS = {
   blogCover: 'blog/covers',
@@ -141,6 +146,32 @@ export class R2StorageProvider implements StorageProvider {
         Key: key,
       }),
     );
+  }
+
+  async getObject(key: string, access: MediaAccess): Promise<StoredObject> {
+    const s3 = ensureClient();
+    try {
+      const result = await s3.send(
+        new GetObjectCommand({
+          Bucket: bucketFor(access),
+          Key: key,
+        }),
+      );
+      const bytes = await result.Body?.transformToByteArray();
+      if (!bytes) {
+        throw new AppError('Media not found', 404, 'MEDIA_NOT_FOUND');
+      }
+      return {
+        buffer: Buffer.from(bytes),
+        mimeType: result.ContentType || 'application/octet-stream',
+      };
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      logger.warn('R2 getObject failed', {
+        name: error instanceof Error ? error.name : 'unknown',
+      });
+      throw new AppError('Media not found', 404, 'MEDIA_NOT_FOUND');
+    }
   }
 
   async signedUrl(

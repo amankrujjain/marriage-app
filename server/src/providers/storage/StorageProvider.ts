@@ -7,6 +7,11 @@ export interface StoredFile {
   size: number;
 }
 
+export interface StoredObject {
+  buffer: Buffer;
+  mimeType: string;
+}
+
 export interface StorageProvider {
   upload(params: {
     buffer: Buffer;
@@ -17,6 +22,7 @@ export interface StorageProvider {
     contentDisposition?: string;
   }): Promise<StoredFile>;
   delete(key: string, access: MediaAccess): Promise<void>;
+  getObject(key: string, access: MediaAccess): Promise<StoredObject>;
   signedUrl(
     key: string,
     opts?: { downloadName?: string; fromNow?: boolean },

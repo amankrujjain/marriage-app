@@ -2,11 +2,14 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { UserRole } from '@marriage/shared';
 import { SiteHeader } from '@/components/landing/SiteHeader';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { OrnamentDiv } from '@/components/landing/Ornaments';
-import { useAppSelector } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { authSuccess } from '../store/authSlice';
+import { fetchMe } from '../services/authApi';
 import { useAuthActions } from '../hooks/useAuthActions';
 
 function formatPremiumUntil(iso: string | null | undefined): string | null {
@@ -24,8 +27,24 @@ function formatPremiumUntil(iso: string | null | undefined): string | null {
 
 export function AccountPanel() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
   const { logout } = useAuthActions();
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const fresh = await fetchMe();
+        if (!cancelled) dispatch(authSuccess(fresh));
+      } catch {
+        /* keep existing session */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [dispatch]);
 
   if (!user) return null;
 

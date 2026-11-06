@@ -6,6 +6,9 @@ import type { UserPaymentListItem } from '@marriage/shared';
 import { SiteHeader } from '@/components/landing/SiteHeader';
 import { SiteFooter } from '@/components/landing/SiteFooter';
 import { OrnamentDiv } from '@/components/landing/Ornaments';
+import { useAppDispatch } from '@/store/hooks';
+import { authSuccess } from '@/features/auth/store/authSlice';
+import { fetchMe } from '@/features/auth/services/authApi';
 import { getInvoiceUrl, listMyPayments } from '../services/billingApi';
 
 function formatDate(iso: string | null): string {
@@ -26,12 +29,28 @@ function formatInr(amountInr: number): string {
 }
 
 export function PaymentHistoryPanel() {
+  const dispatch = useAppDispatch();
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<UserPaymentListItem[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [invoiceBusyId, setInvoiceBusyId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const fresh = await fetchMe();
+        if (!cancelled) dispatch(authSuccess(fresh));
+      } catch {
+        /* keep existing session */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     let cancelled = false;

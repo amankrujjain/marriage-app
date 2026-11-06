@@ -42,7 +42,8 @@ export function verifyCheckoutSignature(input: {
 }
 
 export function verifyWebhookSignature(rawBody: Buffer, signature: string): boolean {
-  const secret = env.RAZORPAY_WEBHOOK_SECRET?.trim() || env.RAZORPAY_KEY_SECRET?.trim();
+  // Dedicated webhook secret only — do not fall back to KEY_SECRET.
+  const secret = env.RAZORPAY_WEBHOOK_SECRET?.trim();
   if (!secret || !signature) return false;
   const expected = createHmac('sha256', secret).update(rawBody).digest('hex');
   try {

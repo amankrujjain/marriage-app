@@ -10,8 +10,13 @@ export function isSafeMediaFileName(fileName: string): boolean {
   return SAFE_FILE.test(fileName) && !fileName.includes('..');
 }
 
+function mediaSigningSecret(): string {
+  const dedicated = env.MEDIA_SIGNING_SECRET?.trim();
+  return dedicated && dedicated.length >= 16 ? dedicated : env.JWT_SECRET;
+}
+
 function signPayload(kind: MediaKind, fileName: string, exp: number): string {
-  return createHmac('sha256', env.JWT_SECRET)
+  return createHmac('sha256', mediaSigningSecret())
     .update(`${kind}/${fileName}:${exp}`)
     .digest('hex');
 }

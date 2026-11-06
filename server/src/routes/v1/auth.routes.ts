@@ -18,17 +18,35 @@ import { resetPasswordSchema } from '../../validators/auth/resetPasswordSchema';
 
 const router = Router();
 
-router.use(authRateLimit);
-router.post('/register', validateRequest({ body: registerSchema }), registerController);
-router.post('/login', validateRequest({ body: loginSchema }), loginController);
-router.post('/google', validateRequest({ body: googleAuthSchema }), googleController);
+// Strict limit only on credential / token-exchange routes.
+// Do NOT share this bucket with /me, /refresh, /logout — page loads burn it instantly.
+router.post(
+  '/register',
+  authRateLimit,
+  validateRequest({ body: registerSchema }),
+  registerController,
+);
+router.post(
+  '/login',
+  authRateLimit,
+  validateRequest({ body: loginSchema }),
+  loginController,
+);
+router.post(
+  '/google',
+  authRateLimit,
+  validateRequest({ body: googleAuthSchema }),
+  googleController,
+);
 router.post(
   '/forgot-password',
+  authRateLimit,
   validateRequest({ body: forgotPasswordSchema }),
   forgotPasswordController,
 );
 router.post(
   '/reset-password',
+  authRateLimit,
   validateRequest({ body: resetPasswordSchema }),
   resetPasswordController,
 );

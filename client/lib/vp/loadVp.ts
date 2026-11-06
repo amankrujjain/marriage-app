@@ -69,8 +69,8 @@ export function loadVp(): Promise<VpApi> {
   }
   if (!loading) {
     loading = (async () => {
-      await loadScript('/vp/biodata.js', 'vpBiodata');
-      await loadScript('/vp/biodata30.js', 'vpBiodata30');
+      await loadScript('/vp/biodata.js?v=20261106b', 'vpBiodata');
+      await loadScript('/vp/biodata30.js?v=20261106b', 'vpBiodata30');
       if (!window.VP || typeof window.VP.thumb !== 'function') {
         throw new Error('VP failed to initialize');
       }

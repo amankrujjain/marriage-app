@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { authSuccess } from '@/features/auth/store/authSlice';
+import { fetchMe } from '@/features/auth/services/authApi';
 import { globalLoadingHide, globalLoadingShow } from '@/store/slices/uiSlice';
 import {
   checkoutWeddingPass,
@@ -92,6 +93,13 @@ export function useWeddingPassCheckout() {
                   signature: response.razorpay_signature,
                 });
                 dispatch(authSuccess(result.user));
+                // Re-fetch /me so PASS badge cannot stay stuck on FREE after fulfil.
+                try {
+                  const fresh = await fetchMe();
+                  dispatch(authSuccess(fresh));
+                } catch {
+                  /* verify user payload is enough */
+                }
                 resolve();
               } catch (err) {
                 reject(err instanceof Error ? err : new Error('Verification failed'));
