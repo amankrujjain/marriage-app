@@ -31,10 +31,15 @@
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --wrap: 1180px;
   --head-h: 74px;
-  --f-display: var(--font-display), "Cormorant Garamond", Georgia, serif;
-  --f-label: var(--font-label), Marcellus, Georgia, serif;
-  --f-body: var(--font-body), Mulish, system-ui, sans-serif;
-  --f-dev: var(--font-hindi), "Noto Serif Devanagari", serif;
+  /* Loaded via Google Fonts <link> in layout (not next/font — Docker-safe). */
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-label: Marcellus, Georgia, serif;
+  --font-body: Mulish, system-ui, sans-serif;
+  --font-hindi: "Tiro Devanagari Hindi", "Noto Serif Devanagari", serif;
+  --f-display: var(--font-display);
+  --f-label: var(--font-label);
+  --f-body: var(--font-body);
+  --f-dev: var(--font-hindi);
 
   /* legacy aliases (editor / download) */
   --color-maroon: var(--maroon-700);

@@ -1,44 +1,9 @@
 import type { Metadata } from 'next';
-import {
-  Cormorant_Garamond,
-  Marcellus,
-  Mulish,
-  Tiro_Devanagari_Hindi,
-} from 'next/font/google';
 import { Providers } from './providers';
 import { SITE_URL } from '@/lib/seo';
 import './globals.css';
 import './nav-ui.css';
 import '@/styles/vp-templates/index.css';
-
-const display = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-const body = Mulish({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-body',
-  display: 'swap',
-});
-
-const label = Marcellus({
-  subsets: ['latin'],
-  weight: '400',
-  variable: '--font-label',
-  display: 'swap',
-});
-
-const hindi = Tiro_Devanagari_Hindi({
-  subsets: ['devanagari', 'latin'],
-  weight: '400',
-  variable: '--font-hindi',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -75,12 +40,26 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Fonts load via stylesheet link (not next/font/google).
+ * next/font/google fails intermittently in Docker when Google returns
+ * extensionless /l/font?kit= URLs (Next 15.x loader bug).
+ */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${display.variable} ${body.variable} ${label.variable} ${hindi.variable}`}
-    >
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Marcellus&family=Mulish:wght@400;500;600;700;800&family=Tiro+Devanagari+Hindi&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="font-body antialiased">
         <Providers>{children}</Providers>
       </body>
