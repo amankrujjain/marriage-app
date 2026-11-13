@@ -5624,12 +5624,124 @@ select.input{appearance:none;-webkit-appearance:none;padding-right:2em;backgroun
   border-color: rgba(104, 20, 33, 0.35);
   color: var(--maroon);
 }
+.blog-editor-mode {
+  display: inline-flex;
+  gap: 0;
+  margin-right: 4px;
+}
+.blog-editor-mode button {
+  border-radius: 0;
+}
+.blog-editor-mode button:first-child {
+  border-radius: 6px 0 0 6px;
+}
+.blog-editor-mode button:last-child {
+  border-radius: 0 6px 6px 0;
+  margin-left: -1px;
+}
+.blog-editor-table-select select {
+  border: 1px solid var(--line-2);
+  background: #fff;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font: 600 0.75rem var(--f-body);
+  color: var(--ink-2);
+  max-width: 150px;
+}
+.blog-editor-html {
+  display: block;
+  width: 100%;
+  min-height: 320px;
+  padding: 14px 16px;
+  border: 0;
+  resize: vertical;
+  outline: none;
+  font: 500 0.86rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--ink);
+  background: #fffefb;
+}
 .blog-editor-content .tiptap {
   min-height: 280px;
   padding: 14px 16px;
   outline: none;
   font: 500 1rem/1.6 var(--f-body);
   color: var(--ink);
+}
+.blog-editor-content .tiptap .tableWrapper,
+.blog-preview-html .tableWrapper,
+.blog-article-body .tableWrapper {
+  overflow-x: auto;
+  margin: 1.1em 0;
+}
+.blog-editor-content .tiptap table,
+.blog-preview-html table,
+.blog-article-body table,
+.blog-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+  margin: 0;
+}
+.blog-editor-content .tiptap th,
+.blog-editor-content .tiptap td,
+.blog-preview-html th,
+.blog-preview-html td,
+.blog-article-body th,
+.blog-article-body td,
+.blog-table th,
+.blog-table td {
+  border: 1px solid var(--line-2);
+  padding: 0.55em 0.75em;
+  text-align: left;
+  vertical-align: top;
+}
+.blog-table--plain thead th {
+  background: #f7f1ea;
+  font-weight: 700;
+}
+.blog-table--striped thead th {
+  background: #f3e8dc;
+  font-weight: 700;
+}
+.blog-table--striped tbody tr:nth-child(even) td {
+  background: #fbf7f2;
+}
+.blog-table--maroon thead th {
+  background: var(--maroon);
+  color: #fff;
+  border-color: var(--maroon-900);
+  font-weight: 700;
+}
+.blog-table--maroon tbody tr:nth-child(even) td {
+  background: #fbf4f5;
+}
+.blog-table--bordered th,
+.blog-table--bordered td {
+  border-width: 2px;
+  border-color: rgba(104, 20, 33, 0.28);
+}
+.blog-table--bordered thead th {
+  background: #fff;
+  color: var(--maroon-900);
+}
+.blog-table--compact th,
+.blog-table--compact td {
+  padding: 0.35em 0.55em;
+  font-size: 0.9em;
+}
+.blog-table--compact thead th {
+  background: #efe6db;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 .blog-editor-content .tiptap p.is-editor-empty:first-child::before {
   color: var(--ink-3);

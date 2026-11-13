@@ -32,11 +32,20 @@ const OPTIONS: sanitizeHtml.IOptions = {
   allowedAttributes: {
     a: ['href', 'title', 'rel', 'target'],
     img: ['src', 'alt', 'width', 'height', 'loading'],
-    th: ['colspan', 'rowspan'],
-    td: ['colspan', 'rowspan'],
+    table: ['class'],
+    th: ['colspan', 'rowspan', 'class'],
+    td: ['colspan', 'rowspan', 'class'],
   },
   allowedClasses: {
     code: ['language-*'],
+    table: [
+      'blog-table',
+      'blog-table--plain',
+      'blog-table--striped',
+      'blog-table--maroon',
+      'blog-table--bordered',
+      'blog-table--compact',
+    ],
   },
   allowedSchemes: ['http', 'https', 'mailto'],
   allowedSchemesByTag: {
